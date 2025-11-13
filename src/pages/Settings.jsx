@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { ArrowLeft, User, Bell, Shield, Palette, Save, Loader2 } from 'lucide-react';
+import { ArrowLeft, User, Bell, Shield, Palette, Save, Loader2, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import TeamManagement from '../components/settings/TeamManagement';
 
 export default function Settings() {
   const queryClient = useQueryClient();
@@ -130,6 +131,15 @@ export default function Settings() {
               <User className="w-4 h-4 mr-2" />
               Profile
             </TabsTrigger>
+            {user?.role === 'admin' && (
+              <TabsTrigger 
+                value="team"
+                className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-[#8B1F1F] rounded-none px-6 py-4"
+              >
+                <Users className="w-4 h-4 mr-2" />
+                Team
+              </TabsTrigger>
+            )}
             <TabsTrigger 
               value="notifications"
               className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-[#8B1F1F] rounded-none px-6 py-4"
@@ -253,6 +263,17 @@ export default function Settings() {
                   </Button>
                 </div>
               </div>
+            </TabsContent>
+
+            <TabsContent value="team" className="mt-0 space-y-6">
+              {user?.role === 'admin' ? (
+                <TeamManagement />
+              ) : (
+                <div className="text-center py-12 text-gray-400">
+                  <Shield className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p>Admin access required</p>
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="notifications" className="mt-0 space-y-6">
