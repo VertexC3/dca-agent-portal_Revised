@@ -56,24 +56,20 @@ export default function Layout({ children, currentPageName }) {
             </Link>
             
             <nav className="hidden md:flex items-center gap-2">
-              {navItems.map(item => {
-                // Don't show icons for AI Training and Automation
-                const showIcon = item.page !== 'AITraining' && item.page !== 'Automation';
-                return (
-                  <Link
-                    key={item.page}
-                    to={createPageUrl(item.page)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                      currentPageName === item.page
-                        ? 'bg-[#8B1F1F] text-white shadow-md'
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    {showIcon && <item.icon className="w-4 h-4" />}
-                    {item.name}
-                  </Link>
-                );
-              })}
+              {navItems.map(item => (
+                <Link
+                  key={item.page}
+                  to={createPageUrl(item.page)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                    currentPageName === item.page
+                      ? 'bg-[#8B1F1F] text-white shadow-md'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <item.icon className="w-4 h-4" />
+                  {item.name}
+                </Link>
+              ))}
             </nav>
 
             <div className="flex items-center gap-2">
