@@ -29,6 +29,7 @@ const statusColors = {
 export default function DailyView() {
   const urlParams = new URLSearchParams(window.location.search);
   const selectedDate = urlParams.get('date');
+  const [selectedChannel, setSelectedChannel] = React.useState('all');
 
   const { data: allCommunications = [], isLoading } = useQuery({
     queryKey: ['communications'],
@@ -36,6 +37,10 @@ export default function DailyView() {
   });
 
   const dailyCommunications = allCommunications.filter(c => c.date === selectedDate);
+  
+  const filteredCommunications = selectedChannel === 'all'
+    ? dailyCommunications
+    : dailyCommunications.filter(c => c.channel === selectedChannel);
 
   // Group by channel
   const byChannel = {
@@ -66,42 +71,64 @@ export default function DailyView() {
         <ExportShareButtons data={dailyCommunications} filename={`communications-${selectedDate}`} />
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - Now Filters */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
+        <button
+          onClick={() => setSelectedChannel('all')}
+          className={`bg-white rounded-2xl p-6 border shadow-lg transition-all hover:shadow-xl text-left ${
+            selectedChannel === 'all' 
+              ? 'border-[#8B1F1F] ring-2 ring-[#8B1F1F] ring-opacity-50' 
+              : 'border-gray-200 hover:border-[#8B1F1F]'
+          }`}
+        >
           <div className="flex items-center gap-3 mb-2">
-            <MessageSquare className="w-6 h-6 text-[#8B1F1F]" />
-            <span className="text-gray-600">Total</span>
+            <MessageSquare className={`w-6 h-6 ${selectedChannel === 'all' ? 'text-[#8B1F1F]' : 'text-gray-600'}`} />
+            <span className={`${selectedChannel === 'all' ? 'text-[#8B1F1F] font-semibold' : 'text-gray-600'}`}>Total</span>
           </div>
           <p className="text-3xl font-bold text-gray-800">{dailyCommunications.length}</p>
-        </div>
+        </button>
         
         {Object.entries(byChannel).map(([channel, comms]) => {
           const Icon = channelIcons[channel];
           return (
-            <div key={channel} className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
+            <button
+              key={channel}
+              onClick={() => setSelectedChannel(channel)}
+              className={`bg-white rounded-2xl p-6 border shadow-lg transition-all hover:shadow-xl text-left ${
+                selectedChannel === channel 
+                  ? 'border-[#8B1F1F] ring-2 ring-[#8B1F1F] ring-opacity-50' 
+                  : 'border-gray-200 hover:border-[#8B1F1F]'
+              }`}
+            >
               <div className="flex items-center gap-3 mb-2">
-                <Icon className="w-6 h-6 text-gray-600" />
-                <span className="text-gray-600 capitalize">{channel}</span>
+                <Icon className={`w-6 h-6 ${selectedChannel === channel ? 'text-[#8B1F1F]' : 'text-gray-600'}`} />
+                <span className={`capitalize ${selectedChannel === channel ? 'text-[#8B1F1F] font-semibold' : 'text-gray-600'}`}>{channel}</span>
               </div>
               <p className="text-3xl font-bold text-gray-800">{comms.length}</p>
-            </div>
+            </button>
           );
         })}
       </div>
 
       {/* Communications List */}
       <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">All Communications</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">
+            {selectedChannel === 'all' ? 'All Communications' : `${selectedChannel.charAt(0).toUpperCase() + selectedChannel.slice(1)} Communications`}
+          </h2>
+          <div className="text-sm text-gray-600">
+            Showing {filteredCommunications.length} of {dailyCommunications.length} communications
+          </div>
+        </div>
         
-        {dailyCommunications.length === 0 ? (
+        {filteredCommunications.length === 0 ? (
           <div className="text-center py-12 text-gray-400">
             <Calendar className="w-16 h-16 mx-auto mb-4 opacity-50" />
-            <p className="text-lg">No communications found for this date</p>
+            <p className="text-lg">No communications found for this filter</p>
           </div>
         ) : (
           <div className="space-y-3">
-            {dailyCommunications.map(comm => {
+            {filteredCommunications.map(comm => {
               const ChannelIcon = channelIcons[comm.channel];
               return (
                 <Link
