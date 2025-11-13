@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from './utils';
 import { base44 } from './api/base44Client';
+import { useQuery } from '@tanstack/react-query';
 import { Home, MessageSquare, BarChart3, Settings, LogOut, User, Brain, Zap } from 'lucide-react';
 import {
   DropdownMenu,
@@ -12,19 +13,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export default function Layout({ children, currentPageName }) {
-  const [user, setUser] = React.useState(null);
-
-  React.useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const currentUser = await base44.auth.me();
-        setUser(currentUser);
-      } catch (error) {
-        console.error('Error loading user:', error);
-      }
-    };
-    loadUser();
-  }, []);
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: () => base44.auth.me(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
   const navItems = [
     { name: 'Dashboard', icon: Home, page: 'Dashboard' },
