@@ -24,12 +24,13 @@ const statusColors = {
   resolved: 'bg-green-50 text-green-700 border-green-200'
 };
 
-export default function RecentCommunicationList({ communications, selectedChannel, onChannelChange }) {
+export default function RecentCommunicationList({ communications, selectedChannel, selectedStatus, onChannelChange }) {
   const channels = ['all', 'email', 'phone', 'text', 'ai_agent'];
 
-  const filteredCommunications = selectedChannel === 'all'
-    ? communications
-    : communications.filter(c => c.channel === selectedChannel);
+  const filteredCommunications = communications
+    .filter(c => selectedChannel === 'all' || c.channel === selectedChannel)
+    .filter(c => selectedStatus === 'all' || c.status === selectedStatus)
+    .slice(0, 10);
 
   return (
     <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">

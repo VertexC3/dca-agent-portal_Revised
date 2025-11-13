@@ -9,6 +9,7 @@ import { Loader2 } from 'lucide-react';
 
 export default function Dashboard() {
   const [selectedChannel, setSelectedChannel] = useState('all');
+  const [selectedStatus, setSelectedStatus] = useState('all');
 
   const { data: communications = [], isLoading } = useQuery({
     queryKey: ['communications'],
@@ -118,17 +119,28 @@ export default function Dashboard() {
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
-          { label: 'Total Communications', value: communications.length, color: 'bg-[#8B1F1F]' },
-          { label: 'Pending', value: communications.filter(c => c.status === 'pending').length, color: 'bg-yellow-500' },
-          { label: 'In Progress', value: communications.filter(c => c.status === 'in_progress').length, color: 'bg-blue-500' },
-          { label: 'Resolved', value: communications.filter(c => c.status === 'resolved').length, color: 'bg-green-500' }
+          { label: 'Total Communications', value: communications.length, color: 'bg-[#8B1F1F]', status: 'all' },
+          { label: 'Pending', value: communications.filter(c => c.status === 'pending').length, color: 'bg-yellow-500', status: 'pending' },
+          { label: 'In Progress', value: communications.filter(c => c.status === 'in_progress').length, color: 'bg-blue-500', status: 'in_progress' },
+          { label: 'Resolved', value: communications.filter(c => c.status === 'resolved').length, color: 'bg-green-500', status: 'resolved' }
         ].map(stat => (
-          <div key={stat.label} className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
+          <button
+            key={stat.label}
+            onClick={() => setSelectedStatus(stat.status)}
+            className={`bg-white rounded-2xl p-6 border-2 shadow-lg text-left transition-all hover:shadow-xl hover:scale-105 ${
+              selectedStatus === stat.status 
+                ? 'border-[#8B1F1F] ring-2 ring-[#8B1F1F]/20' 
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+          >
             <div className={`w-12 h-12 rounded-xl ${stat.color} flex items-center justify-center mb-4`}>
               <span className="text-2xl font-bold text-white">{stat.value}</span>
             </div>
             <p className="text-gray-600 text-sm font-medium">{stat.label}</p>
-          </div>
+            {selectedStatus === stat.status && (
+              <div className="mt-2 text-xs text-[#8B1F1F] font-semibold">● Active Filter</div>
+            )}
+          </button>
         ))}
       </div>
 
@@ -140,8 +152,9 @@ export default function Dashboard() {
         {/* Recent Communications - Takes 2 columns */}
         <div className="lg:col-span-2">
           <RecentCommunicationList 
-            communications={communications.slice(0, 10)}
+            communications={communications}
             selectedChannel={selectedChannel}
+            selectedStatus={selectedStatus}
             onChannelChange={setSelectedChannel}
           />
         </div>
