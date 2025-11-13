@@ -14,7 +14,8 @@ const channelIcons = {
 const channelColors = {
   phone: 'bg-blue-50 text-blue-700 border-blue-200',
   email: 'bg-[#8B1F1F]/10 text-[#8B1F1F] border-[#8B1F1F]/30',
-  text: 'bg-green-50 text-green-700 border-green-200'
+  text: 'bg-green-50 text-green-700 border-green-200',
+  ai_agent: 'bg-purple-50 text-purple-700 border-purple-200'
 };
 
 const statusColors = {
@@ -24,7 +25,7 @@ const statusColors = {
 };
 
 export default function RecentCommunicationList({ communications, selectedChannel, onChannelChange }) {
-  const channels = ['all', 'email', 'phone', 'text'];
+  const channels = ['all', 'email', 'phone', 'text', 'ai_agent'];
 
   const filteredCommunications = selectedChannel === 'all'
     ? communications
@@ -49,7 +50,7 @@ export default function RecentCommunicationList({ communications, selectedChanne
                 }`}
               >
                 {Icon && <Icon className="w-4 h-4" />}
-                {channel.charAt(0).toUpperCase() + channel.slice(1)}
+                {channel === 'ai_agent' ? 'AI Agent' : channel.charAt(0).toUpperCase() + channel.slice(1)}
               </button>
             );
           })}

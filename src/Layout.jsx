@@ -1,14 +1,40 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from './utils';
-import { Home, MessageSquare, BarChart3, Settings } from 'lucide-react';
+import { base44 } from './api/base44Client';
+import { Home, MessageSquare, BarChart3, Settings, LogOut, User } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 export default function Layout({ children, currentPageName }) {
+  const [user, setUser] = React.useState(null);
+
+  React.useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const currentUser = await base44.auth.me();
+        setUser(currentUser);
+      } catch (error) {
+        console.error('Error loading user:', error);
+      }
+    };
+    loadUser();
+  }, []);
+
   const navItems = [
     { name: 'Dashboard', icon: Home, page: 'Dashboard' },
-    { name: 'Communications', icon: MessageSquare, page: 'Dashboard' },
-    { name: 'Analytics', icon: BarChart3, page: 'Dashboard' },
+    { name: 'Communications', icon: MessageSquare, page: 'Communications' },
+    { name: 'Analytics', icon: BarChart3, page: 'Analytics' },
   ];
+
+  const handleLogout = () => {
+    base44.auth.logout();
+  };
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gray-50">
@@ -45,9 +71,32 @@ export default function Layout({ children, currentPageName }) {
             </nav>
 
             <div className="flex items-center gap-2">
-              <button className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 transition-all">
-                <Settings className="w-5 h-5" />
-              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-all">
+                    <div className="w-10 h-10 rounded-full bg-[#8B1F1F] flex items-center justify-center text-white font-semibold border-2 border-gray-200">
+                      {user?.full_name?.charAt(0)?.toUpperCase() || 'U'}
+                    </div>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 bg-white border-gray-200">
+                  <div className="px-3 py-2 border-b border-gray-100">
+                    <p className="font-semibold text-gray-800">{user?.full_name || 'User'}</p>
+                    <p className="text-xs text-gray-500 truncate">{user?.email || ''}</p>
+                  </div>
+                  <DropdownMenuItem asChild>
+                    <Link to={createPageUrl('Settings')} className="flex items-center gap-2 cursor-pointer text-gray-700">
+                      <Settings className="w-4 h-4" />
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 cursor-pointer text-red-600">
+                    <LogOut className="w-4 h-4" />
+                    Log Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>

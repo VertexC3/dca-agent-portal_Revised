@@ -54,6 +54,9 @@ export default function Dashboard() {
         ))}
       </div>
 
+      {/* Chart - Full Width at Top */}
+      <CommunicationChart communications={communications} />
+
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Communications - Takes 2 columns */}
@@ -70,9 +73,6 @@ export default function Dashboard() {
           <InsightsCard communications={communications} />
         </div>
       </div>
-
-      {/* Chart - Full Width */}
-      <CommunicationChart communications={communications} />
     </div>
   );
 }
