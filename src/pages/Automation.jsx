@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Zap } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import WorkflowBuilder from '../components/automation/WorkflowBuilder';
 import AutomationQueue from '../components/automation/AutomationQueue';
@@ -11,14 +10,9 @@ export default function Automation() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-500">
-          <Zap className="w-8 h-8 text-white" />
-        </div>
-        <div>
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Automation Hub</h1>
-          <p className="text-gray-600">Create and manage automated workflows and actions</p>
-        </div>
+      <div>
+        <h1 className="text-4xl font-bold text-gray-800 mb-2">Automation Hub</h1>
+        <p className="text-gray-600">Create and manage automated workflows and actions</p>
       </div>
 
       {/* Tabs */}

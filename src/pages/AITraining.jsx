@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Brain } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import KnowledgeBaseManager from '../components/training/KnowledgeBaseManager';
 import FeedbackManager from '../components/training/FeedbackManager';
@@ -11,14 +10,9 @@ export default function AITraining() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500">
-          <Brain className="w-8 h-8 text-white" />
-        </div>
-        <div>
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">AI Training Module</h1>
-          <p className="text-gray-600">Improve AI accuracy through knowledge base management and feedback</p>
-        </div>
+      <div>
+        <h1 className="text-4xl font-bold text-gray-800 mb-2">AI Training Module</h1>
+        <p className="text-gray-600">Improve AI accuracy through knowledge base management and feedback</p>
       </div>
 
       {/* Tabs */}
