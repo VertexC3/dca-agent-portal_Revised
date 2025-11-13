@@ -38,7 +38,48 @@ export default function Communications() {
 
   const { data: communications = [], isLoading } = useQuery({
     queryKey: ['communications'],
-    queryFn: () => base44.entities.PatientCommunication.list('-timestamp', 1000)
+    queryFn: async () => {
+      const comms = await base44.entities.PatientCommunication.list('-timestamp', 1000);
+      
+      const getDummyDOB = (name) => {
+        const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const year = 1950 + (hash % 50);
+        const month = (hash % 12) + 1;
+        const day = (hash % 28) + 1;
+        return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      };
+      const getDummyAddress = (name) => {
+        const addresses = ['123 Main St, Springfield, IL 62701', '456 Oak Ave, Portland, OR 97201', '789 Pine Rd, Austin, TX 78701'];
+        return addresses[name.length % addresses.length];
+      };
+      const getDummyAllergies = (name) => {
+        const allergies = ['Penicillin, Peanuts', 'Shellfish, Latex', 'Sulfa drugs, Bee stings'];
+        return allergies[name.length % allergies.length];
+      };
+      const getDummyMedications = (name) => {
+        const meds = ['Lisinopril 10mg, Metformin 500mg', 'Levothyroxine 50mcg, Omeprazole 20mg', 'Amlodipine 5mg, Simvastatin 40mg'];
+        return meds[name.length % meds.length];
+      };
+      const getDummyConditions = (name) => {
+        const conditions = ['Hypertension, Type 2 Diabetes', 'Hypothyroidism, GERD', 'Hypertension, Anxiety'];
+        return conditions[name.length % conditions.length];
+      };
+      const getDummyInsurance = (name) => {
+        const insurances = ['Blue Cross Blue Shield PPO', 'United Healthcare HMO', 'Aetna PPO'];
+        return insurances[name.length % insurances.length];
+      };
+      
+      return comms.map(comm => ({
+        ...comm,
+        patient_date_of_birth: comm.patient_date_of_birth || getDummyDOB(comm.patient_name),
+        patient_address: comm.patient_address || getDummyAddress(comm.patient_name),
+        patient_allergies: comm.patient_allergies || getDummyAllergies(comm.patient_name),
+        current_medications: comm.current_medications || getDummyMedications(comm.patient_name),
+        known_conditions: comm.known_conditions || getDummyConditions(comm.patient_name),
+        insurance_provider: comm.insurance_provider || getDummyInsurance(comm.patient_name),
+        preferred_contact_method: comm.preferred_contact_method || 'email'
+      }));
+    }
   });
 
   const filteredCommunications = communications.filter(comm => {
