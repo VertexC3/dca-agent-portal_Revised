@@ -56,17 +56,17 @@ export default function ExportShareButtons({ data, filename = 'export' }) {
     <div className="flex gap-2">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button className="backdrop-blur-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white">
+          <Button className="bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700">
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="backdrop-blur-xl bg-white/20 border-white/30">
-          <DropdownMenuItem onClick={handleExportCSV} className="text-white cursor-pointer">
+        <DropdownMenuContent className="bg-white border-gray-200">
+          <DropdownMenuItem onClick={handleExportCSV} className="text-gray-700 cursor-pointer">
             <FileText className="w-4 h-4 mr-2" />
             Export as CSV
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleExportJSON} className="text-white cursor-pointer">
+          <DropdownMenuItem onClick={handleExportJSON} className="text-gray-700 cursor-pointer">
             <FileText className="w-4 h-4 mr-2" />
             Export as JSON
           </DropdownMenuItem>
@@ -75,7 +75,7 @@ export default function ExportShareButtons({ data, filename = 'export' }) {
 
       <Button 
         onClick={handleShare}
-        className="backdrop-blur-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white"
+        className="bg-[#8B1F1F] hover:bg-[#721919] text-white"
       >
         <Share2 className="w-4 h-4 mr-2" />
         Share

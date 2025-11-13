@@ -22,9 +22,9 @@ const channelIcons = {
 };
 
 const statusColors = {
-  pending: 'bg-yellow-500/20 text-yellow-200 border-yellow-300/30',
-  in_progress: 'bg-blue-500/20 text-blue-200 border-blue-300/30',
-  resolved: 'bg-green-500/20 text-green-200 border-green-300/30'
+  pending: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+  in_progress: 'bg-blue-50 text-blue-700 border-blue-200',
+  resolved: 'bg-green-50 text-green-700 border-green-200'
 };
 
 export default function CommunicationDetail() {
@@ -113,9 +113,9 @@ Generate a professional, empathetic, and helpful response to this patient. Be co
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="backdrop-blur-xl bg-white/10 rounded-2xl p-8 border border-white/20">
-          <Loader2 className="w-12 h-12 text-white animate-spin mx-auto mb-4" />
-          <p className="text-white text-center">Loading communication...</p>
+        <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-lg">
+          <Loader2 className="w-12 h-12 text-[#8B1F1F] animate-spin mx-auto mb-4" />
+          <p className="text-gray-700 text-center">Loading communication...</p>
         </div>
       </div>
     );
@@ -124,8 +124,8 @@ Generate a professional, empathetic, and helpful response to this patient. Be co
   if (!communication) {
     return (
       <div className="text-center py-12">
-        <AlertCircle className="w-16 h-16 text-white/50 mx-auto mb-4" />
-        <p className="text-white text-xl">Communication not found</p>
+        <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+        <p className="text-gray-700 text-xl">Communication not found</p>
       </div>
     );
   }
@@ -139,13 +139,13 @@ Generate a professional, empathetic, and helpful response to this patient. Be co
         <div className="flex items-center gap-4">
           <Link 
             to={createPageUrl('Dashboard')}
-            className="p-2 rounded-lg backdrop-blur-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white transition-all"
+            className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 transition-all"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">Communication Details</h1>
-            <p className="text-white/70">Review and respond to patient communication</p>
+            <h1 className="text-4xl font-bold text-gray-800 mb-2">Communication Details</h1>
+            <p className="text-gray-600">Review and respond to patient communication</p>
           </div>
         </div>
         <ExportShareButtons data={[communication]} filename={`communication-${communication.id}`} />
@@ -155,14 +155,14 @@ Generate a professional, empathetic, and helpful response to this patient. Be co
         {/* Main Content - Left Side (2 columns) */}
         <div className="lg:col-span-2 space-y-6">
           {/* Patient Info & Message */}
-          <div className="backdrop-blur-xl bg-white/10 rounded-2xl p-6 border border-white/20 shadow-2xl">
+          <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
             <div className="flex items-start gap-4 mb-6">
-              <div className="p-4 rounded-xl bg-gradient-to-br from-purple-500/30 to-pink-500/30 border border-white/30 backdrop-blur-sm">
-                <User className="w-8 h-8 text-white" />
+              <div className="p-4 rounded-xl bg-[#8B1F1F]/10 border border-[#8B1F1F]/30">
+                <User className="w-8 h-8 text-[#8B1F1F]" />
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-white mb-1">{communication.patient_name}</h2>
-                <div className="flex flex-wrap gap-3 text-white/70 text-sm">
+                <h2 className="text-2xl font-bold text-gray-800 mb-1">{communication.patient_name}</h2>
+                <div className="flex flex-wrap gap-3 text-gray-600 text-sm">
                   {communication.patient_email && (
                     <span className="flex items-center gap-1">
                       <Mail className="w-4 h-4" />
@@ -178,64 +178,64 @@ Generate a professional, empathetic, and helpful response to this patient. Be co
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Badge className={`${statusColors[communication.status]} border backdrop-blur-sm text-base px-3 py-1`}>
+                <Badge className={`${statusColors[communication.status]} border text-base px-3 py-1`}>
                   {communication.status.replace(/_/g, ' ')}
                 </Badge>
               </div>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div className="backdrop-blur-lg bg-white/10 rounded-xl p-4 border border-white/20">
-                <div className="flex items-center gap-2 text-white/70 mb-1 text-sm">
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                <div className="flex items-center gap-2 text-gray-600 mb-1 text-sm">
                   <ChannelIcon className="w-4 h-4" />
                   Channel
                 </div>
-                <p className="text-white font-semibold capitalize">{communication.channel}</p>
+                <p className="text-gray-800 font-semibold capitalize">{communication.channel}</p>
               </div>
-              <div className="backdrop-blur-lg bg-white/10 rounded-xl p-4 border border-white/20">
-                <div className="flex items-center gap-2 text-white/70 mb-1 text-sm">
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                <div className="flex items-center gap-2 text-gray-600 mb-1 text-sm">
                   <FileText className="w-4 h-4" />
                   Request Type
                 </div>
-                <p className="text-white font-semibold text-sm">
+                <p className="text-gray-800 font-semibold text-sm">
                   {communication.request_type?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                 </p>
               </div>
-              <div className="backdrop-blur-lg bg-white/10 rounded-xl p-4 border border-white/20">
-                <div className="flex items-center gap-2 text-white/70 mb-1 text-sm">
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                <div className="flex items-center gap-2 text-gray-600 mb-1 text-sm">
                   <Calendar className="w-4 h-4" />
                   Date
                 </div>
-                <p className="text-white font-semibold text-sm">
+                <p className="text-gray-800 font-semibold text-sm">
                   {format(new Date(communication.date), 'MMM d, yyyy')}
                 </p>
               </div>
-              <div className="backdrop-blur-lg bg-white/10 rounded-xl p-4 border border-white/20">
-                <div className="flex items-center gap-2 text-white/70 mb-1 text-sm">
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                <div className="flex items-center gap-2 text-gray-600 mb-1 text-sm">
                   <Clock className="w-4 h-4" />
                   Time
                 </div>
-                <p className="text-white font-semibold text-sm">
+                <p className="text-gray-800 font-semibold text-sm">
                   {format(new Date(communication.timestamp || communication.date), 'h:mm a')}
                 </p>
               </div>
             </div>
 
             {/* Patient Message/Transcript */}
-            <div className="backdrop-blur-lg bg-white/10 rounded-xl p-6 border border-white/20">
-              <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
                 <MessageSquare className="w-5 h-5" />
                 {communication.channel === 'phone' ? 'Transcript' : 'Message'}
               </h3>
-              <p className="text-white/90 leading-relaxed whitespace-pre-wrap">
+              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                 {communication.transcript || communication.message_content}
               </p>
             </div>
 
             {/* Voice Recording */}
             {communication.channel === 'phone' && communication.voice_recording_url && (
-              <div className="backdrop-blur-lg bg-white/10 rounded-xl p-6 border border-white/20">
-                <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 mt-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
                   <Play className="w-5 h-5" />
                   Voice Recording
                 </h3>
@@ -248,16 +248,16 @@ Generate a professional, empathetic, and helpful response to this patient. Be co
           </div>
 
           {/* Response Section */}
-          <div className="backdrop-blur-xl bg-white/10 rounded-2xl p-6 border border-white/20 shadow-2xl">
+          <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-white flex items-center gap-2">
+              <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                 <Send className="w-6 h-6" />
                 Send Response
               </h3>
               <Button
                 onClick={handleGenerateResponse}
                 disabled={isGenerating}
-                className="backdrop-blur-xl bg-gradient-to-r from-purple-500/30 to-pink-500/30 hover:from-purple-500/40 hover:to-pink-500/40 border border-white/30 text-white"
+                className="bg-[#8B1F1F] hover:bg-[#721919] text-white"
               >
                 {isGenerating ? (
                   <>
@@ -277,12 +277,12 @@ Generate a professional, empathetic, and helpful response to this patient. Be co
               value={responseText}
               onChange={(e) => setResponseText(e.target.value)}
               placeholder="Type your response here or generate one using AI..."
-              className="min-h-[200px] backdrop-blur-lg bg-white/10 border-white/30 text-white placeholder:text-white/50 mb-4"
+              className="min-h-[200px] bg-gray-50 border-gray-200 text-gray-800 placeholder:text-gray-400 mb-4"
             />
 
             <div className="flex items-center gap-3">
               <Select value={newStatus || communication.status} onValueChange={handleStatusChange}>
-                <SelectTrigger className="w-48 backdrop-blur-lg bg-white/10 border-white/30 text-white">
+                <SelectTrigger className="w-48 bg-gray-50 border-gray-200 text-gray-800">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -295,7 +295,7 @@ Generate a professional, empathetic, and helpful response to this patient. Be co
               <Button
                 onClick={handleSendResponse}
                 disabled={!responseText.trim() || updateMutation.isPending}
-                className="flex-1 backdrop-blur-xl bg-gradient-to-r from-green-500/30 to-emerald-500/30 hover:from-green-500/40 hover:to-emerald-500/40 border border-white/30 text-white"
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
               >
                 {updateMutation.isPending ? (
                   <>
@@ -317,19 +317,19 @@ Generate a professional, empathetic, and helpful response to this patient. Be co
         <div className="space-y-6">
           {/* AI Recommended Response */}
           {communication.recommended_response && (
-            <div className="backdrop-blur-xl bg-white/10 rounded-2xl p-6 border border-white/20 shadow-2xl">
-              <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-yellow-300" />
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
+              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-[#8B1F1F]" />
                 AI Recommended Response
               </h3>
-              <div className="backdrop-blur-lg bg-white/10 rounded-xl p-4 border border-white/20">
-                <p className="text-white/90 leading-relaxed whitespace-pre-wrap">
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                   {communication.recommended_response}
                 </p>
               </div>
               <Button
                 onClick={() => setResponseText(communication.recommended_response)}
-                className="w-full mt-3 backdrop-blur-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white"
+                className="w-full mt-3 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700"
               >
                 Use This Response
               </Button>
@@ -337,19 +337,19 @@ Generate a professional, empathetic, and helpful response to this patient. Be co
           )}
 
           {/* Activity History */}
-          <div className="backdrop-blur-xl bg-white/10 rounded-2xl p-6 border border-white/20 shadow-2xl">
-            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+          <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
               <Clock className="w-5 h-5" />
               Activity History
             </h3>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full bg-blue-500/30 border border-white/30 flex items-center justify-center flex-shrink-0">
-                  <MessageSquare className="w-4 h-4 text-white" />
+                <div className="w-8 h-8 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center flex-shrink-0">
+                  <MessageSquare className="w-4 h-4 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-white font-medium">Message received</p>
-                  <p className="text-white/60 text-sm">
+                  <p className="text-gray-800 font-medium">Message received</p>
+                  <p className="text-gray-500 text-sm">
                     {format(new Date(communication.timestamp || communication.date), 'MMM d, yyyy h:mm a')}
                   </p>
                 </div>
@@ -357,31 +357,31 @@ Generate a professional, empathetic, and helpful response to this patient. Be co
 
               {communication.recommended_response && (
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-purple-500/30 border border-white/30 flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 rounded-full bg-[#8B1F1F]/10 border border-[#8B1F1F]/30 flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="w-4 h-4 text-[#8B1F1F]" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">AI response generated</p>
-                    <p className="text-white/60 text-sm">Ready to send</p>
+                    <p className="text-gray-800 font-medium">AI response generated</p>
+                    <p className="text-gray-500 text-sm">Ready to send</p>
                   </div>
                 </div>
               )}
 
               {communication.response_sent && (
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-500/30 border border-white/30 flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 rounded-full bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
                   </div>
                   <div>
-                    <p className="text-white font-medium">Response sent</p>
-                    <p className="text-white/60 text-sm">
+                    <p className="text-gray-800 font-medium">Response sent</p>
+                    <p className="text-gray-500 text-sm">
                       {communication.response_timestamp 
                         ? format(new Date(communication.response_timestamp), 'MMM d, yyyy h:mm a')
                         : 'Recently'
                       }
                     </p>
                     {communication.handled_by && (
-                      <p className="text-white/60 text-xs mt-1">By: {communication.handled_by}</p>
+                      <p className="text-gray-500 text-xs mt-1">By: {communication.handled_by}</p>
                     )}
                   </div>
                 </div>

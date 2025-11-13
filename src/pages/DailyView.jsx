@@ -15,15 +15,15 @@ const channelIcons = {
 };
 
 const channelColors = {
-  phone: 'bg-blue-500/20 text-blue-200 border-blue-300/30',
-  email: 'bg-purple-500/20 text-purple-200 border-purple-300/30',
-  text: 'bg-green-500/20 text-green-200 border-green-300/30'
+  phone: 'bg-blue-50 text-blue-700 border-blue-200',
+  email: 'bg-[#8B1F1F]/10 text-[#8B1F1F] border-[#8B1F1F]/30',
+  text: 'bg-green-50 text-green-700 border-green-200'
 };
 
 const statusColors = {
-  pending: 'bg-yellow-500/20 text-yellow-200 border-yellow-300/30',
-  in_progress: 'bg-blue-500/20 text-blue-200 border-blue-300/30',
-  resolved: 'bg-green-500/20 text-green-200 border-green-300/30'
+  pending: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+  in_progress: 'bg-blue-50 text-blue-700 border-blue-200',
+  resolved: 'bg-green-50 text-green-700 border-green-200'
 };
 
 export default function DailyView() {
@@ -51,16 +51,16 @@ export default function DailyView() {
         <div className="flex items-center gap-4">
           <Link 
             to={createPageUrl('Dashboard')}
-            className="p-2 rounded-lg backdrop-blur-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white transition-all"
+            className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 transition-all"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
+            <h1 className="text-4xl font-bold text-gray-800 mb-2 flex items-center gap-3">
               <Calendar className="w-8 h-8" />
               {selectedDate ? format(new Date(selectedDate), 'MMMM d, yyyy') : 'Daily View'}
             </h1>
-            <p className="text-white/70">{dailyCommunications.length} communications on this day</p>
+            <p className="text-gray-600">{dailyCommunications.length} communications on this day</p>
           </div>
         </div>
         <ExportShareButtons data={dailyCommunications} filename={`communications-${selectedDate}`} />
@@ -68,34 +68,34 @@ export default function DailyView() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="backdrop-blur-xl bg-white/10 rounded-2xl p-6 border border-white/20 shadow-2xl">
+        <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
           <div className="flex items-center gap-3 mb-2">
-            <MessageSquare className="w-6 h-6 text-white" />
-            <span className="text-white/70">Total</span>
+            <MessageSquare className="w-6 h-6 text-[#8B1F1F]" />
+            <span className="text-gray-600">Total</span>
           </div>
-          <p className="text-3xl font-bold text-white">{dailyCommunications.length}</p>
+          <p className="text-3xl font-bold text-gray-800">{dailyCommunications.length}</p>
         </div>
         
         {Object.entries(byChannel).map(([channel, comms]) => {
           const Icon = channelIcons[channel];
           return (
-            <div key={channel} className="backdrop-blur-xl bg-white/10 rounded-2xl p-6 border border-white/20 shadow-2xl">
+            <div key={channel} className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
               <div className="flex items-center gap-3 mb-2">
-                <Icon className="w-6 h-6 text-white" />
-                <span className="text-white/70 capitalize">{channel}</span>
+                <Icon className="w-6 h-6 text-gray-600" />
+                <span className="text-gray-600 capitalize">{channel}</span>
               </div>
-              <p className="text-3xl font-bold text-white">{comms.length}</p>
+              <p className="text-3xl font-bold text-gray-800">{comms.length}</p>
             </div>
           );
         })}
       </div>
 
       {/* Communications List */}
-      <div className="backdrop-blur-xl bg-white/10 rounded-2xl p-6 border border-white/20 shadow-2xl">
-        <h2 className="text-2xl font-bold text-white mb-6">All Communications</h2>
+      <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">All Communications</h2>
         
         {dailyCommunications.length === 0 ? (
-          <div className="text-center py-12 text-white/60">
+          <div className="text-center py-12 text-gray-400">
             <Calendar className="w-16 h-16 mx-auto mb-4 opacity-50" />
             <p className="text-lg">No communications found for this date</p>
           </div>
@@ -109,37 +109,37 @@ export default function DailyView() {
                   to={createPageUrl(`CommunicationDetail?id=${comm.id}`)}
                   className="block group"
                 >
-                  <div className="backdrop-blur-lg bg-white/10 hover:bg-white/20 rounded-xl p-5 border border-white/20 hover:border-white/40 transition-all hover:shadow-xl hover:scale-[1.01] cursor-pointer">
+                  <div className="bg-gray-50 hover:bg-gray-100 rounded-xl p-5 border border-gray-200 hover:border-[#8B1F1F] transition-all hover:shadow-md cursor-pointer">
                     <div className="flex items-start gap-4">
-                      <div className={`p-3 rounded-xl ${channelColors[comm.channel]} border backdrop-blur-sm`}>
+                      <div className={`p-3 rounded-xl ${channelColors[comm.channel]} border`}>
                         <ChannelIcon className="w-6 h-6" />
                       </div>
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between mb-3">
                           <div>
-                            <h3 className="font-semibold text-white text-lg flex items-center gap-2">
+                            <h3 className="font-semibold text-gray-800 text-lg flex items-center gap-2">
                               <User className="w-5 h-5" />
                               {comm.patient_name}
                             </h3>
-                            <p className="text-sm text-white/70 mt-1">
+                            <p className="text-sm text-gray-600 mt-1">
                               {comm.request_type?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'General Inquiry'}
                             </p>
                           </div>
                           
                           <div className="flex items-center gap-2">
-                            <Badge className={`${statusColors[comm.status]} border backdrop-blur-sm`}>
+                            <Badge className={`${statusColors[comm.status]} border`}>
                               {comm.status.replace(/_/g, ' ')}
                             </Badge>
-                            <ChevronRight className="w-5 h-5 text-white/50 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-[#8B1F1F] group-hover:translate-x-1 transition-all" />
                           </div>
                         </div>
                         
-                        <p className="text-white/80 mb-3 line-clamp-2">
+                        <p className="text-gray-700 mb-3 line-clamp-2">
                           {comm.message_content}
                         </p>
                         
-                        <div className="flex items-center gap-4 text-sm text-white/60">
+                        <div className="flex items-center gap-4 text-sm text-gray-500">
                           <span className="flex items-center gap-1">
                             <Clock className="w-4 h-4" />
                             {format(new Date(comm.timestamp || comm.date), 'h:mm a')}
