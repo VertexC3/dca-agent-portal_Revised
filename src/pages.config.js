@@ -5,6 +5,7 @@ import Settings from './pages/Settings';
 import Communications from './pages/Communications';
 import Analytics from './pages/Analytics';
 import AITraining from './pages/AITraining';
+import Automation from './pages/Automation';
 import Layout from './Layout.jsx';
 
 
@@ -16,6 +17,7 @@ export const PAGES = {
     "Communications": Communications,
     "Analytics": Analytics,
     "AITraining": AITraining,
+    "Automation": Automation,
 }
 
 export const pagesConfig = {
