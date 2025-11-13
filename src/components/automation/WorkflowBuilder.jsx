@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Zap, Plus, Edit, Trash2, Play, Pause, AlertCircle } from 'lucide-react';
+import WorkflowTemplates from './WorkflowTemplates';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -329,6 +330,11 @@ export default function WorkflowBuilder() {
             </form>
           </DialogContent>
         </Dialog>
+      </div>
+
+      {/* Quick Start Templates */}
+      <div className="mb-6">
+        <WorkflowTemplates onTemplateApplied={() => queryClient.invalidateQueries(['workflowRules'])} />
       </div>
 
       {/* Stats */}
