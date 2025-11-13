@@ -52,10 +52,88 @@ export default function CommunicationDetail() {
     queryKey: ['communication', commId],
     queryFn: async () => {
       const allComms = await base44.entities.PatientCommunication.list();
-      return allComms.find(c => c.id === commId);
+      const comm = allComms.find(c => c.id === commId);
+      
+      if (!comm) return null;
+      
+      // Add dummy patient data if not present
+      return {
+        ...comm,
+        patient_date_of_birth: comm.patient_date_of_birth || getDummyDOB(comm.patient_name),
+        patient_address: comm.patient_address || getDummyAddress(comm.patient_name),
+        patient_allergies: comm.patient_allergies || getDummyAllergies(comm.patient_name),
+        current_medications: comm.current_medications || getDummyMedications(comm.patient_name),
+        known_conditions: comm.known_conditions || getDummyConditions(comm.patient_name),
+        insurance_provider: comm.insurance_provider || getDummyInsurance(comm.patient_name),
+        preferred_contact_method: comm.preferred_contact_method || 'email'
+      };
     },
     enabled: !!commId
   });
+
+  // Dummy data generators
+  const getDummyDOB = (name) => {
+    const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const year = 1950 + (hash % 50);
+    const month = (hash % 12) + 1;
+    const day = (hash % 28) + 1;
+    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  };
+
+  const getDummyAddress = (name) => {
+    const addresses = [
+      '123 Main St, Springfield, IL 62701',
+      '456 Oak Ave, Portland, OR 97201',
+      '789 Pine Rd, Austin, TX 78701',
+      '321 Elm St, Boston, MA 02101',
+      '654 Maple Dr, Seattle, WA 98101'
+    ];
+    return addresses[name.length % addresses.length];
+  };
+
+  const getDummyAllergies = (name) => {
+    const allergies = [
+      'Penicillin, Peanuts',
+      'Shellfish, Latex',
+      'Sulfa drugs, Bee stings',
+      'Aspirin, Tree nuts',
+      'Codeine, Dairy'
+    ];
+    return allergies[name.length % allergies.length];
+  };
+
+  const getDummyMedications = (name) => {
+    const meds = [
+      'Lisinopril 10mg, Metformin 500mg, Atorvastatin 20mg',
+      'Levothyroxine 50mcg, Omeprazole 20mg',
+      'Amlodipine 5mg, Simvastatin 40mg, Aspirin 81mg',
+      'Losartan 50mg, Metoprolol 25mg',
+      'Gabapentin 300mg, Sertraline 50mg, Vitamin D3'
+    ];
+    return meds[name.length % meds.length];
+  };
+
+  const getDummyConditions = (name) => {
+    const conditions = [
+      'Hypertension, Type 2 Diabetes, High Cholesterol',
+      'Hypothyroidism, GERD',
+      'Hypertension, Hyperlipidemia',
+      'Hypertension, Anxiety',
+      'Chronic Pain, Depression'
+    ];
+    return conditions[name.length % conditions.length];
+  };
+
+  const getDummyInsurance = (name) => {
+    const insurances = [
+      'Blue Cross Blue Shield PPO',
+      'United Healthcare HMO',
+      'Aetna PPO',
+      'Cigna POS',
+      'Medicare Part D'
+    ];
+    return insurances[name.length % insurances.length];
+  };
 
   const updateMutation = useMutation({
     mutationFn: (data) => base44.entities.PatientCommunication.update(commId, data),
