@@ -7,11 +7,13 @@ import { format } from 'date-fns';
 import { 
   ArrowLeft, Phone, Mail, MessageSquare, User, Clock, 
   Calendar, Sparkles, Send, Loader2, Play, FileText,
-  CheckCircle, AlertCircle
+  CheckCircle, AlertCircle, ThumbsUp, ThumbsDown, Edit3
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ExportShareButtons from '../components/communication/ExportShareButtons';
 
@@ -35,6 +37,14 @@ export default function CommunicationDetail() {
   const [responseText, setResponseText] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [newStatus, setNewStatus] = useState('');
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [feedbackData, setFeedbackData] = useState({
+    feedback_type: 'positive',
+    feedback_notes: '',
+    corrected_response: '',
+    conversation_quality: 5,
+    improvement_area: 'accuracy'
+  });
 
   const { data: communication, isLoading } = useQuery({
     queryKey: ['communication', commId],
@@ -108,6 +118,26 @@ Generate a professional, empathetic, and helpful response to this patient. Be co
   const handleStatusChange = async (status) => {
     setNewStatus(status);
     await updateMutation.mutateAsync({ status });
+  };
+
+  const handleSubmitFeedback = async () => {
+    if (!communication.recommended_response) return;
+
+    await base44.entities.AITrainingFeedback.create({
+      communication_id: communication.id,
+      ai_response: communication.recommended_response,
+      ...feedbackData
+    });
+
+    alert('Feedback submitted successfully! This will help improve the AI.');
+    setShowFeedbackForm(false);
+    setFeedbackData({
+      feedback_type: 'positive',
+      feedback_notes: '',
+      corrected_response: '',
+      conversation_quality: 5,
+      improvement_area: 'accuracy'
+    });
   };
 
   if (isLoading) {
@@ -322,17 +352,136 @@ Generate a professional, empathetic, and helpful response to this patient. Be co
                 <Sparkles className="w-5 h-5 text-[#8B1F1F]" />
                 AI Recommended Response
               </h3>
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 mb-3">
                 <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                   {communication.recommended_response}
                 </p>
               </div>
-              <Button
-                onClick={() => setResponseText(communication.recommended_response)}
-                className="w-full mt-3 bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700"
-              >
-                Use This Response
-              </Button>
+              
+              <div className="space-y-2">
+                <Button
+                  onClick={() => setResponseText(communication.recommended_response)}
+                  className="w-full bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700"
+                >
+                  Use This Response
+                </Button>
+
+                {!showFeedbackForm ? (
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => {
+                        setFeedbackData({ ...feedbackData, feedback_type: 'positive' });
+                        setShowFeedbackForm(true);
+                      }}
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                    >
+                      <ThumbsUp className="w-4 h-4 mr-1" />
+                      Good
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setFeedbackData({ ...feedbackData, feedback_type: 'negative' });
+                        setShowFeedbackForm(true);
+                      }}
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                    >
+                      <ThumbsDown className="w-4 h-4 mr-1" />
+                      Needs Work
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setFeedbackData({ ...feedbackData, feedback_type: 'correction' });
+                        setShowFeedbackForm(true);
+                      }}
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                    >
+                      <Edit3 className="w-4 h-4 mr-1" />
+                      Correct
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="bg-purple-50 rounded-xl p-4 border border-purple-200 space-y-3">
+                    <h4 className="text-sm font-semibold text-gray-800">Provide AI Training Feedback</h4>
+                    
+                    <div>
+                      <Label className="text-xs">Quality Score (1-5)</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="5"
+                        value={feedbackData.conversation_quality}
+                        onChange={(e) => setFeedbackData({ ...feedbackData, conversation_quality: parseInt(e.target.value) })}
+                        className="mt-1"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-xs">Improvement Area</Label>
+                      <Select 
+                        value={feedbackData.improvement_area} 
+                        onValueChange={(value) => setFeedbackData({ ...feedbackData, improvement_area: value })}
+                      >
+                        <SelectTrigger className="mt-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="accuracy">Accuracy</SelectItem>
+                          <SelectItem value="tone">Tone</SelectItem>
+                          <SelectItem value="completeness">Completeness</SelectItem>
+                          <SelectItem value="empathy">Empathy</SelectItem>
+                          <SelectItem value="policy_compliance">Policy Compliance</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label className="text-xs">Feedback Notes</Label>
+                      <Textarea
+                        value={feedbackData.feedback_notes}
+                        onChange={(e) => setFeedbackData({ ...feedbackData, feedback_notes: e.target.value })}
+                        placeholder="What could be improved?"
+                        className="mt-1 min-h-[60px]"
+                      />
+                    </div>
+
+                    {feedbackData.feedback_type === 'correction' && (
+                      <div>
+                        <Label className="text-xs">Corrected Response</Label>
+                        <Textarea
+                          value={feedbackData.corrected_response}
+                          onChange={(e) => setFeedbackData({ ...feedbackData, corrected_response: e.target.value })}
+                          placeholder="Provide the corrected response..."
+                          className="mt-1 min-h-[80px]"
+                        />
+                      </div>
+                    )}
+
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={handleSubmitFeedback}
+                        size="sm"
+                        className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white"
+                      >
+                        Submit Feedback
+                      </Button>
+                      <Button
+                        onClick={() => setShowFeedbackForm(false)}
+                        size="sm"
+                        variant="outline"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

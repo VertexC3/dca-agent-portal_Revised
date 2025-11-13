@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from './utils';
 import { base44 } from './api/base44Client';
-import { Home, MessageSquare, BarChart3, Settings, LogOut, User } from 'lucide-react';
+import { Home, MessageSquare, BarChart3, Settings, LogOut, User, Brain } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +30,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Dashboard', icon: Home, page: 'Dashboard' },
     { name: 'Communications', icon: MessageSquare, page: 'Communications' },
     { name: 'Analytics', icon: BarChart3, page: 'Analytics' },
+    { name: 'AI Training', icon: Brain, page: 'AITraining' },
   ];
 
   const handleLogout = () => {

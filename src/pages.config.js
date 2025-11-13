@@ -4,6 +4,7 @@ import CommunicationDetail from './pages/CommunicationDetail';
 import Settings from './pages/Settings';
 import Communications from './pages/Communications';
 import Analytics from './pages/Analytics';
+import AITraining from './pages/AITraining';
 import Layout from './Layout.jsx';
 
 
@@ -14,6 +15,7 @@ export const PAGES = {
     "Settings": Settings,
     "Communications": Communications,
     "Analytics": Analytics,
+    "AITraining": AITraining,
 }
 
 export const pagesConfig = {
