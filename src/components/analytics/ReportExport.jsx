@@ -13,33 +13,64 @@ import { format } from 'date-fns';
 export default function ReportExport({ communications }) {
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const generateCSV = (data, filename) => {
+  const generateXLS = (data, filename) => {
     if (!data || data.length === 0) return;
     
-    const headers = Object.keys(data[0]).join(',');
+    // Create CSV format (Excel can open CSV files)
+    const headers = Object.keys(data[0]).join('\t');
     const rows = data.map(item => 
-      Object.values(item).map(val => `"${val}"`).join(',')
+      Object.values(item).map(val => `"${val}"`).join('\t')
     ).join('\n');
     
-    const csv = `${headers}\n${rows}`;
-    const blob = new Blob([csv], { type: 'text/csv' });
+    const xls = `${headers}\n${rows}`;
+    const blob = new Blob([xls], { type: 'application/vnd.ms-excel' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${filename}_${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    a.download = `${filename}_${format(new Date(), 'yyyy-MM-dd')}.xls`;
     a.click();
     window.URL.revokeObjectURL(url);
   };
 
-  const generateJSON = (data, filename) => {
-    const json = JSON.stringify(data, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
+  const generatePDF = (data, filename) => {
+    // Create a simple HTML representation for PDF
+    const htmlContent = `
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            h1 { color: #8B1F1F; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #8B1F1F; color: white; }
+            tr:nth-child(even) { background-color: #f9f9f9; }
+          </style>
+        </head>
+        <body>
+          <h1>DCA Pharmacy - ${filename.replace(/_/g, ' ').toUpperCase()}</h1>
+          <p>Generated: ${format(new Date(), 'MMMM d, yyyy h:mm a')}</p>
+          <table>
+            <thead>
+              <tr>${Object.keys(data[0] || {}).map(key => `<th>${key}</th>`).join('')}</tr>
+            </thead>
+            <tbody>
+              ${data.map(row => `<tr>${Object.values(row).map(val => `<td>${val}</td>`).join('')}</tr>`).join('')}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `;
+    
+    const blob = new Blob([htmlContent], { type: 'text/html' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${filename}_${format(new Date(), 'yyyy-MM-dd')}.json`;
+    a.download = `${filename}_${format(new Date(), 'yyyy-MM-dd')}.html`;
     a.click();
     window.URL.revokeObjectURL(url);
+    
+    alert('PDF export: Opening printable HTML version. Use browser Print > Save as PDF');
+    window.open(url, '_blank');
   };
 
   const exportFullReport = (format) => {
@@ -58,10 +89,10 @@ export default function ReportExport({ communications }) {
       satisfaction_score: c.satisfaction_score || 'N/A'
     }));
 
-    if (format === 'csv') {
-      generateCSV(reportData, 'full_report');
+    if (format === 'xls') {
+      generateXLS(reportData, 'full_report');
     } else {
-      generateJSON(reportData, 'full_report');
+      generatePDF(reportData, 'full_report');
     }
 
     setTimeout(() => setIsGenerating(false), 1000);
@@ -107,10 +138,10 @@ export default function ReportExport({ communications }) {
         : 'N/A'
     }));
 
-    if (format === 'csv') {
-      generateCSV(reportData, 'agent_performance');
+    if (format === 'xls') {
+      generateXLS(reportData, 'agent_performance');
     } else {
-      generateJSON(reportData, 'agent_performance');
+      generatePDF(reportData, 'agent_performance');
     }
 
     setTimeout(() => setIsGenerating(false), 1000);
@@ -131,10 +162,10 @@ export default function ReportExport({ communications }) {
         handled_by: c.handled_by || 'N/A'
       }));
 
-    if (format === 'csv') {
-      generateCSV(satisfactionData, 'satisfaction_report');
+    if (format === 'xls') {
+      generateXLS(satisfactionData, 'satisfaction_report');
     } else {
-      generateJSON(satisfactionData, 'satisfaction_report');
+      generatePDF(satisfactionData, 'satisfaction_report');
     }
 
     setTimeout(() => setIsGenerating(false), 1000);
@@ -168,10 +199,10 @@ export default function ReportExport({ communications }) {
       new Date(a.date) - new Date(b.date)
     );
 
-    if (format === 'csv') {
-      generateCSV(reportData, 'trends_report');
+    if (format === 'xls') {
+      generateXLS(reportData, 'trends_report');
     } else {
-      generateJSON(reportData, 'trends_report');
+      generatePDF(reportData, 'trends_report');
     }
 
     setTimeout(() => setIsGenerating(false), 1000);
@@ -203,22 +234,22 @@ export default function ReportExport({ communications }) {
           </div>
           <div className="flex gap-2">
             <Button 
-              onClick={() => exportFullReport('csv')}
+              onClick={() => exportFullReport('xls')}
               disabled={isGenerating}
               size="sm"
               className="flex-1 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300"
             >
               <Table className="w-4 h-4 mr-1" />
-              CSV
+              XLS
             </Button>
             <Button 
-              onClick={() => exportFullReport('json')}
+              onClick={() => exportFullReport('pdf')}
               disabled={isGenerating}
               size="sm"
               className="flex-1 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300"
             >
               <FileText className="w-4 h-4 mr-1" />
-              JSON
+              PDF
             </Button>
           </div>
         </div>
@@ -236,22 +267,22 @@ export default function ReportExport({ communications }) {
           </div>
           <div className="flex gap-2">
             <Button 
-              onClick={() => exportAgentPerformance('csv')}
+              onClick={() => exportAgentPerformance('xls')}
               disabled={isGenerating}
               size="sm"
               className="flex-1 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300"
             >
               <Table className="w-4 h-4 mr-1" />
-              CSV
+              XLS
             </Button>
             <Button 
-              onClick={() => exportAgentPerformance('json')}
+              onClick={() => exportAgentPerformance('pdf')}
               disabled={isGenerating}
               size="sm"
               className="flex-1 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300"
             >
               <FileText className="w-4 h-4 mr-1" />
-              JSON
+              PDF
             </Button>
           </div>
         </div>
@@ -269,22 +300,22 @@ export default function ReportExport({ communications }) {
           </div>
           <div className="flex gap-2">
             <Button 
-              onClick={() => exportSatisfactionReport('csv')}
+              onClick={() => exportSatisfactionReport('xls')}
               disabled={isGenerating}
               size="sm"
               className="flex-1 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300"
             >
               <Table className="w-4 h-4 mr-1" />
-              CSV
+              XLS
             </Button>
             <Button 
-              onClick={() => exportSatisfactionReport('json')}
+              onClick={() => exportSatisfactionReport('pdf')}
               disabled={isGenerating}
               size="sm"
               className="flex-1 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300"
             >
               <FileText className="w-4 h-4 mr-1" />
-              JSON
+              PDF
             </Button>
           </div>
         </div>
@@ -302,22 +333,22 @@ export default function ReportExport({ communications }) {
           </div>
           <div className="flex gap-2">
             <Button 
-              onClick={() => exportTrendsReport('csv')}
+              onClick={() => exportTrendsReport('xls')}
               disabled={isGenerating}
               size="sm"
               className="flex-1 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300"
             >
               <Table className="w-4 h-4 mr-1" />
-              CSV
+              XLS
             </Button>
             <Button 
-              onClick={() => exportTrendsReport('json')}
+              onClick={() => exportTrendsReport('pdf')}
               disabled={isGenerating}
               size="sm"
               className="flex-1 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300"
             >
               <FileText className="w-4 h-4 mr-1" />
-              JSON
+              PDF
             </Button>
           </div>
         </div>

@@ -22,7 +22,10 @@ export default function Settings() {
   const [profileData, setProfileData] = useState({
     full_name: '',
     email: '',
+    profile_picture: ''
   });
+
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const [notificationSettings, setNotificationSettings] = useState({
     email_notifications: true,
@@ -36,6 +39,7 @@ export default function Settings() {
       setProfileData({
         full_name: user.full_name || '',
         email: user.email || '',
+        profile_picture: user.profile_picture || ''
       });
       
       setNotificationSettings({
@@ -65,6 +69,23 @@ export default function Settings() {
 
   const handleSaveProfile = () => {
     updateProfileMutation.mutate(profileData);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const result = await base44.integrations.Core.UploadFile({ file });
+      setProfileData({ ...profileData, profile_picture: result.file_url });
+      await updateProfileMutation.mutateAsync({ profile_picture: result.file_url });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Failed to upload image');
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const handleSaveNotifications = () => {
@@ -139,6 +160,51 @@ export default function Settings() {
                 <p className="text-gray-600 mb-6">Update your account profile information.</p>
 
                 <div className="space-y-4 max-w-2xl">
+                  <div>
+                    <Label className="text-gray-700 mb-2 block">Profile Picture</Label>
+                    <div className="flex items-center gap-4">
+                      {profileData.profile_picture ? (
+                        <img 
+                          src={profileData.profile_picture} 
+                          alt="Profile"
+                          className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+                        />
+                      ) : (
+                        <div className="w-20 h-20 rounded-full bg-[#8B1F1F] flex items-center justify-center text-white text-2xl font-semibold border-2 border-gray-200">
+                          {user?.full_name?.charAt(0)?.toUpperCase() || 'U'}
+                        </div>
+                      )}
+                      <div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          id="profile-picture-upload"
+                          disabled={uploadingImage}
+                        />
+                        <label htmlFor="profile-picture-upload">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            disabled={uploadingImage}
+                            onClick={() => document.getElementById('profile-picture-upload').click()}
+                            className="cursor-pointer"
+                          >
+                            {uploadingImage ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Uploading...
+                              </>
+                            ) : (
+                              'Upload Picture'
+                            )}
+                          </Button>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
                   <div>
                     <Label htmlFor="full_name" className="text-gray-700">Full Name</Label>
                     <Input

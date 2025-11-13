@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { format, subDays, isAfter, isBefore, startOfDay, endOfDay } from 'date-fns';
 import { TrendingUp, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -157,7 +157,7 @@ export default function TrendsAnalysis({ communications }) {
 
       <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
         <ResponsiveContainer width="100%" height={350}>
-          <LineChart data={trendData}>
+          <BarChart data={trendData}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.1)" />
             <XAxis 
               dataKey="displayDate" 
@@ -176,24 +176,23 @@ export default function TrendsAnalysis({ communications }) {
             
             {groupBy === 'channel' ? (
               <>
-                <Line type="monotone" dataKey="phone" stroke={colors.phone} strokeWidth={2} name="Phone" />
-                <Line type="monotone" dataKey="email" stroke={colors.email} strokeWidth={2} name="Email" />
-                <Line type="monotone" dataKey="text" stroke={colors.text} strokeWidth={2} name="Text" />
-                <Line type="monotone" dataKey="ai_agent" stroke={colors.ai_agent} strokeWidth={2} name="AI Agent" />
+                <Bar dataKey="phone" stackId="a" fill={colors.phone} name="Phone" />
+                <Bar dataKey="email" stackId="a" fill={colors.email} name="Email" />
+                <Bar dataKey="text" stackId="a" fill={colors.text} name="Text" />
+                <Bar dataKey="ai_agent" stackId="a" fill={colors.ai_agent} name="AI Agent" />
               </>
             ) : (
               topRequestTypes.map(type => (
-                <Line 
+                <Bar 
                   key={type}
-                  type="monotone" 
                   dataKey={type} 
-                  stroke={colors[type] || '#6B7280'} 
-                  strokeWidth={2}
+                  stackId="a"
+                  fill={colors[type] || '#6B7280'} 
                   name={type.replace(/_/g, ' ')}
                 />
               ))
             )}
-          </LineChart>
+          </BarChart>
         </ResponsiveContainer>
       </div>
 

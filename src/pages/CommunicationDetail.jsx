@@ -16,6 +16,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ExportShareButtons from '../components/communication/ExportShareButtons';
+import PatientInfoPanel from '../components/communication/PatientInfoPanel';
+import SharedNotes from '../components/communication/SharedNotes';
 
 const channelIcons = {
   phone: Phone,
@@ -537,6 +539,12 @@ Generate a professional, empathetic, and helpful response to this patient. Be co
               )}
             </div>
           </div>
+
+          {/* Patient Information Panel */}
+          <PatientInfoPanel communication={communication} />
+
+          {/* Shared Notes */}
+          <SharedNotes communicationId={communication.id} />
         </div>
       </div>
     </div>

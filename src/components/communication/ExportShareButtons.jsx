@@ -1,14 +1,24 @@
-import React from 'react';
-import { Download, Share2, FileText, Mail } from 'lucide-react';
+import React, { useState } from 'react';
+import { Download, Share2, FileText, Mail, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { base44 } from '@/api/base44Client';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
+const TEAM_MEMBERS = [
+  { name: 'Mike Allen', email: 'mike.allen@dcapharmacy.com' },
+  { name: 'Ben Myatt', email: 'ben.myatt@dcapharmacy.com' }
+];
+
 export default function ExportShareButtons({ data, filename = 'export' }) {
+  const [emailInput, setEmailInput] = useState('');
+  const [isEmailFormVisible, setIsEmailFormVisible] = useState(false);
   const handleExportCSV = () => {
     if (!data || data.length === 0) return;
     
@@ -38,17 +48,27 @@ export default function ExportShareButtons({ data, filename = 'export' }) {
     window.URL.revokeObjectURL(url);
   };
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: 'DCA Pharmacy Communication Data',
-        text: 'Sharing communication data from DCA Pharmacy Hub',
-        url: window.location.href
+  const handleShareViaEmail = async (recipientEmail) => {
+    try {
+      const shareUrl = window.location.href;
+      await base44.integrations.Core.SendEmail({
+        to: recipientEmail,
+        subject: `DCA Pharmacy - Communication Data Shared`,
+        body: `A team member has shared communication data with you.\n\nView here: ${shareUrl}\n\nData Summary:\n${JSON.stringify(data, null, 2)}`
       });
-    } else {
-      // Fallback: copy URL to clipboard
-      navigator.clipboard.writeText(window.location.href);
-      alert('Link copied to clipboard!');
+      alert(`Successfully shared with ${recipientEmail}`);
+      setEmailInput('');
+      setIsEmailFormVisible(false);
+    } catch (error) {
+      console.error('Error sharing:', error);
+      alert('Failed to share via email');
+    }
+  };
+
+  const handleCustomEmailShare = (e) => {
+    e.preventDefault();
+    if (emailInput.trim()) {
+      handleShareViaEmail(emailInput);
     }
   };
 
@@ -73,13 +93,50 @@ export default function ExportShareButtons({ data, filename = 'export' }) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Button 
-        onClick={handleShare}
-        className="bg-[#8B1F1F] hover:bg-[#721919] text-white"
-      >
-        <Share2 className="w-4 h-4 mr-2" />
-        Share
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button className="bg-[#8B1F1F] hover:bg-[#721919] text-white">
+            <Share2 className="w-4 h-4 mr-2" />
+            Share
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-72 bg-white border-gray-200 p-3">
+          {/* Email Form */}
+          <div className="mb-3">
+            <p className="text-sm font-semibold text-gray-700 mb-2">Share via Email</p>
+            <form onSubmit={handleCustomEmailShare} className="flex gap-2">
+              <Input
+                type="email"
+                placeholder="Enter email address"
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                className="text-sm"
+              />
+              <Button type="submit" size="sm" className="bg-[#8B1F1F] hover:bg-[#721919]">
+                <Mail className="w-4 h-4" />
+              </Button>
+            </form>
+          </div>
+
+          <DropdownMenuSeparator />
+
+          {/* Team Members */}
+          <p className="text-xs font-semibold text-gray-500 mb-2 mt-2">SHARE WITH TEAM</p>
+          {TEAM_MEMBERS.map((member, idx) => (
+            <DropdownMenuItem
+              key={idx}
+              onClick={() => handleShareViaEmail(member.email)}
+              className="cursor-pointer text-gray-700 hover:bg-gray-100"
+            >
+              <User className="w-4 h-4 mr-2" />
+              <div>
+                <p className="font-medium text-sm">{member.name}</p>
+                <p className="text-xs text-gray-500">{member.email}</p>
+              </div>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }

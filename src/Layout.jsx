@@ -40,7 +40,7 @@ export default function Layout({ children, currentPageName }) {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gray-50">
-      {/* Header */}
+      {/* Header - Already Sticky */}
       <header className="sticky top-0 z-50 backdrop-blur-md bg-white/90 border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
@@ -56,29 +56,41 @@ export default function Layout({ children, currentPageName }) {
             </Link>
             
             <nav className="hidden md:flex items-center gap-2">
-              {navItems.map(item => (
-                <Link
-                  key={item.page}
-                  to={createPageUrl(item.page)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                    currentPageName === item.page
-                      ? 'bg-[#8B1F1F] text-white shadow-md'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  <item.icon className="w-4 h-4" />
-                  {item.name}
-                </Link>
-              ))}
+              {navItems.map(item => {
+                // Don't show icons for AI Training and Automation
+                const showIcon = item.page !== 'AITraining' && item.page !== 'Automation';
+                return (
+                  <Link
+                    key={item.page}
+                    to={createPageUrl(item.page)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                      currentPageName === item.page
+                        ? 'bg-[#8B1F1F] text-white shadow-md'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    {showIcon && <item.icon className="w-4 h-4" />}
+                    {item.name}
+                  </Link>
+                );
+              })}
             </nav>
 
             <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-all">
-                    <div className="w-10 h-10 rounded-full bg-[#8B1F1F] flex items-center justify-center text-white font-semibold border-2 border-gray-200">
-                      {user?.full_name?.charAt(0)?.toUpperCase() || 'U'}
-                    </div>
+                    {user?.profile_picture ? (
+                      <img 
+                        src={user.profile_picture} 
+                        alt={user.full_name}
+                        className="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-[#8B1F1F] flex items-center justify-center text-white font-semibold border-2 border-gray-200">
+                        {user?.full_name?.charAt(0)?.toUpperCase() || 'U'}
+                      </div>
+                    )}
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 bg-white border-gray-200">
