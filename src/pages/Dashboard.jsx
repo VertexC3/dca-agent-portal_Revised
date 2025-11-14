@@ -117,18 +117,19 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         {[
-          { label: 'Total Communications', value: communications.length, color: 'bg-[#8B1F1F]', status: 'all' },
-          { label: 'Pending', value: communications.filter(c => c.status === 'pending').length, color: 'bg-yellow-500', status: 'pending' },
-          { label: 'In Progress', value: communications.filter(c => c.status === 'in_progress').length, color: 'bg-blue-500', status: 'in_progress' },
-          { label: 'Resolved', value: communications.filter(c => c.status === 'resolved').length, color: 'bg-green-500', status: 'resolved' }
+          { label: 'Total', value: communications.length, color: 'bg-[#8B1F1F]', channel: 'all' },
+          { label: 'Email', value: communications.filter(c => c.channel === 'email').length, color: 'bg-blue-500', channel: 'email' },
+          { label: 'Phone', value: communications.filter(c => c.channel === 'phone').length, color: 'bg-green-500', channel: 'phone' },
+          { label: 'Text', value: communications.filter(c => c.channel === 'text').length, color: 'bg-purple-500', channel: 'text' },
+          { label: 'AI Agent', value: communications.filter(c => c.channel === 'ai_agent').length, color: 'bg-orange-500', channel: 'ai_agent' }
         ].map(stat => (
           <button
             key={stat.label}
-            onClick={() => setSelectedStatus(stat.status)}
+            onClick={() => setSelectedChannel(stat.channel)}
             className={`bg-white rounded-2xl p-6 border-2 shadow-lg text-left transition-all hover:shadow-xl hover:scale-105 ${
-              selectedStatus === stat.status 
+              selectedChannel === stat.channel 
                 ? 'border-[#8B1F1F] ring-2 ring-[#8B1F1F]/20' 
                 : 'border-gray-200 hover:border-gray-300'
             }`}
@@ -137,7 +138,7 @@ export default function Dashboard() {
               <span className="text-2xl font-bold text-white">{stat.value}</span>
             </div>
             <p className="text-gray-600 text-sm font-medium">{stat.label}</p>
-            {selectedStatus === stat.status && (
+            {selectedChannel === stat.channel && (
               <div className="mt-2 text-xs text-[#8B1F1F] font-semibold">● Active Filter</div>
             )}
           </button>
