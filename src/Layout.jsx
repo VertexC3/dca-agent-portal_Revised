@@ -58,7 +58,6 @@ export default function Layout({ children, currentPageName }) {
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
-                  <item.icon className="w-4 h-4" />
                   {item.name}
                 </Link>
               ))}
