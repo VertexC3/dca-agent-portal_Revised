@@ -33,7 +33,6 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Dashboard', icon: Home, page: 'PatientDashboard' },
     { name: 'Prescriptions', icon: Pill, page: 'PatientDashboard' },
     { name: 'Communications', icon: MessageSquare, page: 'PatientCommunications' },
-    { name: 'Profile', icon: User, page: 'PatientProfile' },
   ];
 
   const navItems = isPatientView ? patientNavItems : adminNavItems;
@@ -123,14 +122,23 @@ export default function Layout({ children, currentPageName }) {
                     <p className="font-semibold text-gray-800">{user?.full_name || 'User'}</p>
                     <p className="text-xs text-gray-500 truncate">{user?.email || ''}</p>
                   </div>
-                  <DropdownMenuItem asChild>
-                    <Link to={createPageUrl(isPatientView ? 'PatientProfile' : 'Settings')} className="flex items-center gap-2 cursor-pointer text-gray-700">
-                      <Settings className="w-4 h-4" />
-                      {isPatientView ? 'My Profile' : 'Settings'}
-                    </Link>
-                  </DropdownMenuItem>
-                  {!isPatientView && (
+                  {isPatientView ? (
                     <>
+                      <DropdownMenuItem asChild>
+                        <Link to={createPageUrl('PatientProfile')} className="flex items-center gap-2 cursor-pointer text-gray-700">
+                          <User className="w-4 h-4" />
+                          My Profile
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  ) : (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link to={createPageUrl('Settings')} className="flex items-center gap-2 cursor-pointer text-gray-700">
+                          <Settings className="w-4 h-4" />
+                          Settings
+                        </Link>
+                      </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
                         <Link to={createPageUrl('AITraining')} className="flex items-center gap-2 cursor-pointer text-gray-700">
