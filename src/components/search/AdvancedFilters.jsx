@@ -63,7 +63,7 @@ export default function AdvancedFilters({ filters, onFiltersChange, onClearFilte
 
           {/* Search by Patient */}
           <div>
-            <Label className="text-sm font-medium text-gray-700">Search Patient</Label>
+            <Label className="text-sm font-medium text-gray-700">Patient</Label>
             <div className="relative mt-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
@@ -73,6 +73,17 @@ export default function AdvancedFilters({ filters, onFiltersChange, onClearFilte
                 className="pl-9"
               />
             </div>
+          </div>
+
+          {/* Rx Number */}
+          <div>
+            <Label className="text-sm font-medium text-gray-700">Rx Number</Label>
+            <Input
+              placeholder="Prescription number..."
+              value={filters.rxNumber || ''}
+              onChange={(e) => handleFilterChange('rxNumber', e.target.value)}
+              className="mt-1"
+            />
           </div>
 
           {/* Status Filter */}
