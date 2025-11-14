@@ -4,11 +4,13 @@ import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import { format } from 'date-fns';
-import { Phone, Mail, MessageSquare, User, Clock, ChevronRight, Search, Filter, Bot } from 'lucide-react';
+import { Phone, Mail, MessageSquare, User, Clock, ChevronRight, Search, Filter, Bot, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import ExportShareButtons from '../components/communication/ExportShareButtons';
+import AdvancedFilters from '../components/search/AdvancedFilters';
 
 const channelIcons = {
   phone: Phone,
@@ -31,10 +33,22 @@ const statusColors = {
 };
 
 export default function Communications() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialSearch = urlParams.get('search') || '';
+  
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [channelFilter, setChannelFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [handledByFilter, setHandledByFilter] = useState('all');
+  const [advancedFilters, setAdvancedFilters] = useState({
+    patientSearch: '',
+    status: 'all',
+    channel: 'all',
+    requestType: 'all',
+    handledBy: 'all',
+    dateFrom: '',
+    dateTo: ''
+  });
 
   const { data: communications = [], isLoading } = useQuery({
     queryKey: ['communications'],
@@ -83,14 +97,65 @@ export default function Communications() {
   });
 
   const filteredCommunications = communications.filter(comm => {
-    const matchesSearch = comm.patient_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         comm.message_content?.toLowerCase().includes(searchTerm.toLowerCase());
+    // Basic search
+    const matchesSearch = searchTerm === '' || 
+      comm.patient_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      comm.message_content?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      comm.patient_email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      comm.patient_phone?.includes(searchTerm);
+    
+    // Advanced filters
+    const matchesPatientSearch = !advancedFilters.patientSearch || 
+      comm.patient_name?.toLowerCase().includes(advancedFilters.patientSearch.toLowerCase()) ||
+      comm.patient_email?.toLowerCase().includes(advancedFilters.patientSearch.toLowerCase()) ||
+      comm.patient_phone?.includes(advancedFilters.patientSearch) ||
+      comm.patient_id?.toLowerCase().includes(advancedFilters.patientSearch.toLowerCase());
+
+    const matchesAdvStatus = advancedFilters.status === 'all' || comm.status === advancedFilters.status;
+    const matchesAdvChannel = advancedFilters.channel === 'all' || comm.channel === advancedFilters.channel;
+    const matchesRequestType = advancedFilters.requestType === 'all' || comm.request_type === advancedFilters.requestType;
+    
+    const matchesAdvHandledBy = advancedFilters.handledBy === 'all' || 
+      (advancedFilters.handledBy === 'ai_agent' && comm.handled_by_type === 'ai_agent') ||
+      (advancedFilters.handledBy === 'representative' && comm.handled_by_type === 'representative') ||
+      (advancedFilters.handledBy === 'escalated' && comm.escalated_to_human) ||
+      (advancedFilters.handledBy === 'unassigned' && !comm.handled_by);
+
+    // Date range filter
+    const commDate = new Date(comm.date);
+    const matchesDateFrom = !advancedFilters.dateFrom || commDate >= new Date(advancedFilters.dateFrom);
+    const matchesDateTo = !advancedFilters.dateTo || commDate <= new Date(advancedFilters.dateTo);
+
+    // Legacy filters
     const matchesChannel = channelFilter === 'all' || comm.channel === channelFilter;
     const matchesStatus = statusFilter === 'all' || comm.status === statusFilter;
     const matchesHandledBy = handledByFilter === 'all' || comm.handled_by_type === handledByFilter;
     
-    return matchesSearch && matchesChannel && matchesStatus && matchesHandledBy;
+    return matchesSearch && matchesPatientSearch && matchesAdvStatus && matchesAdvChannel && 
+           matchesRequestType && matchesAdvHandledBy && matchesDateFrom && matchesDateTo &&
+           matchesChannel && matchesStatus && matchesHandledBy;
   });
+
+  const activeFilterCount = Object.values(advancedFilters).filter(val => {
+    if (typeof val === 'string') return val && val !== 'all';
+    return val;
+  }).length;
+
+  const handleClearAllFilters = () => {
+    setSearchTerm('');
+    setAdvancedFilters({
+      patientSearch: '',
+      status: 'all',
+      channel: 'all',
+      requestType: 'all',
+      handledBy: 'all',
+      dateFrom: '',
+      dateTo: ''
+    });
+    setChannelFilter('all');
+    setStatusFilter('all');
+    setHandledByFilter('all');
+  };
 
   return (
     <div className="space-y-6">
@@ -103,80 +168,132 @@ export default function Communications() {
         <ExportShareButtons data={filteredCommunications} filename="all-communications" />
       </div>
 
-      {/* Filters */}
+      {/* Search and Filters */}
       <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
-        <div className="flex items-center gap-2 mb-4">
-          <Filter className="w-5 h-5 text-gray-600" />
-          <h3 className="text-lg font-semibold text-gray-800">Filters</h3>
+        <div className="flex items-center gap-4 mb-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input
+              placeholder="Quick search by patient name, email, phone, or message..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-10"
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+          
+          <AdvancedFilters
+            filters={advancedFilters}
+            onFiltersChange={setAdvancedFilters}
+            onClearFilters={() => setAdvancedFilters({
+              patientSearch: '',
+              status: 'all',
+              channel: 'all',
+              requestType: 'all',
+              handledBy: 'all',
+              dateFrom: '',
+              dateTo: ''
+            })}
+          />
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div>
-            <label className="text-sm text-gray-600 mb-1 block">Search</label>
-            <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <Input
-                placeholder="Search patients..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-          </div>
 
-          <div>
-            <label className="text-sm text-gray-600 mb-1 block">Channel</label>
-            <Select value={channelFilter} onValueChange={setChannelFilter}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Channels</SelectItem>
-                <SelectItem value="phone">Phone</SelectItem>
-                <SelectItem value="email">Email</SelectItem>
-                <SelectItem value="text">Text</SelectItem>
-                <SelectItem value="ai_agent">AI Agent</SelectItem>
-              </SelectContent>
-            </Select>
+        {/* Active Filters Display */}
+        {(activeFilterCount > 0 || searchTerm) && (
+          <div className="flex items-center gap-2 flex-wrap pt-4 border-t border-gray-100">
+            <span className="text-sm text-gray-600 font-medium">Active filters:</span>
+            {searchTerm && (
+              <Badge variant="outline" className="bg-[#8B1F1F]/10 text-[#8B1F1F] border-[#8B1F1F]/30">
+                Search: "{searchTerm}"
+                <button onClick={() => setSearchTerm('')} className="ml-1">
+                  <X className="w-3 h-3" />
+                </button>
+              </Badge>
+            )}
+            {advancedFilters.patientSearch && (
+              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                Patient: "{advancedFilters.patientSearch}"
+                <button onClick={() => setAdvancedFilters({...advancedFilters, patientSearch: ''})} className="ml-1">
+                  <X className="w-3 h-3" />
+                </button>
+              </Badge>
+            )}
+            {advancedFilters.status !== 'all' && (
+              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                Status: {advancedFilters.status.replace(/_/g, ' ')}
+                <button onClick={() => setAdvancedFilters({...advancedFilters, status: 'all'})} className="ml-1">
+                  <X className="w-3 h-3" />
+                </button>
+              </Badge>
+            )}
+            {advancedFilters.channel !== 'all' && (
+              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                Channel: {advancedFilters.channel}
+                <button onClick={() => setAdvancedFilters({...advancedFilters, channel: 'all'})} className="ml-1">
+                  <X className="w-3 h-3" />
+                </button>
+              </Badge>
+            )}
+            {advancedFilters.requestType !== 'all' && (
+              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                Type: {advancedFilters.requestType.replace(/_/g, ' ')}
+                <button onClick={() => setAdvancedFilters({...advancedFilters, requestType: 'all'})} className="ml-1">
+                  <X className="w-3 h-3" />
+                </button>
+              </Badge>
+            )}
+            {advancedFilters.handledBy !== 'all' && (
+              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                Handled: {advancedFilters.handledBy.replace(/_/g, ' ')}
+                <button onClick={() => setAdvancedFilters({...advancedFilters, handledBy: 'all'})} className="ml-1">
+                  <X className="w-3 h-3" />
+                </button>
+              </Badge>
+            )}
+            {(advancedFilters.dateFrom || advancedFilters.dateTo) && (
+              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                Date: {advancedFilters.dateFrom || 'Start'} - {advancedFilters.dateTo || 'End'}
+                <button onClick={() => setAdvancedFilters({...advancedFilters, dateFrom: '', dateTo: ''})} className="ml-1">
+                  <X className="w-3 h-3" />
+                </button>
+              </Badge>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClearAllFilters}
+              className="text-[#8B1F1F] hover:text-[#721919] ml-auto"
+            >
+              Clear All
+            </Button>
           </div>
-
-          <div>
-            <label className="text-sm text-gray-600 mb-1 block">Status</label>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="in_progress">In Progress</SelectItem>
-                <SelectItem value="resolved">Resolved</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <label className="text-sm text-gray-600 mb-1 block">Handled By</label>
-            <Select value={handledByFilter} onValueChange={setHandledByFilter}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="ai_agent">AI Agent</SelectItem>
-                <SelectItem value="representative">Representative</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Communications List */}
       <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-semibold text-gray-800">
-            {filteredCommunications.length} Communications
-          </h3>
+          <div>
+            <h3 className="text-xl font-semibold text-gray-800">
+              {filteredCommunications.length} Communication{filteredCommunications.length !== 1 ? 's' : ''}
+            </h3>
+            {filteredCommunications.length !== communications.length && (
+              <p className="text-sm text-gray-500 mt-1">
+                Filtered from {communications.length} total communication{communications.length !== 1 ? 's' : ''}
+              </p>
+            )}
+          </div>
+          {filteredCommunications.length !== communications.length && (
+            <span className="text-sm text-[#8B1F1F] font-medium">
+              {activeFilterCount + (searchTerm ? 1 : 0)} filter{(activeFilterCount + (searchTerm ? 1 : 0)) !== 1 ? 's' : ''} applied
+            </span>
+          )}
         </div>
 
         <div className="space-y-3">
