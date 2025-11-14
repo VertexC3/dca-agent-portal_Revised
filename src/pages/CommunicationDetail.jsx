@@ -18,6 +18,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import ExportShareButtons from '../components/communication/ExportShareButtons';
 import PatientInfoPanel from '../components/communication/PatientInfoPanel';
 import SharedNotes from '../components/communication/SharedNotes';
+import PatientProfileDialog from '../components/communication/PatientProfileDialog';
+import ActionWorkflow from '../components/communication/ActionWorkflow';
 
 const channelIcons = {
   phone: Phone,
@@ -40,6 +42,7 @@ export default function CommunicationDetail() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [newStatus, setNewStatus] = useState('');
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [showPatientProfile, setShowPatientProfile] = useState(false);
   const [feedbackData, setFeedbackData] = useState({
     feedback_type: 'positive',
     feedback_notes: '',
@@ -166,6 +169,7 @@ ${channelInstructions[communication.channel] || channelInstructions.email}
 Generate a professional, empathetic, and helpful response to this patient. Address their concern directly.`,
       });
       
+      // Auto-populate the response text
       setResponseText(response);
       
       // Save recommended response
@@ -297,6 +301,13 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                 </div>
               </div>
               <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => setShowPatientProfile(true)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  Patient Profile
+                </Button>
                 <Badge className={`${statusColors[communication.status]} border text-base px-3 py-1`}>
                   {communication.status.replace(/_/g, ' ')}
                 </Badge>
@@ -366,6 +377,13 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
             )}
           </div>
 
+          {/* Action Workflow */}
+          <ActionWorkflow 
+            requestType={communication.request_type} 
+            patientName={communication.patient_name}
+            communication={communication}
+          />
+
           {/* Response Section */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
             <div className="flex items-center justify-between mb-4">
@@ -434,28 +452,17 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
 
         {/* Sidebar - Right Side (1 column) */}
         <div className="space-y-6">
-          {/* AI Recommended Response */}
+          {/* AI Training Feedback - Only shown if recommended response exists */}
           {communication.recommended_response && (
             <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
               <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-[#8B1F1F]" />
-                AI Recommended Response
+                AI Response Feedback
               </h3>
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 mb-3">
-                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                  {communication.recommended_response}
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                <Button
-                  onClick={() => setResponseText(communication.recommended_response)}
-                  className="w-full bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700"
-                >
-                  Use This Response
-                </Button>
 
-                {!showFeedbackForm ? (
+              {!showFeedbackForm ? (
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-600 mb-3">Rate the AI-generated response quality:</p>
                   <div className="flex gap-2">
                     <Button
                       onClick={() => {
@@ -494,83 +501,83 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                       Correct
                     </Button>
                   </div>
-                ) : (
-                  <div className="bg-purple-50 rounded-xl p-4 border border-purple-200 space-y-3">
-                    <h4 className="text-sm font-semibold text-gray-800">Provide AI Training Feedback</h4>
-                    
-                    <div>
-                      <Label className="text-xs">Quality Score (1-5)</Label>
-                      <Input
-                        type="number"
-                        min="1"
-                        max="5"
-                        value={feedbackData.conversation_quality}
-                        onChange={(e) => setFeedbackData({ ...feedbackData, conversation_quality: parseInt(e.target.value) })}
-                        className="mt-1"
-                      />
-                    </div>
-
-                    <div>
-                      <Label className="text-xs">Improvement Area</Label>
-                      <Select 
-                        value={feedbackData.improvement_area} 
-                        onValueChange={(value) => setFeedbackData({ ...feedbackData, improvement_area: value })}
-                      >
-                        <SelectTrigger className="mt-1">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="accuracy">Accuracy</SelectItem>
-                          <SelectItem value="tone">Tone</SelectItem>
-                          <SelectItem value="completeness">Completeness</SelectItem>
-                          <SelectItem value="empathy">Empathy</SelectItem>
-                          <SelectItem value="policy_compliance">Policy Compliance</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label className="text-xs">Feedback Notes</Label>
-                      <Textarea
-                        value={feedbackData.feedback_notes}
-                        onChange={(e) => setFeedbackData({ ...feedbackData, feedback_notes: e.target.value })}
-                        placeholder="What could be improved?"
-                        className="mt-1 min-h-[60px]"
-                      />
-                    </div>
-
-                    {feedbackData.feedback_type === 'correction' && (
-                      <div>
-                        <Label className="text-xs">Corrected Response</Label>
-                        <Textarea
-                          value={feedbackData.corrected_response}
-                          onChange={(e) => setFeedbackData({ ...feedbackData, corrected_response: e.target.value })}
-                          placeholder="Provide the corrected response..."
-                          className="mt-1 min-h-[80px]"
-                        />
-                      </div>
-                    )}
-
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={handleSubmitFeedback}
-                        size="sm"
-                        className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white"
-                      >
-                        Submit Feedback
-                      </Button>
-                      <Button
-                        onClick={() => setShowFeedbackForm(false)}
-                        size="sm"
-                        variant="outline"
-                      >
-                        Cancel
-                      </Button>
-                    </div>
+                </div>
+              ) : (
+                <div className="bg-purple-50 rounded-xl p-4 border border-purple-200 space-y-3">
+                  <h4 className="text-sm font-semibold text-gray-800">Provide AI Training Feedback</h4>
+                  
+                  <div>
+                    <Label className="text-xs">Quality Score (1-5)</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      max="5"
+                      value={feedbackData.conversation_quality}
+                      onChange={(e) => setFeedbackData({ ...feedbackData, conversation_quality: parseInt(e.target.value) })}
+                      className="mt-1"
+                    />
                   </div>
-                )}
-              </div>
+
+                  <div>
+                    <Label className="text-xs">Improvement Area</Label>
+                    <Select 
+                      value={feedbackData.improvement_area} 
+                      onValueChange={(value) => setFeedbackData({ ...feedbackData, improvement_area: value })}
+                    >
+                      <SelectTrigger className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="accuracy">Accuracy</SelectItem>
+                        <SelectItem value="tone">Tone</SelectItem>
+                        <SelectItem value="completeness">Completeness</SelectItem>
+                        <SelectItem value="empathy">Empathy</SelectItem>
+                        <SelectItem value="policy_compliance">Policy Compliance</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs">Feedback Notes</Label>
+                    <Textarea
+                      value={feedbackData.feedback_notes}
+                      onChange={(e) => setFeedbackData({ ...feedbackData, feedback_notes: e.target.value })}
+                      placeholder="What could be improved?"
+                      className="mt-1 min-h-[60px]"
+                    />
+                  </div>
+
+                  {feedbackData.feedback_type === 'correction' && (
+                    <div>
+                      <Label className="text-xs">Corrected Response</Label>
+                      <Textarea
+                        value={feedbackData.corrected_response}
+                        onChange={(e) => setFeedbackData({ ...feedbackData, corrected_response: e.target.value })}
+                        placeholder="Provide the corrected response..."
+                        className="mt-1 min-h-[80px]"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleSubmitFeedback}
+                      size="sm"
+                      className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white"
+                    >
+                      Submit Feedback
+                    </Button>
+                    <Button
+                      onClick={() => setShowFeedbackForm(false)}
+                      size="sm"
+                      variant="outline"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -634,6 +641,13 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
           <SharedNotes communicationId={communication.id} />
         </div>
       </div>
+
+      {/* Patient Profile Dialog */}
+      <PatientProfileDialog 
+        open={showPatientProfile} 
+        onClose={() => setShowPatientProfile(false)} 
+        patient={communication}
+      />
     </div>
   );
 }
