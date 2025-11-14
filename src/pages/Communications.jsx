@@ -42,6 +42,7 @@ export default function Communications() {
   const [handledByFilter, setHandledByFilter] = useState('all');
   const [advancedFilters, setAdvancedFilters] = useState({
     patientSearch: '',
+    rxNumber: '',
     status: 'all',
     channel: 'all',
     requestType: 'all',
@@ -111,6 +112,9 @@ export default function Communications() {
       comm.patient_phone?.includes(advancedFilters.patientSearch) ||
       comm.patient_id?.toLowerCase().includes(advancedFilters.patientSearch.toLowerCase());
 
+    const matchesRxNumber = !advancedFilters.rxNumber || 
+      comm.prescription_number?.toLowerCase().includes(advancedFilters.rxNumber.toLowerCase());
+
     const matchesAdvStatus = advancedFilters.status === 'all' || comm.status === advancedFilters.status;
     const matchesAdvChannel = advancedFilters.channel === 'all' || comm.channel === advancedFilters.channel;
     const matchesRequestType = advancedFilters.requestType === 'all' || comm.request_type === advancedFilters.requestType;
@@ -131,7 +135,7 @@ export default function Communications() {
     const matchesStatus = statusFilter === 'all' || comm.status === statusFilter;
     const matchesHandledBy = handledByFilter === 'all' || comm.handled_by_type === handledByFilter;
     
-    return matchesSearch && matchesPatientSearch && matchesAdvStatus && matchesAdvChannel && 
+    return matchesSearch && matchesPatientSearch && matchesRxNumber && matchesAdvStatus && matchesAdvChannel && 
            matchesRequestType && matchesAdvHandledBy && matchesDateFrom && matchesDateTo &&
            matchesChannel && matchesStatus && matchesHandledBy;
   });
@@ -145,6 +149,7 @@ export default function Communications() {
     setSearchTerm('');
     setAdvancedFilters({
       patientSearch: '',
+      rxNumber: '',
       status: 'all',
       channel: 'all',
       requestType: 'all',
@@ -194,6 +199,7 @@ export default function Communications() {
             onFiltersChange={setAdvancedFilters}
             onClearFilters={() => setAdvancedFilters({
               patientSearch: '',
+              rxNumber: '',
               status: 'all',
               channel: 'all',
               requestType: 'all',
@@ -220,6 +226,14 @@ export default function Communications() {
               <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
                 Patient: "{advancedFilters.patientSearch}"
                 <button onClick={() => setAdvancedFilters({...advancedFilters, patientSearch: ''})} className="ml-1">
+                  <X className="w-3 h-3" />
+                </button>
+              </Badge>
+            )}
+            {advancedFilters.rxNumber && (
+              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                Rx #: "{advancedFilters.rxNumber}"
+                <button onClick={() => setAdvancedFilters({...advancedFilters, rxNumber: ''})} className="ml-1">
                   <X className="w-3 h-3" />
                 </button>
               </Badge>
