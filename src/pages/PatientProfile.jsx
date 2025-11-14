@@ -1,0 +1,277 @@
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
+import { User, Mail, Phone, MapPin, Calendar, Save, Loader2, Plus, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+
+export default function PatientProfile() {
+  const queryClient = useQueryClient();
+
+  const { data: user, isLoading } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: () => base44.auth.me()
+  });
+
+  const [profileData, setProfileData] = useState({
+    full_name: '',
+    email: '',
+    phone: '',
+    date_of_birth: '',
+    current_address: '',
+    additional_addresses: [],
+    allergies: '',
+    current_medications: '',
+    known_conditions: '',
+    emergency_contact_name: '',
+    emergency_contact_phone: ''
+  });
+
+  React.useEffect(() => {
+    if (user) {
+      setProfileData({
+        full_name: user.full_name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        date_of_birth: user.date_of_birth || '',
+        current_address: user.current_address || '',
+        additional_addresses: user.additional_addresses || [],
+        allergies: user.allergies || '',
+        current_medications: user.current_medications || '',
+        known_conditions: user.known_conditions || '',
+        emergency_contact_name: user.emergency_contact_name || '',
+        emergency_contact_phone: user.emergency_contact_phone || ''
+      });
+    }
+  }, [user]);
+
+  const updateMutation = useMutation({
+    mutationFn: (data) => base44.auth.updateMe(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['currentUser']);
+      alert('Profile updated successfully!');
+    }
+  });
+
+  const handleSave = () => {
+    updateMutation.mutate(profileData);
+  };
+
+  const addAddress = () => {
+    setProfileData({
+      ...profileData,
+      additional_addresses: [...profileData.additional_addresses, '']
+    });
+  };
+
+  const updateAddress = (index, value) => {
+    const newAddresses = [...profileData.additional_addresses];
+    newAddresses[index] = value;
+    setProfileData({ ...profileData, additional_addresses: newAddresses });
+  };
+
+  const removeAddress = (index) => {
+    const newAddresses = profileData.additional_addresses.filter((_, i) => i !== index);
+    setProfileData({ ...profileData, additional_addresses: newAddresses });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-12 h-12 text-[#8B1F1F] animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6 max-w-4xl mx-auto">
+      <div>
+        <h1 className="text-4xl font-bold text-gray-800 mb-2">My Profile</h1>
+        <p className="text-gray-600">Manage your personal information and preferences</p>
+      </div>
+
+      <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-lg space-y-6">
+        {/* Basic Information */}
+        <div>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <User className="w-5 h-5 text-[#8B1F1F]" />
+            Basic Information
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label>Full Name</Label>
+              <Input
+                value={profileData.full_name}
+                onChange={(e) => setProfileData({ ...profileData, full_name: e.target.value })}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label>Email</Label>
+              <Input
+                value={profileData.email}
+                disabled
+                className="mt-1 bg-gray-50"
+              />
+            </div>
+            <div>
+              <Label>Phone Number</Label>
+              <Input
+                value={profileData.phone}
+                onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                placeholder="(555) 123-4567"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label>Date of Birth</Label>
+              <Input
+                type="date"
+                value={profileData.date_of_birth}
+                onChange={(e) => setProfileData({ ...profileData, date_of_birth: e.target.value })}
+                className="mt-1"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Addresses */}
+        <div>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-[#8B1F1F]" />
+            Addresses
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <Label>Current Address</Label>
+              <Textarea
+                value={profileData.current_address}
+                onChange={(e) => setProfileData({ ...profileData, current_address: e.target.value })}
+                placeholder="123 Main St, Springfield, IL 62701"
+                className="mt-1"
+                rows={2}
+              />
+            </div>
+
+            {profileData.additional_addresses.map((address, index) => (
+              <div key={index} className="flex gap-2">
+                <div className="flex-1">
+                  <Label>Additional Address #{index + 1}</Label>
+                  <Textarea
+                    value={address}
+                    onChange={(e) => updateAddress(index, e.target.value)}
+                    placeholder="456 Oak Ave, Portland, OR 97201"
+                    className="mt-1"
+                    rows={2}
+                  />
+                </div>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => removeAddress(index)}
+                  className="mt-7 text-red-600 hover:text-red-700"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
+
+            <Button
+              variant="outline"
+              onClick={addAddress}
+              className="w-full"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Another Address
+            </Button>
+          </div>
+        </div>
+
+        {/* Medical Information */}
+        <div>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Medical Information</h3>
+          <div className="space-y-4">
+            <div>
+              <Label>Known Allergies</Label>
+              <Textarea
+                value={profileData.allergies}
+                onChange={(e) => setProfileData({ ...profileData, allergies: e.target.value })}
+                placeholder="Penicillin, Peanuts, etc."
+                className="mt-1"
+                rows={2}
+              />
+            </div>
+            <div>
+              <Label>Current Medications</Label>
+              <Textarea
+                value={profileData.current_medications}
+                onChange={(e) => setProfileData({ ...profileData, current_medications: e.target.value })}
+                placeholder="List your current medications..."
+                className="mt-1"
+                rows={2}
+              />
+            </div>
+            <div>
+              <Label>Known Medical Conditions</Label>
+              <Textarea
+                value={profileData.known_conditions}
+                onChange={(e) => setProfileData({ ...profileData, known_conditions: e.target.value })}
+                placeholder="Hypertension, Diabetes, etc."
+                className="mt-1"
+                rows={2}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Emergency Contact */}
+        <div>
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Emergency Contact</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label>Contact Name</Label>
+              <Input
+                value={profileData.emergency_contact_name}
+                onChange={(e) => setProfileData({ ...profileData, emergency_contact_name: e.target.value })}
+                placeholder="John Doe"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label>Contact Phone</Label>
+              <Input
+                value={profileData.emergency_contact_phone}
+                onChange={(e) => setProfileData({ ...profileData, emergency_contact_phone: e.target.value })}
+                placeholder="(555) 987-6543"
+                className="mt-1"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Save Button */}
+        <div className="pt-4">
+          <Button
+            onClick={handleSave}
+            disabled={updateMutation.isPending}
+            className="w-full bg-[#8B1F1F] hover:bg-[#721919] text-white"
+          >
+            {updateMutation.isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4 mr-2" />
+                Save Changes
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}

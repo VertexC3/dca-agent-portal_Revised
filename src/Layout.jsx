@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from './utils';
 import { base44 } from './api/base44Client';
 import { useQuery } from '@tanstack/react-query';
-import { Home, MessageSquare, BarChart3, Settings, LogOut, User, Brain, Zap } from 'lucide-react';
+import { Home, MessageSquare, BarChart3, Settings, LogOut, User, Brain, Zap, Pill } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,17 +15,28 @@ import {
 import GlobalSearchBar from './components/search/GlobalSearchBar';
 
 export default function Layout({ children, currentPageName }) {
+  const [isPatientView, setIsPatientView] = useState(false);
+
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
     queryFn: () => base44.auth.me(),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  const navItems = [
+  const adminNavItems = [
     { name: 'Dashboard', icon: Home, page: 'Dashboard' },
     { name: 'Communications', icon: MessageSquare, page: 'Communications' },
     { name: 'Analytics', icon: BarChart3, page: 'Analytics' },
   ];
+
+  const patientNavItems = [
+    { name: 'Dashboard', icon: Home, page: 'PatientDashboard' },
+    { name: 'Prescriptions', icon: Pill, page: 'PatientDashboard' },
+    { name: 'Communications', icon: MessageSquare, page: 'PatientCommunications' },
+    { name: 'Profile', icon: User, page: 'PatientProfile' },
+  ];
+
+  const navItems = isPatientView ? patientNavItems : adminNavItems;
 
   const handleLogout = () => {
     base44.auth.logout();
@@ -36,18 +48,41 @@ export default function Layout({ children, currentPageName }) {
       <header className="sticky top-0 z-50 backdrop-blur-md bg-white/90 border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <Link to={createPageUrl('Dashboard')} className="flex items-center gap-3">
+            <Link to={createPageUrl(isPatientView ? 'PatientDashboard' : 'Dashboard')} className="flex items-center gap-3">
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/user_68b4602065e9569078753897/50e1878da_DCA_Logo_Updated.png" 
                 alt="DCA Pharmacy" 
                 className="h-12"
               />
               <div className="hidden md:block border-l border-gray-300 pl-3">
-                <h1 className="text-gray-800 font-bold text-lg">Patient Communication Hub</h1>
+                <h1 className="text-gray-800 font-bold text-lg">
+                  {isPatientView ? 'Patient Hub' : 'Patient Communication Hub'}
+                </h1>
               </div>
             </Link>
             
-            <nav className="hidden md:flex items-center gap-2">
+            <nav className="hidden md:flex items-center gap-4">
+              {/* View Toggle */}
+              <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setIsPatientView(false)}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
+                    !isPatientView ? 'bg-white text-[#8B1F1F] shadow' : 'text-gray-600'
+                  }`}
+                >
+                  Staff
+                </button>
+                <button
+                  onClick={() => setIsPatientView(true)}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
+                    isPatientView ? 'bg-white text-[#8B1F1F] shadow' : 'text-gray-600'
+                  }`}
+                >
+                  Patient
+                </button>
+              </div>
+
+              {/* Nav Items */}
               {navItems.map(item => (
                 <Link
                   key={item.page}
@@ -64,7 +99,7 @@ export default function Layout({ children, currentPageName }) {
             </nav>
 
             <div className="flex items-center gap-4">
-              <GlobalSearchBar />
+              {!isPatientView && <GlobalSearchBar />}
               
               <div className="flex items-center gap-2">
               <DropdownMenu>

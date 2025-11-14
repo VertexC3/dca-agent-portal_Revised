@@ -6,6 +6,9 @@ import Communications from './pages/Communications';
 import Analytics from './pages/Analytics';
 import AITraining from './pages/AITraining';
 import Automation from './pages/Automation';
+import PatientDashboard from './pages/PatientDashboard';
+import PatientProfile from './pages/PatientProfile';
+import PatientCommunications from './pages/PatientCommunications';
 import Layout from './Layout.jsx';
 
 
@@ -18,6 +21,9 @@ export const PAGES = {
     "Analytics": Analytics,
     "AITraining": AITraining,
     "Automation": Automation,
+    "PatientDashboard": PatientDashboard,
+    "PatientProfile": PatientProfile,
+    "PatientCommunications": PatientCommunications,
 }
 
 export const pagesConfig = {
