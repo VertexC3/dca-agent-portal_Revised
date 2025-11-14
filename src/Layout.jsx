@@ -92,6 +92,19 @@ export default function Layout({ children, currentPageName }) {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to={createPageUrl('AITraining')} className="flex items-center gap-2 cursor-pointer text-gray-700">
+                      <Brain className="w-4 h-4" />
+                      AI Training
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to={createPageUrl('Automation')} className="flex items-center gap-2 cursor-pointer text-gray-700">
+                      <Zap className="w-4 h-4" />
+                      Automation
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 cursor-pointer text-red-600">
                     <LogOut className="w-4 h-4" />
                     Log Out
