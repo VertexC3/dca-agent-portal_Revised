@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import GlobalSearchBar from './components/search/GlobalSearchBar';
 
 export default function Layout({ children, currentPageName }) {
   const { data: user } = useQuery({
@@ -63,7 +64,10 @@ export default function Layout({ children, currentPageName }) {
               ))}
             </nav>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
+              <GlobalSearchBar />
+              
+              <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-all">
@@ -111,6 +115,7 @@ export default function Layout({ children, currentPageName }) {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              </div>
             </div>
           </div>
         </div>
