@@ -146,15 +146,24 @@ export default function CommunicationDetail() {
   const handleGenerateResponse = async () => {
     setIsGenerating(true);
     try {
+      const channelInstructions = {
+        text: 'Keep the response brief and conversational (2-3 sentences max), suitable for SMS texting. Use simple language and avoid long paragraphs.',
+        email: 'Write a professional, detailed email response with proper greeting and closing. Use full sentences and organize information clearly.',
+        phone: 'Write in a conversational, friendly tone as if speaking directly to the patient. Keep it natural and warm.',
+        ai_agent: 'Generate a clear, helpful response optimized for AI chat interactions. Be direct and concise while remaining friendly.'
+      };
+
       const response = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are a customer service representative at DCA Pharmacy. A patient has sent the following message:
+        prompt: `You are a customer service representative at DCA Pharmacy. A patient has sent the following message via ${communication.channel}:
 
 "${communication.message_content}"
 
 Request Type: ${communication.request_type?.replace(/_/g, ' ')}
 Channel: ${communication.channel}
 
-Generate a professional, empathetic, and helpful response to this patient. Be concise, friendly, and address their concern directly.`,
+${channelInstructions[communication.channel] || channelInstructions.email}
+
+Generate a professional, empathetic, and helpful response to this patient. Address their concern directly.`,
       });
       
       setResponseText(response);
