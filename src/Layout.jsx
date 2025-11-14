@@ -23,8 +23,6 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Dashboard', icon: Home, page: 'Dashboard' },
     { name: 'Communications', icon: MessageSquare, page: 'Communications' },
     { name: 'Analytics', icon: BarChart3, page: 'Analytics' },
-    { name: 'AI Training', icon: Brain, page: 'AITraining' },
-    { name: 'Automation', icon: Zap, page: 'Automation' },
   ];
 
   const handleLogout = () => {
