@@ -124,24 +124,28 @@ export default function Layout({ children, currentPageName }) {
                     <p className="text-xs text-gray-500 truncate">{user?.email || ''}</p>
                   </div>
                   <DropdownMenuItem asChild>
-                    <Link to={createPageUrl('Settings')} className="flex items-center gap-2 cursor-pointer text-gray-700">
+                    <Link to={createPageUrl(isPatientView ? 'PatientProfile' : 'Settings')} className="flex items-center gap-2 cursor-pointer text-gray-700">
                       <Settings className="w-4 h-4" />
-                      Settings
+                      {isPatientView ? 'My Profile' : 'Settings'}
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to={createPageUrl('AITraining')} className="flex items-center gap-2 cursor-pointer text-gray-700">
-                      <Brain className="w-4 h-4" />
-                      AI Training
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to={createPageUrl('Automation')} className="flex items-center gap-2 cursor-pointer text-gray-700">
-                      <Zap className="w-4 h-4" />
-                      Automation
-                    </Link>
-                  </DropdownMenuItem>
+                  {!isPatientView && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to={createPageUrl('AITraining')} className="flex items-center gap-2 cursor-pointer text-gray-700">
+                          <Brain className="w-4 h-4" />
+                          AI Training
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to={createPageUrl('Automation')} className="flex items-center gap-2 cursor-pointer text-gray-700">
+                          <Zap className="w-4 h-4" />
+                          Automation
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="flex items-center gap-2 cursor-pointer text-red-600">
                     <LogOut className="w-4 h-4" />
