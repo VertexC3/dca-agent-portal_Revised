@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Pill, MessageSquare, User, Loader2, Package } from 'lucide-react';
@@ -8,8 +8,11 @@ import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import PrescriptionCard from '../components/patient/PrescriptionCard';
 import OrderHistory from '../components/patient/OrderHistory';
+import RefillRequestDialog from '../components/patient/RefillRequestDialog';
 
 export default function PatientDashboard() {
+  const [showQuickRefill, setShowQuickRefill] = useState(false);
+
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
     queryFn: () => base44.auth.me()
@@ -143,7 +146,10 @@ export default function PatientDashboard() {
                   <span className="text-sm font-semibold text-gray-800">Message Pharmacist</span>
                 </button>
               </Link>
-              <button className="w-full p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 text-left transition-all">
+              <button 
+                onClick={() => setShowQuickRefill(true)}
+                className="w-full p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 text-left transition-all"
+              >
                 <Pill className="w-4 h-4 inline mr-2 text-[#8B1F1F]" />
                 <span className="text-sm font-semibold text-gray-800">Request Refill</span>
               </button>
@@ -160,6 +166,12 @@ export default function PatientDashboard() {
           </div>
         </div>
       </div>
+
+      <RefillRequestDialog
+        open={showQuickRefill}
+        onClose={() => setShowQuickRefill(false)}
+        prescription={prescriptions[0]}
+      />
     </div>
   );
 }

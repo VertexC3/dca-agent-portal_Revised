@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Pill, Play, History, StopCircle, Calendar, Package, Truck, BookOpen } from 'lucide-react';
+import { Pill, Play, History, StopCircle, Calendar, Package, Truck, BookOpen, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import VideoExplainerDialog from './VideoExplainerDialog';
 import FillHistoryDialog from './FillHistoryDialog';
 import MedicalGuideDialog from './MedicalGuideDialog';
+import RefillRequestDialog from './RefillRequestDialog';
 import { format } from 'date-fns';
 
 const statusConfig = {
@@ -19,6 +20,7 @@ export default function PrescriptionCard({ prescription }) {
   const [showHistory, setShowHistory] = useState(false);
   const [showMedicalGuide, setShowMedicalGuide] = useState(false);
   const [showStopConfirm, setShowStopConfirm] = useState(false);
+  const [showRefillRequest, setShowRefillRequest] = useState(false);
 
   const StatusIcon = statusConfig[prescription.status]?.icon || Package;
 
@@ -61,6 +63,14 @@ export default function PrescriptionCard({ prescription }) {
           </div>
 
           <div className="space-y-2">
+            <Button
+              onClick={() => setShowRefillRequest(true)}
+              className="w-full bg-[#8B1F1F] hover:bg-[#721919] text-white"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Request Refill
+            </Button>
+
             <div className="flex gap-2">
               <Button
                 variant="outline"
@@ -147,6 +157,12 @@ export default function PrescriptionCard({ prescription }) {
       <MedicalGuideDialog
         open={showMedicalGuide}
         onClose={() => setShowMedicalGuide(false)}
+        prescription={prescription}
+      />
+
+      <RefillRequestDialog
+        open={showRefillRequest}
+        onClose={() => setShowRefillRequest(false)}
         prescription={prescription}
       />
     </>
