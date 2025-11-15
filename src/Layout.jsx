@@ -68,7 +68,7 @@ export default function Layout({ children, currentPageName }) {
               />
               <div className="hidden md:block border-l border-gray-300 pl-3">
                 <h1 className="text-gray-800 font-bold text-lg">
-                  {isPatientView ? 'Patient Hub' : 'Patient Communication Hub'}
+                  {isPatientView ? 'Patient Hub' : 'Staff Dashboard'}
                 </h1>
               </div>
             </Link>
