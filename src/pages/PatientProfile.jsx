@@ -196,40 +196,68 @@ export default function PatientProfile() {
         <div>
           <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
             <MapPin className="w-5 h-5 text-[#8B1F1F]" />
-            Addresses
+            Delivery Addresses
           </h3>
-          <div className="space-y-4">
-            <div>
-              <Label>Current Address</Label>
-              <Textarea
-                value={profileData.current_address}
-                onChange={(e) => setProfileData({ ...profileData, current_address: e.target.value })}
-                placeholder="123 Main St, Springfield, IL 62701"
-                className="mt-1"
-                rows={2}
-              />
-            </div>
-
-            {profileData.additional_addresses.map((address, index) => (
-              <div key={index} className="flex gap-2">
-                <div className="flex-1">
-                  <Label>Additional Address #{index + 1}</Label>
+          <div className="space-y-6">
+            {profileData.addresses.map((addr, index) => (
+              <div key={index} className="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Input
+                    value={addr.name || ''}
+                    onChange={(e) => updateAddress(index, 'name', e.target.value)}
+                    placeholder="Address name (e.g., Home, Work)"
+                    className="flex-1 font-semibold"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => removeAddress(index)}
+                    className="text-red-600 hover:text-red-700 flex-shrink-0"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+                
+                <div>
+                  <Label className="text-xs text-gray-600">Full Address</Label>
                   <Textarea
-                    value={address}
-                    onChange={(e) => updateAddress(index, e.target.value)}
-                    placeholder="456 Oak Ave, Portland, OR 97201"
+                    value={addr.address || ''}
+                    onChange={(e) => updateAddress(index, 'address', e.target.value)}
+                    placeholder="123 Main St, Springfield, IL 62701"
                     className="mt-1"
                     rows={2}
                   />
                 </div>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => removeAddress(index)}
-                  className="mt-7 text-red-600 hover:text-red-700"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+
+                <div>
+                  <Label className="text-xs text-gray-600 mb-2 block">Delivery Days</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
+                      <button
+                        key={day}
+                        type="button"
+                        onClick={() => toggleDeliveryDay(index, day)}
+                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                          (addr.delivery_days || []).includes(day)
+                            ? 'bg-[#8B1F1F] text-white shadow-md'
+                            : 'bg-white text-gray-600 border border-gray-300 hover:border-[#8B1F1F]'
+                        }`}
+                      >
+                        {day.slice(0, 3)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-xs text-gray-600">Delivery Time Window</Label>
+                  <Input
+                    value={addr.delivery_time || ''}
+                    onChange={(e) => updateAddress(index, 'delivery_time', e.target.value)}
+                    placeholder="9:00 AM - 5:00 PM"
+                    className="mt-1"
+                  />
+                </div>
               </div>
             ))}
 
@@ -239,7 +267,7 @@ export default function PatientProfile() {
               className="w-full"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Add Another Address
+              Add New Address
             </Button>
           </div>
         </div>
