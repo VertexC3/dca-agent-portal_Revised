@@ -448,10 +448,7 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
               </Button>
             </div>
           </div>
-        </div>
 
-        {/* Sidebar - Right Side (1 column) */}
-        <div className="space-y-6">
           {/* AI Training Feedback - Only shown if recommended response exists */}
           {communication.recommended_response && (
             <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
@@ -580,7 +577,10 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
               )}
             </div>
           )}
+        </div>
 
+        {/* Sidebar - Right Side (1 column) */}
+        <div className="space-y-6">
           {/* Activity History */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
             <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
