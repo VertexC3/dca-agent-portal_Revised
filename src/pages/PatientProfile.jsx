@@ -101,8 +101,20 @@ export default function PatientProfile() {
     const days = address.delivery_days || [];
     
     if (days.includes(day)) {
+      // Removing day - no validation needed
       address.delivery_days = days.filter(d => d !== day);
     } else {
+      // Check for overlap with other addresses
+      const overlap = newAddresses.find((addr, idx) => 
+        idx !== addressIndex && 
+        addr.delivery_days?.includes(day)
+      );
+      
+      if (overlap) {
+        alert(`Hmm, it looks like there's an overlap. "${overlap.name || 'Another address'}" already has ${day} selected. Please choose only one address for this day.`);
+        return;
+      }
+      
       address.delivery_days = [...days, day];
     }
     
