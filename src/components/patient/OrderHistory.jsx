@@ -70,10 +70,9 @@ export default function OrderHistory({ patientEmail }) {
                 ))}
               </div>
 
-              <div className="flex items-center justify-between pt-3 border-t border-gray-200">
+              <div className="flex items-center justify-between pt-3 border-gray-200">
                 <div className="flex items-center gap-4">
-                  <p className="font-semibold text-gray-800 flex items-center gap-1">
-                    <DollarSign className="w-4 h-4" />
+                  <p className="font-semibold text-gray-800">
                     ${order.total_amount.toFixed(2)}
                   </p>
                   {order.payment_method && (
