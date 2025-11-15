@@ -11,6 +11,7 @@ import OrderHistory from '../components/patient/OrderHistory';
 
 export default function PatientProfile() {
   const queryClient = useQueryClient();
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const { data: user, isLoading } = useQuery({
     queryKey: ['currentUser'],
@@ -72,6 +73,24 @@ export default function PatientProfile() {
 
   const handleSave = () => {
     updateMutation.mutate(profileData);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const result = await base44.integrations.Core.UploadFile({ file });
+      await base44.auth.updateMe({ profile_picture: result.file_url });
+      queryClient.invalidateQueries(['currentUser']);
+      alert('Profile picture updated successfully!');
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Failed to upload profile picture');
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const addAddress = () => {
@@ -160,6 +179,42 @@ export default function PatientProfile() {
         </TabsList>
 
         <TabsContent value="profile" className="p-8 space-y-6">
+        {/* Profile Picture */}
+        <div className="flex flex-col items-center pb-6 border-b border-gray-200">
+          <div className="relative">
+            {user?.profile_picture ? (
+              <img 
+                src={user.profile_picture} 
+                alt={user.full_name}
+                className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
+              />
+            ) : (
+              <div className="w-32 h-32 rounded-full bg-[#8B1F1F] flex items-center justify-center text-white text-4xl font-bold border-4 border-gray-200">
+                {user?.full_name?.charAt(0)?.toUpperCase() || 'U'}
+              </div>
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+              id="profile-picture-upload"
+              disabled={uploadingImage}
+            />
+            <label
+              htmlFor="profile-picture-upload"
+              className="absolute bottom-0 right-0 bg-[#8B1F1F] text-white p-2 rounded-full cursor-pointer hover:bg-[#721919] transition-all shadow-lg"
+            >
+              {uploadingImage ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <User className="w-5 h-5" />
+              )}
+            </label>
+          </div>
+          <p className="mt-3 text-sm text-gray-600">Click the icon to upload a profile picture</p>
+        </div>
+
         {/* Basic Information */}
         <div>
           <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
