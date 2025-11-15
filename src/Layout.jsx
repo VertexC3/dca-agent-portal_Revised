@@ -36,7 +36,19 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Messages', icon: MessageSquare, page: 'PatientMessages' },
   ];
 
+  const staffPages = ['Dashboard', 'Communications', 'StaffMessaging', 'Analytics', 'CommunicationDetail', 'AITraining', 'Automation', 'Settings', 'DailyView'];
+  const patientPages = ['PatientDashboard', 'PatientProfile', 'PatientMessages', 'PatientCommunications', 'PatientCommunicationDetail'];
+
   const navItems = isPatientView ? patientNavItems : adminNavItems;
+
+  // Auto-redirect if on wrong page type
+  React.useEffect(() => {
+    if (isPatientView && staffPages.includes(currentPageName)) {
+      window.location.href = createPageUrl('PatientDashboard');
+    } else if (!isPatientView && patientPages.includes(currentPageName)) {
+      window.location.href = createPageUrl('Dashboard');
+    }
+  }, [isPatientView, currentPageName]);
 
   const handleLogout = () => {
     base44.auth.logout();
