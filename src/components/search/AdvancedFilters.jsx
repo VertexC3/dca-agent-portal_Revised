@@ -1,18 +1,13 @@
 import React, { useState } from 'react';
-import { Filter, X, Calendar, Search } from 'lucide-react';
+import { Filter, X, Calendar, Search, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 
 export default function AdvancedFilters({ filters, onFiltersChange, onClearFilters }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const activeFilterCount = Object.values(filters).filter(val => {
     if (typeof val === 'string') return val && val !== 'all';
@@ -25,27 +20,31 @@ export default function AdvancedFilters({ filters, onFiltersChange, onClearFilte
 
   const handleClear = () => {
     onClearFilters();
-    setIsOpen(false);
   };
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <Button 
-          variant="outline" 
-          className="relative border-gray-300"
-        >
-          <Filter className="w-4 h-4 mr-2" />
-          Advanced Filters
-          {activeFilterCount > 0 && (
-            <Badge className="ml-2 bg-[#8B1F1F] text-white px-2 py-0 text-xs">
-              {activeFilterCount}
-            </Badge>
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[400px] p-4 bg-white" align="end">
-        <div className="space-y-4">
+    <div className="space-y-4">
+      <Button 
+        variant="outline" 
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="relative border-gray-300"
+      >
+        <Filter className="w-4 h-4 mr-2" />
+        Advanced Filters
+        {activeFilterCount > 0 && (
+          <Badge className="ml-2 bg-[#8B1F1F] text-white px-2 py-0 text-xs">
+            {activeFilterCount}
+          </Badge>
+        )}
+        {isExpanded ? (
+          <ChevronUp className="w-4 h-4 ml-2" />
+        ) : (
+          <ChevronDown className="w-4 h-4 ml-2" />
+        )}
+      </Button>
+
+      {isExpanded && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-gray-200">
             <h3 className="font-semibold text-gray-800">Filter Communications</h3>
             {activeFilterCount > 0 && (
@@ -195,13 +194,13 @@ export default function AdvancedFilters({ filters, onFiltersChange, onClearFilte
 
           {/* Apply Button */}
           <Button
-            onClick={() => setIsOpen(false)}
+            onClick={() => setIsExpanded(false)}
             className="w-full bg-[#8B1F1F] hover:bg-[#721919] text-white"
           >
             Apply Filters
           </Button>
         </div>
-      </PopoverContent>
-    </Popover>
+      )}
+    </div>
   );
 }
