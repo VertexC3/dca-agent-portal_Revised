@@ -15,13 +15,27 @@ import {
 import GlobalSearchBar from './components/search/GlobalSearchBar';
 
 export default function Layout({ children, currentPageName }) {
-  const [isPatientView, setIsPatientView] = useState(false);
+  const [isPatientView, setIsPatientView] = useState(() => {
+    return localStorage.getItem('viewMode') === 'patient';
+  });
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
     queryFn: () => base44.auth.me(),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  const handleViewToggle = (isPatient) => {
+    setIsPatientView(isPatient);
+    localStorage.setItem('viewMode', isPatient ? 'patient' : 'staff');
+    
+    // Navigate to appropriate dashboard
+    if (isPatient) {
+      window.location.href = createPageUrl('PatientDashboard');
+    } else {
+      window.location.href = createPageUrl('Dashboard');
+    }
+  };
 
   const adminNavItems = [
     { name: 'Dashboard', icon: Home, page: 'Dashboard' },
@@ -77,7 +91,7 @@ export default function Layout({ children, currentPageName }) {
               {/* View Toggle */}
               <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
                 <button
-                  onClick={() => setIsPatientView(false)}
+                  onClick={() => handleViewToggle(false)}
                   className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
                     !isPatientView ? 'bg-white text-[#8B1F1F] shadow' : 'text-gray-600'
                   }`}
@@ -85,7 +99,7 @@ export default function Layout({ children, currentPageName }) {
                   Staff
                 </button>
                 <button
-                  onClick={() => setIsPatientView(true)}
+                  onClick={() => handleViewToggle(true)}
                   className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
                     isPatientView ? 'bg-white text-[#8B1F1F] shadow' : 'text-gray-600'
                   }`}
