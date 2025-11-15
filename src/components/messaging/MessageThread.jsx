@@ -37,13 +37,11 @@ export default function MessageThread({ patientEmail, isStaffView = false }) {
   });
 
   const { data: messages = [], isLoading } = useQuery({
-    queryKey: ['messages', patientEmail],
+    queryKey: ['messages'],
     queryFn: async () => {
-      const allMessages = await base44.entities.Message.list('-created_date', 500);
-      return allMessages.filter(m => m.patient_email === patientEmail);
+      return await base44.entities.Message.list('-created_date', 500);
     },
-    refetchInterval: 3000, // Poll every 3 seconds for real-time feel
-    enabled: !!patientEmail
+    refetchInterval: 3000 // Poll every 3 seconds for real-time feel
   });
 
   const sendMessageMutation = useMutation({
