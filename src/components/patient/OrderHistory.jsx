@@ -14,16 +14,14 @@ const statusColors = {
   cancelled: 'bg-red-100 text-red-800'
 };
 
-export default function OrderHistory({ patientEmail }) {
+export default function OrderHistory() {
   const [selectedReceipt, setSelectedReceipt] = useState(null);
 
   const { data: orders = [], isLoading } = useQuery({
-    queryKey: ['orders', patientEmail],
+    queryKey: ['orders'],
     queryFn: async () => {
-      const allOrders = await base44.entities.Order.list('-order_date', 100);
-      return allOrders.filter(o => o.patient_email === patientEmail);
-    },
-    enabled: !!patientEmail
+      return await base44.entities.Order.list('-order_date', 100);
+    }
   });
 
   if (isLoading) {
