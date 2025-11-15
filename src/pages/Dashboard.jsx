@@ -10,6 +10,11 @@ import { Loader2 } from 'lucide-react';
 export default function Dashboard() {
   const [selectedChannel, setSelectedChannel] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedRequestType, setSelectedRequestType] = useState('all');
+  const [selectedStaff, setSelectedStaff] = useState('all');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [sortBy, setSortBy] = useState('recent');
 
   const { data: communications = [], isLoading } = useQuery({
     queryKey: ['communications'],
@@ -156,7 +161,18 @@ export default function Dashboard() {
             communications={communications}
             selectedChannel={selectedChannel}
             selectedStatus={selectedStatus}
+            selectedRequestType={selectedRequestType}
+            selectedStaff={selectedStaff}
+            dateFrom={dateFrom}
+            dateTo={dateTo}
+            sortBy={sortBy}
             onChannelChange={setSelectedChannel}
+            onStatusChange={setSelectedStatus}
+            onRequestTypeChange={setSelectedRequestType}
+            onStaffChange={setSelectedStaff}
+            onDateFromChange={setDateFrom}
+            onDateToChange={setDateTo}
+            onSortChange={setSortBy}
           />
         </div>
 
