@@ -114,7 +114,7 @@ export default function OrderHistory({ patientEmail }) {
               <img
                 src={selectedReceipt.receipt_url}
                 alt="Receipt"
-                className="w-full rounded-lg border border-gray-200"
+                className="w-1/2 mx-auto rounded-lg border border-gray-200"
               />
               <div className="p-4 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-600">
