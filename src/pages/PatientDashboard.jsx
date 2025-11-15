@@ -162,7 +162,7 @@ export default function PatientDashboard() {
               <Package className="w-5 h-5 text-[#8B1F1F]" />
               Recent Orders
             </h3>
-            <OrderHistory patientEmail={user?.email} />
+            <OrderHistory />
           </div>
         </div>
       </div>

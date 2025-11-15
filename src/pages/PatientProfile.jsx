@@ -369,7 +369,7 @@ export default function PatientProfile() {
         </TabsContent>
 
         <TabsContent value="orders" className="p-8">
-          <OrderHistory patientEmail={user?.email} />
+          <OrderHistory />
         </TabsContent>
       </Tabs>
     </div>
