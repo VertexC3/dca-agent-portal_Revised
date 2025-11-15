@@ -26,13 +26,14 @@ export default function Layout({ children, currentPageName }) {
   const adminNavItems = [
     { name: 'Dashboard', icon: Home, page: 'Dashboard' },
     { name: 'Communications', icon: MessageSquare, page: 'Communications' },
+    { name: 'Messages', icon: MessageSquare, page: 'StaffMessaging' },
     { name: 'Analytics', icon: BarChart3, page: 'Analytics' },
   ];
 
   const patientNavItems = [
     { name: 'Dashboard', icon: Home, page: 'PatientDashboard' },
     { name: 'Prescriptions', icon: Pill, page: 'PatientDashboard' },
-    { name: 'Communications', icon: MessageSquare, page: 'PatientCommunications' },
+    { name: 'Messages', icon: MessageSquare, page: 'PatientMessages' },
   ];
 
   const navItems = isPatientView ? patientNavItems : adminNavItems;

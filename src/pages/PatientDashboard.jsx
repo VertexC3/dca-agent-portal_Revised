@@ -1,12 +1,13 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Pill, MessageSquare, User, Loader2 } from 'lucide-react';
+import { Pill, MessageSquare, User, Loader2, Package } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import PrescriptionCard from '../components/patient/PrescriptionCard';
+import OrderHistory from '../components/patient/OrderHistory';
 
 export default function PatientDashboard() {
   const { data: user } = useQuery({
@@ -136,15 +137,26 @@ export default function PatientDashboard() {
                   <span className="text-sm font-semibold text-gray-800">Update Profile</span>
                 </button>
               </Link>
-              <button className="w-full p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 text-left transition-all">
-                <MessageSquare className="w-4 h-4 inline mr-2 text-[#8B1F1F]" />
-                <span className="text-sm font-semibold text-gray-800">Contact Pharmacist</span>
-              </button>
+              <Link to={createPageUrl('PatientMessages')}>
+                <button className="w-full p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 text-left transition-all">
+                  <MessageSquare className="w-4 h-4 inline mr-2 text-[#8B1F1F]" />
+                  <span className="text-sm font-semibold text-gray-800">Message Pharmacist</span>
+                </button>
+              </Link>
               <button className="w-full p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 text-left transition-all">
                 <Pill className="w-4 h-4 inline mr-2 text-[#8B1F1F]" />
                 <span className="text-sm font-semibold text-gray-800">Request Refill</span>
               </button>
             </div>
+          </div>
+
+          {/* Recent Orders */}
+          <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
+            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <Package className="w-5 h-5 text-[#8B1F1F]" />
+              Recent Orders
+            </h3>
+            <OrderHistory patientEmail={user?.email} />
           </div>
         </div>
       </div>

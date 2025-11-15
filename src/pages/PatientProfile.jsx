@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { User, Mail, Phone, MapPin, Calendar, Save, Loader2, Plus, Trash2 } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar, Save, Loader2, Plus, Trash2, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import OrderHistory from '../components/patient/OrderHistory';
 
 export default function PatientProfile() {
   const queryClient = useQueryClient();
@@ -92,7 +94,25 @@ export default function PatientProfile() {
         <p className="text-gray-600">Manage your personal information and preferences</p>
       </div>
 
-      <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-lg space-y-6">
+      <Tabs defaultValue="profile" className="bg-white rounded-2xl border border-gray-200 shadow-lg">
+        <TabsList className="w-full justify-start border-b border-gray-200 bg-gray-50 rounded-t-2xl h-auto p-0">
+          <TabsTrigger 
+            value="profile" 
+            className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-[#8B1F1F] rounded-none px-6 py-4"
+          >
+            <User className="w-4 h-4 mr-2" />
+            Profile
+          </TabsTrigger>
+          <TabsTrigger 
+            value="orders"
+            className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-[#8B1F1F] rounded-none px-6 py-4"
+          >
+            <Package className="w-4 h-4 mr-2" />
+            Order History
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="profile" className="p-8 space-y-6">
         {/* Basic Information */}
         <div>
           <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
@@ -271,7 +291,12 @@ export default function PatientProfile() {
             )}
           </Button>
         </div>
-      </div>
+        </TabsContent>
+
+        <TabsContent value="orders" className="p-8">
+          <OrderHistory patientEmail={user?.email} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

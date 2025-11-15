@@ -9,6 +9,8 @@ import Automation from './pages/Automation';
 import PatientDashboard from './pages/PatientDashboard';
 import PatientProfile from './pages/PatientProfile';
 import PatientCommunications from './pages/PatientCommunications';
+import PatientMessages from './pages/PatientMessages';
+import StaffMessaging from './pages/StaffMessaging';
 import Layout from './Layout.jsx';
 
 
@@ -24,6 +26,8 @@ export const PAGES = {
     "PatientDashboard": PatientDashboard,
     "PatientProfile": PatientProfile,
     "PatientCommunications": PatientCommunications,
+    "PatientMessages": PatientMessages,
+    "StaffMessaging": StaffMessaging,
 }
 
 export const pagesConfig = {
