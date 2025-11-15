@@ -11,6 +11,7 @@ import PatientProfile from './pages/PatientProfile';
 import PatientCommunications from './pages/PatientCommunications';
 import PatientMessages from './pages/PatientMessages';
 import StaffMessaging from './pages/StaffMessaging';
+import Prescriptions from './pages/Prescriptions';
 import Layout from './Layout.jsx';
 
 
@@ -28,6 +29,7 @@ export const PAGES = {
     "PatientCommunications": PatientCommunications,
     "PatientMessages": PatientMessages,
     "StaffMessaging": StaffMessaging,
+    "Prescriptions": Prescriptions,
 }
 
 export const pagesConfig = {

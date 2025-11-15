@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Pill, Play, History, StopCircle, Calendar, Package, Truck } from 'lucide-react';
+import { Pill, Play, History, StopCircle, Calendar, Package, Truck, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import VideoExplainerDialog from './VideoExplainerDialog';
 import FillHistoryDialog from './FillHistoryDialog';
+import MedicalGuideDialog from './MedicalGuideDialog';
 import { format } from 'date-fns';
 
 const statusConfig = {
@@ -16,6 +17,7 @@ const statusConfig = {
 export default function PrescriptionCard({ prescription }) {
   const [showVideo, setShowVideo] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showMedicalGuide, setShowMedicalGuide] = useState(false);
   const [showStopConfirm, setShowStopConfirm] = useState(false);
 
   const StatusIcon = statusConfig[prescription.status]?.icon || Package;
@@ -58,38 +60,51 @@ export default function PrescriptionCard({ prescription }) {
             )}
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowVideo(true)}
-              className="flex-1"
-            >
-              <Play className="w-4 h-4 mr-1" />
-              Video Explainer
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowHistory(true)}
-              className="flex-1"
-            >
-              <History className="w-4 h-4 mr-1" />
-              Fill History
-            </Button>
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowVideo(true)}
+                className="flex-1"
+              >
+                <Play className="w-4 h-4 mr-1" />
+                Video Guide
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowStopConfirm(true)}
+                className="flex-1 text-red-600 hover:text-red-700 border-red-200"
+              >
+                <StopCircle className="w-4 h-4 mr-1" />
+                Stop Prescription
+              </Button>
+            </div>
+            
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowMedicalGuide(true)}
+                className="flex-1"
+              >
+                <BookOpen className="w-4 h-4 mr-1" />
+                Medical Guide
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowHistory(true)}
+                className="flex-1"
+              >
+                <History className="w-4 h-4 mr-1" />
+                Fill History
+              </Button>
+            </div>
           </div>
 
-          {!showStopConfirm ? (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowStopConfirm(true)}
-              className="w-full text-red-600 hover:text-red-700 border-red-200"
-            >
-              <StopCircle className="w-4 h-4 mr-1" />
-              Stop Prescription
-            </Button>
-          ) : (
+          {showStopConfirm && (
             <div className="space-y-2 p-3 bg-red-50 rounded-lg border border-red-200">
               <p className="text-sm text-gray-700 font-semibold">Are you sure you want to stop this prescription?</p>
               <div className="flex gap-2">
@@ -126,6 +141,12 @@ export default function PrescriptionCard({ prescription }) {
       <FillHistoryDialog
         open={showHistory}
         onClose={() => setShowHistory(false)}
+        prescription={prescription}
+      />
+
+      <MedicalGuideDialog
+        open={showMedicalGuide}
+        onClose={() => setShowMedicalGuide(false)}
         prescription={prescription}
       />
     </>

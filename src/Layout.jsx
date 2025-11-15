@@ -46,12 +46,12 @@ export default function Layout({ children, currentPageName }) {
 
   const patientNavItems = [
     { name: 'Dashboard', icon: Home, page: 'PatientDashboard' },
-    { name: 'Prescriptions', icon: Pill, page: 'PatientDashboard' },
+    { name: 'Prescriptions', icon: Pill, page: 'Prescriptions' },
     { name: 'Messages', icon: MessageSquare, page: 'PatientMessages' },
   ];
 
   const staffPages = ['Dashboard', 'Communications', 'StaffMessaging', 'Analytics', 'CommunicationDetail', 'AITraining', 'Automation', 'Settings', 'DailyView'];
-  const patientPages = ['PatientDashboard', 'PatientProfile', 'PatientMessages', 'PatientCommunications', 'PatientCommunicationDetail'];
+  const patientPages = ['PatientDashboard', 'PatientProfile', 'PatientMessages', 'PatientCommunications', 'PatientCommunicationDetail', 'Prescriptions'];
 
   const navItems = isPatientView ? patientNavItems : adminNavItems;
 
@@ -80,16 +80,10 @@ export default function Layout({ children, currentPageName }) {
                 alt="DCA Pharmacy" 
                 className="h-12"
               />
-              <div className="hidden md:block border-l border-gray-300 pl-3">
-                <h1 className="text-gray-800 font-bold text-lg">
-                  {isPatientView ? 'Patient Hub' : 'Staff Dashboard'}
-                </h1>
-              </div>
             </Link>
-            
-            <nav className="hidden md:flex items-center gap-4">
-              {/* View Toggle */}
-              <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+
+            {/* View Toggle */}
+            <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
                 <button
                   onClick={() => handleViewToggle(false)}
                   className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
@@ -107,7 +101,8 @@ export default function Layout({ children, currentPageName }) {
                   Patient
                 </button>
               </div>
-
+            
+            <nav className="hidden md:flex items-center gap-4">
               {/* Nav Items */}
               {navItems.map(item => (
                 <Link
