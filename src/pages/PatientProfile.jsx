@@ -23,6 +23,7 @@ export default function PatientProfile() {
     phone: '',
     date_of_birth: '',
     current_address: '',
+    addresses: [],
     additional_addresses: [],
     allergies: '',
     current_medications: '',
@@ -33,12 +34,24 @@ export default function PatientProfile() {
 
   React.useEffect(() => {
     if (user) {
+      // Migrate old addresses to new format if needed
+      let addresses = user.addresses || [];
+      if (!addresses.length && user.current_address) {
+        addresses = [{
+          name: 'Home',
+          address: user.current_address,
+          delivery_days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+          delivery_time: '9:00 AM - 5:00 PM'
+        }];
+      }
+      
       setProfileData({
         full_name: user.full_name || '',
         email: user.email || '',
         phone: user.phone || '',
         date_of_birth: user.date_of_birth || '',
         current_address: user.current_address || '',
+        addresses: addresses,
         additional_addresses: user.additional_addresses || [],
         allergies: user.allergies || '',
         current_medications: user.current_medications || '',
@@ -64,19 +77,41 @@ export default function PatientProfile() {
   const addAddress = () => {
     setProfileData({
       ...profileData,
-      additional_addresses: [...profileData.additional_addresses, '']
+      addresses: [
+        ...profileData.addresses,
+        {
+          name: '',
+          address: '',
+          delivery_days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+          delivery_time: '9:00 AM - 5:00 PM'
+        }
+      ]
     });
   };
 
-  const updateAddress = (index, value) => {
-    const newAddresses = [...profileData.additional_addresses];
-    newAddresses[index] = value;
-    setProfileData({ ...profileData, additional_addresses: newAddresses });
+  const updateAddress = (index, field, value) => {
+    const newAddresses = [...profileData.addresses];
+    newAddresses[index] = { ...newAddresses[index], [field]: value };
+    setProfileData({ ...profileData, addresses: newAddresses });
+  };
+
+  const toggleDeliveryDay = (addressIndex, day) => {
+    const newAddresses = [...profileData.addresses];
+    const address = newAddresses[addressIndex];
+    const days = address.delivery_days || [];
+    
+    if (days.includes(day)) {
+      address.delivery_days = days.filter(d => d !== day);
+    } else {
+      address.delivery_days = [...days, day];
+    }
+    
+    setProfileData({ ...profileData, addresses: newAddresses });
   };
 
   const removeAddress = (index) => {
-    const newAddresses = profileData.additional_addresses.filter((_, i) => i !== index);
-    setProfileData({ ...profileData, additional_addresses: newAddresses });
+    const newAddresses = profileData.addresses.filter((_, i) => i !== index);
+    setProfileData({ ...profileData, addresses: newAddresses });
   };
 
   if (isLoading) {
