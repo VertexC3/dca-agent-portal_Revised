@@ -1,15 +1,33 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Send, Paperclip, Loader2, CheckCheck, Check, X } from 'lucide-react';
+import { Send, Paperclip, Loader2, CheckCheck, Check, X, Mail, MessageSquare, Phone, Bot, Monitor } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
+
+const channelIcons = {
+  platform: Monitor,
+  email: Mail,
+  text: MessageSquare,
+  phone: Phone,
+  ai_agent: Bot
+};
+
+const channelColors = {
+  platform: 'bg-blue-100 text-blue-800',
+  email: 'bg-purple-100 text-purple-800',
+  text: 'bg-green-100 text-green-800',
+  phone: 'bg-orange-100 text-orange-800',
+  ai_agent: 'bg-pink-100 text-pink-800'
+};
 
 export default function MessageThread({ patientEmail, isStaffView = false }) {
   const [messageText, setMessageText] = useState('');
   const [uploadingFile, setUploadingFile] = useState(false);
   const [attachment, setAttachment] = useState(null);
+  const [selectedChannel, setSelectedChannel] = useState('all');
   const messagesEndRef = useRef(null);
   const queryClient = useQueryClient();
 
@@ -88,12 +106,17 @@ export default function MessageThread({ patientEmail, isStaffView = false }) {
       recipient_email: isStaffView ? patientEmail : 'pharmacy',
       patient_email: patientEmail,
       message_content: messageText,
+      channel: 'platform',
       attachment_url: attachment?.url || '',
       attachment_name: attachment?.name || ''
     };
 
     await sendMessageMutation.mutateAsync(messageData);
   };
+
+  const filteredMessages = selectedChannel === 'all' 
+    ? messages 
+    : messages.filter(m => m.channel === selectedChannel);
 
   if (isLoading) {
     return (
@@ -105,15 +128,46 @@ export default function MessageThread({ patientEmail, isStaffView = false }) {
 
   return (
     <div className="flex flex-col h-[600px] bg-white rounded-xl border border-gray-200">
+      {/* Channel Filter */}
+      <div className="border-b border-gray-200 p-4">
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant={selectedChannel === 'all' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setSelectedChannel('all')}
+            className={selectedChannel === 'all' ? 'bg-[#8B1F1F] hover:bg-[#721919]' : ''}
+          >
+            All Channels ({messages.length})
+          </Button>
+          {['platform', 'email', 'text', 'phone', 'ai_agent'].map(channel => {
+            const Icon = channelIcons[channel];
+            const count = messages.filter(m => m.channel === channel).length;
+            return (
+              <Button
+                key={channel}
+                variant={selectedChannel === channel ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setSelectedChannel(channel)}
+                className={selectedChannel === channel ? 'bg-[#8B1F1F] hover:bg-[#721919]' : ''}
+              >
+                <Icon className="w-3 h-3 mr-1" />
+                {channel === 'ai_agent' ? 'AI Agent' : channel.charAt(0).toUpperCase() + channel.slice(1)} ({count})
+              </Button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {messages.length === 0 ? (
+        {filteredMessages.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             <p>No messages yet. Start a conversation!</p>
           </div>
         ) : (
-          messages.map((msg) => {
+          filteredMessages.map((msg) => {
             const isOwnMessage = msg.sender_email === user?.email;
+            const ChannelIcon = channelIcons[msg.channel] || Monitor;
             return (
               <div
                 key={msg.id}
@@ -128,7 +182,13 @@ export default function MessageThread({ patientEmail, isStaffView = false }) {
                     }`}
                   >
                     {!isOwnMessage && (
-                      <p className="text-xs font-semibold mb-1">{msg.sender_name}</p>
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="text-xs font-semibold">{msg.sender_name}</p>
+                        <Badge className={`${channelColors[msg.channel]} text-xs px-1.5 py-0`}>
+                          <ChannelIcon className="w-2.5 h-2.5 mr-0.5" />
+                          {msg.channel === 'ai_agent' ? 'AI' : msg.channel}
+                        </Badge>
+                      </div>
                     )}
                     <p className="text-sm whitespace-pre-wrap">{msg.message_content}</p>
                     {msg.attachment_url && (
@@ -144,7 +204,7 @@ export default function MessageThread({ patientEmail, isStaffView = false }) {
                     )}
                   </div>
                   <div className="flex items-center gap-1 mt-1 text-xs text-gray-500">
-                    <span>{format(new Date(msg.created_date), 'h:mm a')}</span>
+                    <span>{format(new Date(msg.created_date), 'MMM d, h:mm a')}</span>
                     {isOwnMessage && (
                       msg.read ? (
                         <CheckCheck className="w-3 h-3 text-blue-500" />
