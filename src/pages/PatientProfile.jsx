@@ -281,12 +281,20 @@ export default function PatientProfile() {
             {profileData.addresses.map((addr, index) => (
               <div key={index} className="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
                 <div className="flex items-center gap-2 mb-2">
-                  <Input
-                    value={addr.name || ''}
-                    onChange={(e) => updateAddress(index, 'name', e.target.value)}
-                    placeholder="Address name (e.g., Home, Work)"
-                    className="flex-1 font-semibold"
-                  />
+                  <Select 
+                    value={addr.name || 'Home'} 
+                    onValueChange={(value) => updateAddress(index, 'name', value)}
+                  >
+                    <SelectTrigger className="flex-1 font-semibold">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Home">Home</SelectItem>
+                      <SelectItem value="Work">Work</SelectItem>
+                      <SelectItem value="Business">Business</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <Button
                     variant="outline"
                     size="icon"
@@ -295,6 +303,21 @@ export default function PatientProfile() {
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id={`primary-${index}`}
+                    checked={addr.is_primary || false}
+                    onCheckedChange={() => togglePrimary(index)}
+                  />
+                  <label
+                    htmlFor={`primary-${index}`}
+                    className="text-sm font-medium text-gray-700 cursor-pointer flex items-center gap-1"
+                  >
+                    <Star className={`w-4 h-4 ${addr.is_primary ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'}`} />
+                    Primary Address
+                  </label>
                 </div>
                 
                 <div>
@@ -435,8 +458,8 @@ export default function PatientProfile() {
         </div>
         </TabsContent>
 
-        <TabsContent value="orders" className="p-8">
-          <OrderHistory />
+        <TabsContent value="orders" className="p-8" id="orders">
+          <CollapsibleOrderHistory limit={null} showSeeAll={false} />
         </TabsContent>
       </Tabs>
     </div>
