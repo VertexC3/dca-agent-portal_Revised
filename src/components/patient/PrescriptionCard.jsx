@@ -44,9 +44,54 @@ export default function PrescriptionCard({ prescription }) {
               <Pill className="w-5 h-5 text-[#8B1F1F]" />
               <span className="text-lg">{prescription.name}</span>
             </div>
-            <Badge className={`${statusConfig[prescription.status]?.color} border`}>
-              {prescription.status}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge className={`${statusConfig[prescription.status]?.color} border`}>
+                {prescription.status}
+              </Badge>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <MoreVertical className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => setShowRefillRequest(true)}>
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Request Refill
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowRenewal(true)}>
+                    <FileText className="w-4 h-4 mr-2" />
+                    Request Renewal
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowPayment(true)}>
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Payment
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowOrders(true)}>
+                    <Package className="w-4 h-4 mr-2" />
+                    Orders
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setShowVideo(true)}>
+                    <Play className="w-4 h-4 mr-2" />
+                    Video Guide
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowHistory(true)}>
+                    <History className="w-4 h-4 mr-2" />
+                    Fill History
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowMedicalGuide(true)}>
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    Medical Guide
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setShowStopConfirm(true)} className="text-red-600">
+                    <StopCircle className="w-4 h-4 mr-2" />
+                    Stop Prescription
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -71,58 +116,6 @@ export default function PrescriptionCard({ prescription }) {
                 <p className="text-xs text-gray-500 mt-1">Expected delivery: {prescription.expectedDelivery}</p>
               </div>
             )}
-          </div>
-
-          <div className="space-y-2">
-            <Button
-              onClick={() => setShowRefillRequest(true)}
-              className="w-full bg-[#8B1F1F] hover:bg-[#721919] text-white"
-            >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Request Refill
-            </Button>
-
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowVideo(true)}
-                className="flex-1"
-              >
-                <Play className="w-4 h-4 mr-1" />
-                Video Guide
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowStopConfirm(true)}
-                className="flex-1 text-red-600 hover:text-red-700 border-red-200"
-              >
-                <StopCircle className="w-4 h-4 mr-1" />
-                Stop Prescription
-              </Button>
-            </div>
-            
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowMedicalGuide(true)}
-                className="flex-1"
-              >
-                <BookOpen className="w-4 h-4 mr-1" />
-                Medical Guide
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowHistory(true)}
-                className="flex-1"
-              >
-                <History className="w-4 h-4 mr-1" />
-                Fill History
-              </Button>
-            </div>
           </div>
 
           {showStopConfirm && (
