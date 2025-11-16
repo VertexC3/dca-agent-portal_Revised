@@ -101,7 +101,27 @@ export default function Layout({ children, currentPageName }) {
             </nav>
 
             <div className="flex items-center gap-4">
-              {!isPatientView && <GlobalSearchBar />}
+              <GlobalSearchBar />
+
+              {/* View Toggle */}
+              <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => handleViewToggle(false)}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
+                    !isPatientView ? 'bg-white text-[#8B1F1F] shadow' : 'text-gray-600'
+                  }`}
+                >
+                  Staff
+                </button>
+                <button
+                  onClick={() => handleViewToggle(true)}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
+                    isPatientView ? 'bg-white text-[#8B1F1F] shadow' : 'text-gray-600'
+                  }`}
+                >
+                  Patient
+                </button>
+              </div>
               
               <div className="flex items-center gap-2">
               <DropdownMenu>
