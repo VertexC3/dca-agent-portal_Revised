@@ -15,6 +15,7 @@ import VideoExplainerDialog from './VideoExplainerDialog';
 import FillHistoryDialog from './FillHistoryDialog';
 import MedicalGuideDialog from './MedicalGuideDialog';
 import RefillRequestDialog from './RefillRequestDialog';
+import PrescriberProfileDialog from './PrescriberProfileDialog';
 import { format } from 'date-fns';
 
 const statusConfig = {
@@ -32,6 +33,7 @@ export default function PrescriptionCard({ prescription }) {
   const [showRenewal, setShowRenewal] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
+  const [showPrescriberProfile, setShowPrescriberProfile] = useState(false);
 
   const StatusIcon = statusConfig[prescription.status]?.icon || Package;
 
@@ -97,7 +99,13 @@ export default function PrescriptionCard({ prescription }) {
         <CardContent className="space-y-4">
           <div className="space-y-2 text-sm">
             <p className="text-gray-600">
-              <strong>Prescriber:</strong> {prescription.prescriber}
+              <strong>Prescriber:</strong> 
+              <button 
+                onClick={() => setShowPrescriberProfile(true)}
+                className="ml-1 text-[#8B1F1F] hover:underline font-medium"
+              >
+                {prescription.prescriber}
+              </button>
             </p>
             <p className="text-gray-600">
               <strong>Dosage:</strong> {prescription.dosage}
@@ -214,6 +222,13 @@ export default function PrescriptionCard({ prescription }) {
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Prescriber Profile Dialog */}
+      <PrescriberProfileDialog
+        open={showPrescriberProfile}
+        onClose={() => setShowPrescriberProfile(false)}
+        prescriberName={prescription.prescriber}
+      />
     </>
   );
 }
