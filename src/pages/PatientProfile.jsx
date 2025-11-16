@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { User, Mail, Phone, MapPin, Calendar, Save, Loader2, Plus, Trash2, Package } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar, Save, Loader2, Plus, Trash2, Package, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import OrderHistory from '../components/patient/OrderHistory';
+import CollapsibleOrderHistory from '../components/patient/CollapsibleOrderHistory';
 
 export default function PatientProfile() {
   const queryClient = useQueryClient();
@@ -99,13 +102,22 @@ export default function PatientProfile() {
       addresses: [
         ...profileData.addresses,
         {
-          name: '',
+          name: 'Home',
           address: '',
           delivery_days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-          delivery_time: '9:00 AM - 5:00 PM'
+          delivery_time: '9:00 AM - 5:00 PM',
+          is_primary: false
         }
       ]
     });
+  };
+
+  const togglePrimary = (index) => {
+    const newAddresses = profileData.addresses.map((addr, idx) => ({
+      ...addr,
+      is_primary: idx === index
+    }));
+    setProfileData({ ...profileData, addresses: newAddresses });
   };
 
   const updateAddress = (index, field, value) => {

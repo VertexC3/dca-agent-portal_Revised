@@ -47,7 +47,7 @@ export default function Layout({ children, currentPageName }) {
   const patientNavItems = [
     { name: 'Dashboard', icon: Home, page: 'PatientDashboard' },
     { name: 'Prescriptions', icon: Pill, page: 'Prescriptions' },
-    { name: 'Messages', icon: MessageSquare, page: 'PatientMessages' },
+    { name: 'Communication', icon: MessageSquare, page: 'PatientMessages' },
   ];
 
   const staffPages = ['Dashboard', 'Communications', 'StaffMessaging', 'Analytics', 'CommunicationDetail', 'AITraining', 'Automation', 'Settings', 'DailyView'];

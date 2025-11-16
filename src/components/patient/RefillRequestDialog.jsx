@@ -5,13 +5,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, CheckCircle, Pill } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Loader2, CheckCircle, Pill, CreditCard } from 'lucide-react';
 
 export default function RefillRequestDialog({ open, onClose, prescription }) {
   const [deliveryMethod, setDeliveryMethod] = useState('pickup');
   const [notes, setNotes] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [cardNumber, setCardNumber] = useState('');
+  const [saveCard, setSaveCard] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: user } = useQuery({
@@ -137,6 +142,52 @@ DCA Pharmacy Team`
                   ? '2-4 hours for pickup'
                   : '2-3 business days for delivery'}
               </p>
+            </div>
+
+            {/* Payment Section */}
+            <div className="border-t pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowPayment(!showPayment)}
+                className="w-full mb-3"
+              >
+                <CreditCard className="w-4 h-4 mr-2" />
+                {showPayment ? 'Hide Payment' : 'Add Payment Method'}
+              </Button>
+
+              {showPayment && (
+                <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <Label>Card Number</Label>
+                    <Input
+                      value={cardNumber}
+                      onChange={(e) => setCardNumber(e.target.value)}
+                      placeholder="1234 5678 9012 3456"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label>Expiry Date</Label>
+                      <Input placeholder="MM/YY" className="mt-1" />
+                    </div>
+                    <div>
+                      <Label>CVV</Label>
+                      <Input placeholder="123" className="mt-1" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="save-card"
+                      checked={saveCard}
+                      onCheckedChange={setSaveCard}
+                    />
+                    <label htmlFor="save-card" className="text-sm text-gray-700 cursor-pointer">
+                      Save card for future purchases
+                    </label>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-2 pt-4">

@@ -1,8 +1,16 @@
 import React, { useState } from 'react';
-import { Pill, Play, History, StopCircle, Calendar, Package, Truck, BookOpen, RefreshCw } from 'lucide-react';
+import { Pill, Calendar, Package, Truck, MoreVertical, RefreshCw, CreditCard, FileText, Play, History, BookOpen, StopCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import VideoExplainerDialog from './VideoExplainerDialog';
 import FillHistoryDialog from './FillHistoryDialog';
 import MedicalGuideDialog from './MedicalGuideDialog';
@@ -21,6 +29,9 @@ export default function PrescriptionCard({ prescription }) {
   const [showMedicalGuide, setShowMedicalGuide] = useState(false);
   const [showStopConfirm, setShowStopConfirm] = useState(false);
   const [showRefillRequest, setShowRefillRequest] = useState(false);
+  const [showRenewal, setShowRenewal] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [showOrders, setShowOrders] = useState(false);
 
   const StatusIcon = statusConfig[prescription.status]?.icon || Package;
 
@@ -165,6 +176,51 @@ export default function PrescriptionCard({ prescription }) {
         onClose={() => setShowRefillRequest(false)}
         prescription={prescription}
       />
+
+      {/* Renewal Dialog */}
+      {showRenewal && (
+        <Dialog open={showRenewal} onOpenChange={() => setShowRenewal(false)}>
+          <DialogContent className="max-w-md bg-white">
+            <DialogHeader>
+              <DialogTitle>Request Renewal</DialogTitle>
+            </DialogHeader>
+            <p className="text-gray-600">Renewal request for {prescription.name} will be sent to your prescriber.</p>
+            <Button onClick={() => { alert('Renewal request submitted!'); setShowRenewal(false); }} className="bg-[#8B1F1F] hover:bg-[#721919]">
+              Submit Request
+            </Button>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Payment Dialog */}
+      {showPayment && (
+        <Dialog open={showPayment} onOpenChange={() => setShowPayment(false)}>
+          <DialogContent className="max-w-md bg-white">
+            <DialogHeader>
+              <DialogTitle>Payment for {prescription.name}</DialogTitle>
+            </DialogHeader>
+            <p className="text-gray-600">Payment options will be available here.</p>
+            <Button onClick={() => setShowPayment(false)} className="bg-[#8B1F1F] hover:bg-[#721919]">
+              Close
+            </Button>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Orders Dialog */}
+      {showOrders && (
+        <Dialog open={showOrders} onOpenChange={() => setShowOrders(false)}>
+          <DialogContent className="max-w-2xl bg-white">
+            <DialogHeader>
+              <DialogTitle>Orders for {prescription.name}</DialogTitle>
+            </DialogHeader>
+            <p className="text-gray-600">Order history for this prescription will be displayed here.</p>
+            <Button onClick={() => setShowOrders(false)} className="bg-[#8B1F1F] hover:bg-[#721919]">
+              Close
+            </Button>
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 }

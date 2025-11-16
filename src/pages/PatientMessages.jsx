@@ -23,7 +23,7 @@ export default function PatientMessages() {
       <div>
         <h1 className="text-4xl font-bold text-gray-800 mb-2 flex items-center gap-2">
           <MessageSquare className="w-8 h-8 text-[#8B1F1F]" />
-          Messages
+          Communication
         </h1>
         <p className="text-gray-600">Chat with your pharmacy team</p>
       </div>

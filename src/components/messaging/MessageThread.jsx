@@ -8,19 +8,17 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 
 const channelIcons = {
-  platform: Monitor,
+  platform: MessageSquare,
   email: Mail,
   text: MessageSquare,
-  phone: Phone,
-  ai_agent: Bot
+  phone: Phone
 };
 
 const channelColors = {
   platform: 'bg-blue-100 text-blue-800',
   email: 'bg-purple-100 text-purple-800',
   text: 'bg-green-100 text-green-800',
-  phone: 'bg-orange-100 text-orange-800',
-  ai_agent: 'bg-pink-100 text-pink-800'
+  phone: 'bg-orange-100 text-orange-800'
 };
 
 export default function MessageThread({ patientEmail, isStaffView = false }) {
@@ -137,9 +135,10 @@ export default function MessageThread({ patientEmail, isStaffView = false }) {
           >
             All Channels ({messages.length})
           </Button>
-          {['platform', 'email', 'text', 'phone', 'ai_agent'].map(channel => {
+          {['platform', 'email', 'text', 'phone'].map(channel => {
             const Icon = channelIcons[channel];
             const count = messages.filter(m => m.channel === channel).length;
+            const displayName = channel === 'platform' ? 'Chat' : channel.charAt(0).toUpperCase() + channel.slice(1);
             return (
               <Button
                 key={channel}
@@ -149,7 +148,7 @@ export default function MessageThread({ patientEmail, isStaffView = false }) {
                 className={selectedChannel === channel ? 'bg-[#8B1F1F] hover:bg-[#721919]' : ''}
               >
                 <Icon className="w-3 h-3 mr-1" />
-                {channel === 'ai_agent' ? 'AI Agent' : channel.charAt(0).toUpperCase() + channel.slice(1)} ({count})
+                {displayName} ({count})
               </Button>
             );
           })}

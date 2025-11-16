@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Pill, MessageSquare, User, Loader2, Package } from 'lucide-react';
+import { Pill, MessageSquare, User, Loader2, Package, Filter } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import PrescriptionCard from '../components/patient/PrescriptionCard';
-import OrderHistory from '../components/patient/OrderHistory';
+import CollapsibleOrderHistory from '../components/patient/CollapsibleOrderHistory';
 import RefillRequestDialog from '../components/patient/RefillRequestDialog';
 
 export default function PatientDashboard() {
   const [showQuickRefill, setShowQuickRefill] = useState(false);
+  const [prescriptionFilter, setPrescriptionFilter] = useState('Active');
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
@@ -28,7 +30,7 @@ export default function PatientDashboard() {
   });
 
   // Dummy prescriptions with different statuses
-  const prescriptions = [
+  const allPrescriptions = [
     {
       id: 1,
       name: 'Lisinopril 10mg',
@@ -36,7 +38,8 @@ export default function PatientDashboard() {
       prescriber: 'Dr. Smith',
       refills: 3,
       lastFilled: '2025-11-01',
-      status: 'Ready for Pickup'
+      status: 'Ready for Pickup',
+      category: 'Active'
     },
     {
       id: 2,
@@ -47,7 +50,8 @@ export default function PatientDashboard() {
       lastFilled: '2025-10-25',
       status: 'Shipped',
       tracking: '1Z999AA10123456784',
-      expectedDelivery: 'Nov 16, 2025'
+      expectedDelivery: 'Nov 16, 2025',
+      category: 'Active'
     },
     {
       id: 3,
@@ -58,9 +62,32 @@ export default function PatientDashboard() {
       lastFilled: '2025-10-20',
       status: 'In Delivery',
       tracking: '1Z999AA10987654321',
-      expectedDelivery: 'Nov 15, 2025'
+      expectedDelivery: 'Nov 15, 2025',
+      category: 'Active'
+    },
+    {
+      id: 4,
+      name: 'Aspirin 81mg',
+      dosage: 'Take 1 tablet daily',
+      prescriber: 'Dr. Smith',
+      refills: 0,
+      lastFilled: '2025-08-01',
+      status: 'Ready for Pickup',
+      category: 'Inactive'
+    },
+    {
+      id: 5,
+      name: 'Ibuprofen 200mg',
+      dosage: 'Take as needed',
+      prescriber: 'Dr. Johnson',
+      refills: 0,
+      lastFilled: '2025-06-01',
+      status: 'Ready for Pickup',
+      category: 'Discontinued'
     }
   ];
+
+  const prescriptions = allPrescriptions.filter(p => p.category === prescriptionFilter);
 
   return (
     <div className="space-y-6">
