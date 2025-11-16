@@ -103,8 +103,19 @@ export default function PatientDashboard() {
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
               <Pill className="w-6 h-6 text-[#8B1F1F]" />
-              Active Prescriptions ({prescriptions.length})
+              {prescriptionFilter} Prescriptions ({prescriptions.length})
             </h2>
+            <Select value={prescriptionFilter} onValueChange={setPrescriptionFilter}>
+              <SelectTrigger className="w-[160px]">
+                <Filter className="w-4 h-4 mr-2" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Active">Active</SelectItem>
+                <SelectItem value="Inactive">Inactive</SelectItem>
+                <SelectItem value="Discontinued">Discontinued</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid grid-cols-1 gap-4">
@@ -170,7 +181,7 @@ export default function PatientDashboard() {
               <Link to={createPageUrl('PatientMessages')}>
                 <button className="w-full p-3 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 text-left transition-all">
                   <MessageSquare className="w-4 h-4 inline mr-2 text-[#8B1F1F]" />
-                  <span className="text-sm font-semibold text-gray-800">Message Pharmacist</span>
+                  <span className="text-sm font-semibold text-gray-800">Communication</span>
                 </button>
               </Link>
               <button 
@@ -189,7 +200,7 @@ export default function PatientDashboard() {
               <Package className="w-5 h-5 text-[#8B1F1F]" />
               Recent Orders
             </h3>
-            <OrderHistory />
+            <CollapsibleOrderHistory limit={5} showSeeAll={true} />
           </div>
         </div>
       </div>
