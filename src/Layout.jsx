@@ -81,7 +81,7 @@ export default function Layout({ children, currentPageName }) {
       iframe.style.borderRadius = "14px";
       iframe.style.border = "none";
       iframe.style.boxShadow = "0 25px 50px -12px rgb(0 0 0 / 0.25)";
-      iframe.style.width = "400px";
+      iframe.style.width = "500px";
       iframe.style.height = "600px";
       container.appendChild(iframe);
 
