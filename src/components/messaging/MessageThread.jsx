@@ -39,7 +39,9 @@ export default function MessageThread({ patientEmail, isStaffView = false }) {
     queryFn: async () => {
       return await base44.entities.Message.list('-created_date', 500);
     },
-    refetchInterval: 3000 // Poll every 3 seconds for real-time feel
+    refetchInterval: 5000, // Poll every 5 seconds
+    refetchOnWindowFocus: false,
+    staleTime: 2000
   });
 
   const sendMessageMutation = useMutation({
