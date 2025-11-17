@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import OrderHistory from '../components/patient/OrderHistory';
 import CollapsibleOrderHistory from '../components/patient/CollapsibleOrderHistory';
+import PaymentManagement from '../components/patient/PaymentManagement';
 
 export default function PatientProfile() {
   const queryClient = useQueryClient();
