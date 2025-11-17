@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Package, Calendar, ChevronDown, ChevronUp, Loader2, Receipt, ExternalLink } from 'lucide-react';
+import { Package, Calendar, ChevronDown, ChevronUp, Loader2, Receipt, ExternalLink, FileSpreadsheet, FileText, Filter } from 'lucide-react';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../../utils';
 
@@ -19,6 +21,9 @@ const statusColors = {
 export default function CollapsibleOrderHistory({ limit = 5, showSeeAll = false }) {
   const [expandedOrders, setExpandedOrders] = useState({});
   const [selectedReceipt, setSelectedReceipt] = useState(null);
+  const [showReporting, setShowReporting] = useState(false);
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
 
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ['orders'],
@@ -27,7 +32,111 @@ export default function CollapsibleOrderHistory({ limit = 5, showSeeAll = false 
     }
   });
 
-  const displayOrders = limit ? orders.slice(0, limit) : orders;
+  const filteredOrders = useMemo(() => {
+    if (!dateFrom && !dateTo) return orders;
+    
+    return orders.filter(order => {
+      const orderDate = new Date(order.order_date);
+      const from = dateFrom ? new Date(dateFrom) : null;
+      const to = dateTo ? new Date(dateTo) : null;
+      
+      if (from && orderDate < from) return false;
+      if (to && orderDate > to) return false;
+      return true;
+    });
+  }, [orders, dateFrom, dateTo]);
+
+  const displayOrders = limit ? filteredOrders.slice(0, limit) : filteredOrders;
+
+  const generateCSV = () => {
+    const headers = ['Order Number', 'Date', 'Items', 'Total Amount', 'Status', 'Payment Method', 'Location'];
+    const rows = filteredOrders.map(order => {
+      const items = order.items ? JSON.parse(order.items).map(i => `${i.name} ($${i.price})`).join('; ') : '';
+      return [
+        order.order_number,
+        format(new Date(order.order_date), 'MMM d, yyyy h:mm a'),
+        items,
+        order.total_amount.toFixed(2),
+        order.status,
+        order.payment_method || '',
+        order.pharmacy_location || ''
+      ];
+    });
+
+    const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `order-report-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  const generatePDF = () => {
+    const doc = `
+      <html>
+        <head>
+          <title>Order Report</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            h1 { color: #8B1F1F; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #8B1F1F; color: white; }
+            .summary { margin-top: 20px; padding: 10px; background-color: #f5f5f5; }
+          </style>
+        </head>
+        <body>
+          <h1>Order History Report</h1>
+          <p>Generated on: ${format(new Date(), 'MMM d, yyyy h:mm a')}</p>
+          ${dateFrom || dateTo ? `<p>Period: ${dateFrom ? format(new Date(dateFrom), 'MMM d, yyyy') : 'Beginning'} - ${dateTo ? format(new Date(dateTo), 'MMM d, yyyy') : 'Now'}</p>` : ''}
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Order #</th>
+                <th>Date</th>
+                <th>Items</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Payment</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filteredOrders.map(order => {
+                const items = order.items ? JSON.parse(order.items).map(i => i.name).join(', ') : '';
+                return `
+                  <tr>
+                    <td>${order.order_number}</td>
+                    <td>${format(new Date(order.order_date), 'MMM d, yyyy')}</td>
+                    <td>${items}</td>
+                    <td>$${order.total_amount.toFixed(2)}</td>
+                    <td>${order.status}</td>
+                    <td>${order.payment_method || 'N/A'}</td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+          
+          <div class="summary">
+            <h3>Summary</h3>
+            <p><strong>Total Orders:</strong> ${filteredOrders.length}</p>
+            <p><strong>Total Amount:</strong> $${filteredOrders.reduce((sum, o) => sum + o.total_amount, 0).toFixed(2)}</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    const blob = new Blob([doc], { type: 'text/html' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `order-report-${format(new Date(), 'yyyy-MM-dd')}.html`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  };
 
   const toggleOrder = (orderId) => {
     setExpandedOrders(prev => ({
@@ -55,6 +164,88 @@ export default function CollapsibleOrderHistory({ limit = 5, showSeeAll = false 
 
   return (
     <>
+      {/* Reporting Section */}
+      <div className="mb-6 bg-gray-50 rounded-xl p-4 border border-gray-200">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <FileText className="w-5 h-5 text-[#8B1F1F]" />
+            Reporting
+          </h3>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowReporting(!showReporting)}
+          >
+            <Filter className="w-4 h-4 mr-2" />
+            {showReporting ? 'Hide Filters' : 'Show Filters'}
+          </Button>
+        </div>
+
+        {showReporting && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm font-medium text-gray-700">From Date</Label>
+                <Input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-gray-700">To Date</Label>
+                <Input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                onClick={generateCSV}
+                disabled={filteredOrders.length === 0}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                <FileSpreadsheet className="w-4 h-4 mr-2" />
+                Export as XLS
+              </Button>
+              <Button
+                onClick={generatePDF}
+                disabled={filteredOrders.length === 0}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Export as PDF
+              </Button>
+              {(dateFrom || dateTo) && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setDateFrom('');
+                    setDateTo('');
+                  }}
+                >
+                  Clear Filters
+                </Button>
+              )}
+            </div>
+
+            <div className="p-3 bg-white rounded-lg border border-gray-200">
+              <p className="text-sm text-gray-700">
+                <strong>Filtered Orders:</strong> {filteredOrders.length}
+              </p>
+              <p className="text-sm text-gray-700">
+                <strong>Total Amount:</strong> ${filteredOrders.reduce((sum, o) => sum + o.total_amount, 0).toFixed(2)}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
       {showSeeAll && orders.length > limit && (
         <div className="flex justify-end mb-4">
           <Link to={createPageUrl('PatientProfile') + '#orders'}>
