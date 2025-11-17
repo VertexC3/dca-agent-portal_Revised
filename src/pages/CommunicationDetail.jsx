@@ -43,6 +43,7 @@ export default function CommunicationDetail() {
   const [newStatus, setNewStatus] = useState('');
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
   const [showPatientProfile, setShowPatientProfile] = useState(false);
+  const [isEditingRequestType, setIsEditingRequestType] = useState(false);
   const [feedbackData, setFeedbackData] = useState({
     feedback_type: 'positive',
     feedback_notes: '',
@@ -213,6 +214,11 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
     await updateMutation.mutateAsync({ status });
   };
 
+  const handleRequestTypeChange = async (newRequestType) => {
+    await updateMutation.mutateAsync({ request_type: newRequestType });
+    setIsEditingRequestType(false);
+  };
+
   const handleSubmitFeedback = async () => {
     if (!communication.recommended_response) return;
 
@@ -327,9 +333,36 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                   <FileText className="w-4 h-4" />
                   Request Type
                 </div>
-                <p className="text-gray-800 font-semibold text-sm">
-                  {communication.request_type?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                </p>
+                {isEditingRequestType ? (
+                  <Select 
+                    value={communication.request_type} 
+                    onValueChange={handleRequestTypeChange}
+                  >
+                    <SelectTrigger className="w-full bg-white border-gray-200 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="prescription_refill">Prescription Refill</SelectItem>
+                      <SelectItem value="prescription_renewal">Prescription Renewal</SelectItem>
+                      <SelectItem value="medication_inquiry">Medication Inquiry</SelectItem>
+                      <SelectItem value="delivery_status">Delivery Status</SelectItem>
+                      <SelectItem value="billing_question">Billing Question</SelectItem>
+                      <SelectItem value="side_effects">Side Effects</SelectItem>
+                      <SelectItem value="address_update">Address Update</SelectItem>
+                      <SelectItem value="insurance_question">Insurance Question</SelectItem>
+                      <SelectItem value="appointment_scheduling">Appointment Scheduling</SelectItem>
+                      <SelectItem value="general_inquiry">General Inquiry</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <button
+                    onClick={() => setIsEditingRequestType(true)}
+                    className="text-gray-800 font-semibold text-sm hover:text-[#8B1F1F] transition-colors flex items-center gap-1"
+                  >
+                    {communication.request_type?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    <Edit3 className="w-3 h-3" />
+                  </button>
+                )}
               </div>
               <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                 <div className="flex items-center gap-2 text-gray-600 mb-1 text-sm">
@@ -351,16 +384,18 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
               </div>
             </div>
 
-            {/* Patient Message/Transcript */}
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <MessageSquare className="w-5 h-5" />
-                {communication.channel === 'phone' ? 'Transcript' : 'Message'}
-              </h3>
-              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                {communication.transcript || communication.message_content}
-              </p>
-            </div>
+            {/* Patient Message/Transcript - Only show if no request type is selected or not changed */}
+            {!isEditingRequestType && communication.request_type && (
+              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5" />
+                  {communication.channel === 'phone' ? 'Transcript' : 'Message'}
+                </h3>
+                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  {communication.transcript || communication.message_content}
+                </p>
+              </div>
+            )}
 
             {/* Voice Recording */}
             {communication.channel === 'phone' && communication.voice_recording_url && (

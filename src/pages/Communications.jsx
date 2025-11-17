@@ -47,6 +47,7 @@ export default function Communications() {
     channel: 'all',
     requestType: 'all',
     handledBy: 'all',
+    patientName: 'all',
     dateFrom: '',
     dateTo: ''
   });
@@ -97,6 +98,9 @@ export default function Communications() {
     }
   });
 
+  // Get unique patient names for filter
+  const uniquePatients = [...new Set(communications.map(c => c.patient_name))].sort();
+
   const filteredCommunications = communications.filter(comm => {
     // Basic search
     const matchesSearch = searchTerm === '' || 
@@ -125,6 +129,8 @@ export default function Communications() {
       (advancedFilters.handledBy === 'escalated' && comm.escalated_to_human) ||
       (advancedFilters.handledBy === 'unassigned' && !comm.handled_by);
 
+    const matchesPatientName = advancedFilters.patientName === 'all' || comm.patient_name === advancedFilters.patientName;
+
     // Date range filter
     const commDate = new Date(comm.date);
     const matchesDateFrom = !advancedFilters.dateFrom || commDate >= new Date(advancedFilters.dateFrom);
@@ -136,7 +142,7 @@ export default function Communications() {
     const matchesHandledBy = handledByFilter === 'all' || comm.handled_by_type === handledByFilter;
     
     return matchesSearch && matchesPatientSearch && matchesRxNumber && matchesAdvStatus && matchesAdvChannel && 
-           matchesRequestType && matchesAdvHandledBy && matchesDateFrom && matchesDateTo &&
+           matchesRequestType && matchesAdvHandledBy && matchesPatientName && matchesDateFrom && matchesDateTo &&
            matchesChannel && matchesStatus && matchesHandledBy;
   });
 
@@ -154,6 +160,7 @@ export default function Communications() {
       channel: 'all',
       requestType: 'all',
       handledBy: 'all',
+      patientName: 'all',
       dateFrom: '',
       dateTo: ''
     });
@@ -204,9 +211,11 @@ export default function Communications() {
               channel: 'all',
               requestType: 'all',
               handledBy: 'all',
+              patientName: 'all',
               dateFrom: '',
               dateTo: ''
             })}
+            patients={uniquePatients}
           />
         </div>
 
@@ -266,6 +275,14 @@ export default function Communications() {
               <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
                 Handled: {advancedFilters.handledBy.replace(/_/g, ' ')}
                 <button onClick={() => setAdvancedFilters({...advancedFilters, handledBy: 'all'})} className="ml-1">
+                  <X className="w-3 h-3" />
+                </button>
+              </Badge>
+            )}
+            {advancedFilters.patientName !== 'all' && (
+              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                Patient: {advancedFilters.patientName}
+                <button onClick={() => setAdvancedFilters({...advancedFilters, patientName: 'all'})} className="ml-1">
                   <X className="w-3 h-3" />
                 </button>
               </Badge>
