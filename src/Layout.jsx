@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from './utils';
 import { base44 } from './api/base44Client';
 import { useQuery } from '@tanstack/react-query';
-import { Home, MessageSquare, BarChart3, Settings, LogOut, User, Brain, Zap, Pill } from 'lucide-react';
+import { Home, MessageSquare, BarChart3, Settings, LogOut, User, Brain, Zap, Pill, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import {
   DropdownMenu,
@@ -18,6 +18,7 @@ export default function Layout({ children, currentPageName }) {
   const [isPatientView, setIsPatientView] = useState(() => {
     return localStorage.getItem('viewMode') === 'patient';
   });
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
@@ -69,7 +70,7 @@ export default function Layout({ children, currentPageName }) {
   };
 
   React.useEffect(() => {
-    if (isPatientView) {
+    if (isPatientView && isChatbotOpen) {
       const container = document.getElementById('chatbot-container');
       if (!container) return;
 
@@ -91,7 +92,7 @@ export default function Layout({ children, currentPageName }) {
         }
       };
     }
-  }, [isPatientView]);
+  }, [isPatientView, isChatbotOpen]);
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gray-50">
@@ -222,10 +223,26 @@ export default function Layout({ children, currentPageName }) {
 
       {/* Agent Chatbot - Patient View Only */}
       {isPatientView && (
-        <div 
-          id="chatbot-container" 
-          className="fixed bottom-6 right-6 z-50"
-        />
+        <>
+          {isChatbotOpen ? (
+            <div className="fixed bottom-6 right-6 z-50">
+              <button
+                onClick={() => setIsChatbotOpen(false)}
+                className="absolute -top-3 -right-3 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-all z-10 border border-gray-200"
+              >
+                <X className="w-5 h-5 text-gray-700" />
+              </button>
+              <div id="chatbot-container" />
+            </div>
+          ) : (
+            <button
+              onClick={() => setIsChatbotOpen(true)}
+              className="fixed bottom-6 right-6 z-50 bg-[#8B1F1F] text-white px-6 py-3 rounded-full shadow-lg hover:bg-[#721919] transition-all font-semibold"
+            >
+              Agent
+            </button>
+          )}
+        </>
       )}
     </div>
   );
