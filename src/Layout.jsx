@@ -68,6 +68,31 @@ export default function Layout({ children, currentPageName }) {
     base44.auth.logout();
   };
 
+  React.useEffect(() => {
+    if (isPatientView) {
+      const container = document.getElementById('chatbot-container');
+      if (!container) return;
+
+      const iframe = document.createElement('iframe');
+      iframe.src = 'https://jessica.teleperson.com/industry/dca';
+      iframe.id = 'teleperson-iframe';
+      iframe.title = 'Teleperson Concierge';
+      iframe.allow = "microphone *";
+      iframe.style.borderRadius = "14px";
+      iframe.style.border = "none";
+      iframe.style.boxShadow = "0 25px 50px -12px rgb(0 0 0 / 0.25)";
+      iframe.style.width = "400px";
+      iframe.style.height = "600px";
+      container.appendChild(iframe);
+
+      return () => {
+        if (iframe.parentNode) {
+          iframe.parentNode.removeChild(iframe);
+        }
+      };
+    }
+  }, [isPatientView]);
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-gray-50">
       {/* Header - Already Sticky */}
@@ -194,6 +219,14 @@ export default function Layout({ children, currentPageName }) {
       <main className="max-w-7xl mx-auto px-6 py-8">
         {children}
       </main>
+
+      {/* Agent Chatbot - Patient View Only */}
+      {isPatientView && (
+        <div 
+          id="chatbot-container" 
+          className="fixed bottom-6 right-6 z-50"
+        />
+      )}
     </div>
   );
 }
