@@ -16,6 +16,7 @@ import FillHistoryDialog from './FillHistoryDialog';
 import MedicalGuideDialog from './MedicalGuideDialog';
 import RefillRequestDialog from './RefillRequestDialog';
 import PrescriberProfileDialog from './PrescriberProfileDialog';
+import PrescriptionPaymentDialog from './PrescriptionPaymentDialog';
 import { format } from 'date-fns';
 
 const statusConfig = {
@@ -194,19 +195,11 @@ export default function PrescriptionCard({ prescription }) {
       )}
 
       {/* Payment Dialog */}
-      {showPayment && (
-        <Dialog open={showPayment} onOpenChange={() => setShowPayment(false)}>
-          <DialogContent className="max-w-md bg-white">
-            <DialogHeader>
-              <DialogTitle>Payment for {prescription.name}</DialogTitle>
-            </DialogHeader>
-            <p className="text-gray-600">Payment options will be available here.</p>
-            <Button onClick={() => setShowPayment(false)} className="bg-[#8B1F1F] hover:bg-[#721919]">
-              Close
-            </Button>
-          </DialogContent>
-        </Dialog>
-      )}
+      <PrescriptionPaymentDialog
+        open={showPayment}
+        onClose={() => setShowPayment(false)}
+        prescription={prescription}
+      />
 
       {/* Orders Dialog */}
       {showOrders && (

@@ -44,8 +44,8 @@ export default function AdvancedFilters({ filters, onFiltersChange, onClearFilte
       </Button>
 
       {isExpanded && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-gray-200">
+        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg">
+          <div className="flex items-center justify-between pb-4 border-b border-gray-200">
             <h3 className="font-semibold text-gray-800">Filter Communications</h3>
             {activeFilterCount > 0 && (
               <Button
@@ -60,118 +60,118 @@ export default function AdvancedFilters({ filters, onFiltersChange, onClearFilte
             )}
           </div>
 
-          {/* Search by Patient */}
-          <div>
-            <Label className="text-sm font-medium text-gray-700">Patient</Label>
-            <div className="relative mt-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+            {/* Search by Patient */}
+            <div>
+              <Label className="text-sm font-medium text-gray-700">Patient</Label>
+              <div className="relative mt-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="Name, email, phone, or ID..."
+                  value={filters.patientSearch || ''}
+                  onChange={(e) => handleFilterChange('patientSearch', e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+
+            {/* Rx Number */}
+            <div>
+              <Label className="text-sm font-medium text-gray-700">Rx Number</Label>
               <Input
-                placeholder="Name, email, phone, or ID..."
-                value={filters.patientSearch || ''}
-                onChange={(e) => handleFilterChange('patientSearch', e.target.value)}
-                className="pl-9"
+                placeholder="Prescription number..."
+                value={filters.rxNumber || ''}
+                onChange={(e) => handleFilterChange('rxNumber', e.target.value)}
+                className="mt-1"
               />
             </div>
-          </div>
 
-          {/* Rx Number */}
-          <div>
-            <Label className="text-sm font-medium text-gray-700">Rx Number</Label>
-            <Input
-              placeholder="Prescription number..."
-              value={filters.rxNumber || ''}
-              onChange={(e) => handleFilterChange('rxNumber', e.target.value)}
-              className="mt-1"
-            />
-          </div>
+            {/* Status Filter */}
+            <div>
+              <Label className="text-sm font-medium text-gray-700">Status</Label>
+              <Select 
+                value={filters.status || 'all'} 
+                onValueChange={(value) => handleFilterChange('status', value)}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="in_progress">In Progress</SelectItem>
+                  <SelectItem value="resolved">Resolved</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Status Filter */}
-          <div>
-            <Label className="text-sm font-medium text-gray-700">Status</Label>
-            <Select 
-              value={filters.status || 'all'} 
-              onValueChange={(value) => handleFilterChange('status', value)}
-            >
-              <SelectTrigger className="mt-1">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="in_progress">In Progress</SelectItem>
-                <SelectItem value="resolved">Resolved</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            {/* Channel Filter */}
+            <div>
+              <Label className="text-sm font-medium text-gray-700">Channel</Label>
+              <Select 
+                value={filters.channel || 'all'} 
+                onValueChange={(value) => handleFilterChange('channel', value)}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Channels</SelectItem>
+                  <SelectItem value="email">Email</SelectItem>
+                  <SelectItem value="phone">Phone</SelectItem>
+                  <SelectItem value="text">Text</SelectItem>
+                  <SelectItem value="ai_agent">AI Agent</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Channel Filter */}
-          <div>
-            <Label className="text-sm font-medium text-gray-700">Channel</Label>
-            <Select 
-              value={filters.channel || 'all'} 
-              onValueChange={(value) => handleFilterChange('channel', value)}
-            >
-              <SelectTrigger className="mt-1">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Channels</SelectItem>
-                <SelectItem value="email">Email</SelectItem>
-                <SelectItem value="phone">Phone</SelectItem>
-                <SelectItem value="text">Text</SelectItem>
-                <SelectItem value="ai_agent">AI Agent</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            {/* Request Type Filter */}
+            <div>
+              <Label className="text-sm font-medium text-gray-700">Request Type</Label>
+              <Select 
+                value={filters.requestType || 'all'} 
+                onValueChange={(value) => handleFilterChange('requestType', value)}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="prescription_refill">Prescription Refill</SelectItem>
+                  <SelectItem value="medication_inquiry">Medication Inquiry</SelectItem>
+                  <SelectItem value="delivery_status">Delivery Status</SelectItem>
+                  <SelectItem value="billing_question">Billing Question</SelectItem>
+                  <SelectItem value="side_effects">Side Effects</SelectItem>
+                  <SelectItem value="appointment_scheduling">Appointment Scheduling</SelectItem>
+                  <SelectItem value="insurance_question">Insurance Question</SelectItem>
+                  <SelectItem value="general_inquiry">General Inquiry</SelectItem>
+                  <SelectItem value="complaint">Complaint</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Request Type Filter */}
-          <div>
-            <Label className="text-sm font-medium text-gray-700">Request Type</Label>
-            <Select 
-              value={filters.requestType || 'all'} 
-              onValueChange={(value) => handleFilterChange('requestType', value)}
-            >
-              <SelectTrigger className="mt-1">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="prescription_refill">Prescription Refill</SelectItem>
-                <SelectItem value="medication_inquiry">Medication Inquiry</SelectItem>
-                <SelectItem value="delivery_status">Delivery Status</SelectItem>
-                <SelectItem value="billing_question">Billing Question</SelectItem>
-                <SelectItem value="side_effects">Side Effects</SelectItem>
-                <SelectItem value="appointment_scheduling">Appointment Scheduling</SelectItem>
-                <SelectItem value="insurance_question">Insurance Question</SelectItem>
-                <SelectItem value="general_inquiry">General Inquiry</SelectItem>
-                <SelectItem value="complaint">Complaint</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            {/* Handled By Filter */}
+            <div>
+              <Label className="text-sm font-medium text-gray-700">Handled By</Label>
+              <Select 
+                value={filters.handledBy || 'all'} 
+                onValueChange={(value) => handleFilterChange('handledBy', value)}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="ai_agent">AI Agent</SelectItem>
+                  <SelectItem value="representative">Representative</SelectItem>
+                  <SelectItem value="escalated">Escalated to Human</SelectItem>
+                  <SelectItem value="unassigned">Unassigned</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Handled By Filter */}
-          <div>
-            <Label className="text-sm font-medium text-gray-700">Handled By</Label>
-            <Select 
-              value={filters.handledBy || 'all'} 
-              onValueChange={(value) => handleFilterChange('handledBy', value)}
-            >
-              <SelectTrigger className="mt-1">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="ai_agent">AI Agent</SelectItem>
-                <SelectItem value="representative">Representative</SelectItem>
-                <SelectItem value="escalated">Escalated to Human</SelectItem>
-                <SelectItem value="unassigned">Unassigned</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Date Range */}
-          <div className="grid grid-cols-2 gap-3">
+            {/* Date Range */}
             <div>
               <Label className="text-sm font-medium text-gray-700">From Date</Label>
               <Input
@@ -195,7 +195,7 @@ export default function AdvancedFilters({ filters, onFiltersChange, onClearFilte
           {/* Apply Button */}
           <Button
             onClick={() => setIsExpanded(false)}
-            className="w-full bg-[#8B1F1F] hover:bg-[#721919] text-white"
+            className="w-full mt-4 bg-[#8B1F1F] hover:bg-[#721919] text-white"
           >
             Apply Filters
           </Button>
