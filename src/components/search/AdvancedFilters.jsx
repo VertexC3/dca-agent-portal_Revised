@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 
-export default function AdvancedFilters({ filters, onFiltersChange, onClearFilters }) {
+export default function AdvancedFilters({ filters, onFiltersChange, onClearFilters, patients = [] }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const activeFilterCount = Object.values(filters).filter(val => {
@@ -167,6 +167,25 @@ export default function AdvancedFilters({ filters, onFiltersChange, onClearFilte
                   <SelectItem value="representative">Representative</SelectItem>
                   <SelectItem value="escalated">Escalated to Human</SelectItem>
                   <SelectItem value="unassigned">Unassigned</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Patient List Filter */}
+            <div>
+              <Label className="text-sm font-medium text-gray-700">Select Patient</Label>
+              <Select 
+                value={filters.patientName || 'all'} 
+                onValueChange={(value) => handleFilterChange('patientName', value)}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="All Patients" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Patients</SelectItem>
+                  {patients.map(patient => (
+                    <SelectItem key={patient} value={patient}>{patient}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
