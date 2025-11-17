@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { User, Mail, Phone, MapPin, Calendar, Save, Loader2, Plus, Trash2, Package, Star } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar, Save, Loader2, Plus, Trash2, Package, Star, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -181,6 +181,13 @@ export default function PatientProfile() {
           >
             <User className="w-4 h-4 mr-2" />
             Profile
+          </TabsTrigger>
+          <TabsTrigger 
+            value="payment"
+            className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-[#8B1F1F] rounded-none px-6 py-4"
+          >
+            <CreditCard className="w-4 h-4 mr-2" />
+            Payment
           </TabsTrigger>
           <TabsTrigger 
             value="orders"
@@ -457,6 +464,10 @@ export default function PatientProfile() {
             )}
           </Button>
         </div>
+        </TabsContent>
+
+        <TabsContent value="payment" className="p-8">
+          <PaymentManagement user={user} />
         </TabsContent>
 
         <TabsContent value="orders" className="p-8" id="orders">
