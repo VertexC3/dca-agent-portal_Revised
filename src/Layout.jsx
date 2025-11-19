@@ -20,6 +20,10 @@ export default function Layout({ children, currentPageName }) {
   });
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
 
+  React.useEffect(() => {
+    document.title = "DCA Pharmacy";
+  }, []);
+
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
     queryFn: () => base44.auth.me(),
