@@ -11,7 +11,8 @@ import { Label } from '@/components/ui/label';
 const channelIcons = {
   phone: Phone,
   email: Mail,
-  text: MessageSquare
+  text: MessageSquare,
+  ai_agent: MessageSquare
 };
 
 const channelColors = {
