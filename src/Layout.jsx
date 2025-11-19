@@ -47,6 +47,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Communications', icon: MessageSquare, page: 'Communications' },
     { name: 'Messages', icon: MessageSquare, page: 'StaffMessaging' },
     { name: 'Analytics', icon: BarChart3, page: 'Analytics' },
+    { name: 'Rx Trends', icon: Pill, page: 'PrescriptionTrends' },
   ];
 
   const patientNavItems = [
@@ -55,7 +56,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Communication', icon: MessageSquare, page: 'PatientMessages' },
   ];
 
-  const staffPages = ['Dashboard', 'Communications', 'StaffMessaging', 'Analytics', 'CommunicationDetail', 'AITraining', 'Automation', 'Settings', 'DailyView'];
+  const staffPages = ['Dashboard', 'Communications', 'StaffMessaging', 'Analytics', 'CommunicationDetail', 'AITraining', 'Automation', 'Settings', 'DailyView', 'PrescriptionTrends'];
   const patientPages = ['PatientDashboard', 'PatientProfile', 'PatientMessages', 'PatientCommunications', 'PatientCommunicationDetail', 'Prescriptions'];
 
   const navItems = isPatientView ? patientNavItems : adminNavItems;
