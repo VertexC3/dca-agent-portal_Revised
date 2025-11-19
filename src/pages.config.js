@@ -12,6 +12,7 @@ import PatientCommunications from './pages/PatientCommunications';
 import PatientMessages from './pages/PatientMessages';
 import StaffMessaging from './pages/StaffMessaging';
 import Prescriptions from './pages/Prescriptions';
+import Roadmap from './pages/Roadmap';
 import __Layout from './Layout.jsx';
 
 
@@ -30,6 +31,7 @@ export const PAGES = {
     "PatientMessages": PatientMessages,
     "StaffMessaging": StaffMessaging,
     "Prescriptions": Prescriptions,
+    "Roadmap": Roadmap,
 }
 
 export const pagesConfig = {
