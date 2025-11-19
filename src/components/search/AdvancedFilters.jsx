@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { Filter, X, Calendar, Search, ChevronDown, ChevronUp } from 'lucide-react';
+import { Filter, X, Calendar, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 export default function AdvancedFilters({ filters, onFiltersChange, onClearFilters, patients = [] }) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const activeFilterCount = Object.values(filters).filter(val => {
     if (typeof val === 'string') return val && val !== 'all';
@@ -22,11 +23,15 @@ export default function AdvancedFilters({ filters, onFiltersChange, onClearFilte
     onClearFilters();
   };
 
+  const handleApply = () => {
+    setIsOpen(false);
+  };
+
   return (
-    <div className="space-y-4">
+    <>
       <Button 
         variant="outline" 
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={() => setIsOpen(true)}
         className="relative border-gray-300"
       >
         <Filter className="w-4 h-4 mr-2" />
@@ -36,29 +41,26 @@ export default function AdvancedFilters({ filters, onFiltersChange, onClearFilte
             {activeFilterCount}
           </Badge>
         )}
-        {isExpanded ? (
-          <ChevronUp className="w-4 h-4 ml-2" />
-        ) : (
-          <ChevronDown className="w-4 h-4 ml-2" />
-        )}
       </Button>
 
-      {isExpanded && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-lg">
-          <div className="flex items-center justify-between pb-4 border-b border-gray-200">
-            <h3 className="font-semibold text-gray-800">Filter Communications</h3>
-            {activeFilterCount > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClear}
-                className="text-[#8B1F1F] hover:text-[#721919]"
-              >
-                <X className="w-4 h-4 mr-1" />
-                Clear All
-              </Button>
-            )}
-          </div>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-w-4xl bg-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span className="text-xl font-semibold text-gray-800">Filter Communications</span>
+              {activeFilterCount > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleClear}
+                  className="text-[#8B1F1F] hover:text-[#721919]"
+                >
+                  <X className="w-4 h-4 mr-1" />
+                  Clear All
+                </Button>
+              )}
+            </DialogTitle>
+          </DialogHeader>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
             {/* Search by Patient */}
@@ -213,13 +215,13 @@ export default function AdvancedFilters({ filters, onFiltersChange, onClearFilte
 
           {/* Apply Button */}
           <Button
-            onClick={() => setIsExpanded(false)}
-            className="w-full mt-4 bg-[#8B1F1F] hover:bg-[#721919] text-white"
+            onClick={handleApply}
+            className="w-full mt-6 bg-[#8B1F1F] hover:bg-[#721919] text-white"
           >
             Apply Filters
           </Button>
-        </div>
-      )}
-    </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
