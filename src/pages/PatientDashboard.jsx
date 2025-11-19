@@ -13,11 +13,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import PrescriptionCard from '../components/patient/PrescriptionCard';
 import CollapsibleOrderHistory from '../components/patient/CollapsibleOrderHistory';
 import RefillRequestDialog from '../components/patient/RefillRequestDialog';
+import SatisfactionSurveyAlert from '../components/patient/SatisfactionSurveyAlert';
 
 export default function PatientDashboard() {
   const [showQuickRefill, setShowQuickRefill] = useState(false);
   const [prescriptionFilter, setPrescriptionFilter] = useState('Active');
   const [showEditActions, setShowEditActions] = useState(false);
+  const [showSurveyAlert, setShowSurveyAlert] = useState(true);
   const queryClient = useQueryClient();
 
   const { data: user } = useQuery({
@@ -157,6 +159,14 @@ export default function PatientDashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Survey Alert */}
+      {showSurveyAlert && !user?.survey_completed && (
+        <SatisfactionSurveyAlert 
+          user={user} 
+          onDismiss={() => setShowSurveyAlert(false)} 
+        />
+      )}
+
       {/* Welcome Header */}
       <div className="bg-gradient-to-r from-[#8B1F1F] to-[#6B1515] rounded-2xl p-8 text-white">
         <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.full_name}!</h1>
