@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { MapPin, Plus, Edit2, Trash2, Loader2, Calendar, Target, Zap, CheckCircle2, X } from 'lucide-react';
+import { MapPin, Plus, Edit2, Trash2, Loader2, Calendar, Target, Zap, CheckCircle2, X, LayoutGrid, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,6 +27,7 @@ export default function Roadmap() {
   const [showDialog, setShowDialog] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [categorizingAI, setCategorizingAI] = useState(false);
+  const [viewMode, setViewMode] = useState('kanban'); // 'kanban' or 'list'
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -174,17 +175,39 @@ Examples of good categories: "Patient Experience", "AI Features", "Data Analytic
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Product Roadmap</h1>
           <p className="text-gray-600">Plan and track feature development</p>
         </div>
-        <Button
-          onClick={() => handleOpenDialog()}
-          className="bg-[#8B1F1F] hover:bg-[#721919] text-white"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Add Item
-        </Button>
+        <div className="flex items-center gap-3">
+          {/* View Toggle */}
+          <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('kanban')}
+              className={`px-3 py-2 rounded-md transition-all ${
+                viewMode === 'kanban' ? 'bg-white text-[#8B1F1F] shadow' : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`px-3 py-2 rounded-md transition-all ${
+                viewMode === 'list' ? 'bg-white text-[#8B1F1F] shadow' : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
+          <Button
+            onClick={() => handleOpenDialog()}
+            className="bg-[#8B1F1F] hover:bg-[#721919] text-white"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Item
+          </Button>
+        </div>
       </div>
 
-      {/* Timeline View */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Kanban View */}
+      {viewMode === 'kanban' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {timelines.map(timeline => (
           <div key={timeline} className="bg-white rounded-2xl p-4 border border-gray-200 shadow-lg">
             <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-200">
@@ -247,7 +270,94 @@ Examples of good categories: "Patient Experience", "AI Features", "Data Analytic
             </div>
           </div>
         ))}
-      </div>
+        </div>
+      )}
+
+      {/* List View */}
+      {viewMode === 'list' && (
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Title</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Description</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Timeline</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Category</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Complexity</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {roadmapItems.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="px-6 py-12 text-center">
+                      <MapPin className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                      <p className="text-gray-500">No roadmap items yet</p>
+                    </td>
+                  </tr>
+                ) : (
+                  roadmapItems.map(item => (
+                    <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4">
+                        <p className="font-semibold text-gray-800">{item.title}</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="text-sm text-gray-600 line-clamp-2 max-w-md">{item.description}</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <Badge variant="outline" className="text-xs">
+                          <Calendar className="w-3 h-3 mr-1" />
+                          {item.timeline}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4">
+                        {item.category ? (
+                          <Badge variant="outline" className="text-xs">
+                            <Target className="w-3 h-3 mr-1" />
+                            {item.category}
+                          </Badge>
+                        ) : (
+                          <span className="text-xs text-gray-400">—</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <Badge className={`text-xs ${complexityColors[item.complexity]}`}>
+                          <Zap className="w-3 h-3 mr-1" />
+                          {item.complexity}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4">
+                        <Badge className={`text-xs ${statusColors[item.status]}`}>
+                          {item.status === 'completed' && <CheckCircle2 className="w-3 h-3 mr-1" />}
+                          {item.status}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleOpenDialog(item)}
+                            className="p-1.5 hover:bg-gray-200 rounded transition-colors"
+                          >
+                            <Edit2 className="w-4 h-4 text-gray-600" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item.id)}
+                            className="p-1.5 hover:bg-red-100 rounded transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* Add/Edit Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
