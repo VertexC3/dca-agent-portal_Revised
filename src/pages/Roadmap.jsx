@@ -170,40 +170,38 @@ Examples of good categories: "Patient Experience", "AI Features", "Data Analytic
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">Product Roadmap</h1>
-            <p className="text-gray-600">Plan and track feature development</p>
-          </div>
-          <div className="flex items-center gap-3">
-            {/* View Toggle */}
-            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => setViewMode('kanban')}
-                className={`px-3 py-2 rounded-md transition-all ${
-                  viewMode === 'kanban' ? 'bg-white text-[#8B1F1F] shadow' : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`px-3 py-2 rounded-md transition-all ${
-                  viewMode === 'list' ? 'bg-white text-[#8B1F1F] shadow' : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                <List className="w-4 h-4" />
-              </button>
-            </div>
-            <Button
-              onClick={() => handleOpenDialog()}
-              className="bg-[#8B1F1F] hover:bg-[#721919] text-white"
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-800 mb-2">Product Roadmap</h1>
+          <p className="text-gray-600">Plan and track feature development</p>
+        </div>
+        <div className="flex items-center gap-3">
+          {/* View Toggle */}
+          <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('kanban')}
+              className={`px-3 py-2 rounded-md transition-all ${
+                viewMode === 'kanban' ? 'bg-white text-[#8B1F1F] shadow' : 'text-gray-600 hover:text-gray-800'
+              }`}
             >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Item
-            </Button>
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`px-3 py-2 rounded-md transition-all ${
+                viewMode === 'list' ? 'bg-white text-[#8B1F1F] shadow' : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              <List className="w-4 h-4" />
+            </button>
           </div>
+          <Button
+            onClick={() => handleOpenDialog()}
+            className="bg-[#8B1F1F] hover:bg-[#721919] text-white"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Item
+          </Button>
         </div>
       </div>
 

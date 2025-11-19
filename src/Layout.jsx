@@ -56,7 +56,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Communication', icon: MessageSquare, page: 'PatientMessages' },
   ];
 
-  const staffPages = ['Dashboard', 'Communications', 'StaffMessaging', 'Analytics', 'CommunicationDetail', 'AITraining', 'Automation', 'Settings', 'DailyView', 'PrescriptionTrends', 'Roadmap'];
+  const staffPages = ['Dashboard', 'Communications', 'StaffMessaging', 'Analytics', 'CommunicationDetail', 'AITraining', 'Automation', 'Settings', 'DailyView', 'PrescriptionTrends'];
   const patientPages = ['PatientDashboard', 'PatientProfile', 'PatientMessages', 'PatientCommunications', 'PatientCommunicationDetail', 'Prescriptions'];
 
   const navItems = isPatientView ? patientNavItems : adminNavItems;
