@@ -170,7 +170,7 @@ Examples of good categories: "Patient Experience", "AI Features", "Data Analytic
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-gray-50 pb-6 -mt-8 pt-8 -mx-6 px-6">
+      <div>
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold text-gray-800 mb-2">Product Roadmap</h1>
@@ -308,7 +308,7 @@ Examples of good categories: "Patient Experience", "AI Features", "Data Analytic
         <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200 sticky top-[120px] z-[5]">
+              <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-[5]">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Title</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Description</th>
