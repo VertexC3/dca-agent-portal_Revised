@@ -308,7 +308,7 @@ Examples of good categories: "Patient Experience", "AI Features", "Data Analytic
         <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-[5]">
+              <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Title</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Description</th>
