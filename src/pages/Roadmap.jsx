@@ -170,38 +170,40 @@ Examples of good categories: "Patient Experience", "AI Features", "Data Analytic
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Product Roadmap</h1>
-          <p className="text-gray-600">Plan and track feature development</p>
-        </div>
-        <div className="flex items-center gap-3">
-          {/* View Toggle */}
-          <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-            <button
-              onClick={() => setViewMode('kanban')}
-              className={`px-3 py-2 rounded-md transition-all ${
-                viewMode === 'kanban' ? 'bg-white text-[#8B1F1F] shadow' : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              <LayoutGrid className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`px-3 py-2 rounded-md transition-all ${
-                viewMode === 'list' ? 'bg-white text-[#8B1F1F] shadow' : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              <List className="w-4 h-4" />
-            </button>
+      <div className="sticky top-0 z-10 bg-gray-50 pb-6 -mt-8 pt-8 -mx-6 px-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-800 mb-2">Product Roadmap</h1>
+            <p className="text-gray-600">Plan and track feature development</p>
           </div>
-          <Button
-            onClick={() => handleOpenDialog()}
-            className="bg-[#8B1F1F] hover:bg-[#721919] text-white"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Item
-          </Button>
+          <div className="flex items-center gap-3">
+            {/* View Toggle */}
+            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('kanban')}
+                className={`px-3 py-2 rounded-md transition-all ${
+                  viewMode === 'kanban' ? 'bg-white text-[#8B1F1F] shadow' : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-2 rounded-md transition-all ${
+                  viewMode === 'list' ? 'bg-white text-[#8B1F1F] shadow' : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                <List className="w-4 h-4" />
+              </button>
+            </div>
+            <Button
+              onClick={() => handleOpenDialog()}
+              className="bg-[#8B1F1F] hover:bg-[#721919] text-white"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Item
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -306,7 +308,7 @@ Examples of good categories: "Patient Experience", "AI Features", "Data Analytic
         <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-50 border-b border-gray-200 sticky top-[120px] z-[5]">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Title</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Description</th>
