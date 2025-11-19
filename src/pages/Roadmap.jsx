@@ -219,45 +219,73 @@ Examples of good categories: "Patient Experience", "AI Features", "Data Analytic
             <div className="space-y-3">
               {groupedItems[timeline]?.map(item => (
                 <div
-                  key={item.id}
-                  className="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-[#8B1F1F] transition-all group"
+                key={item.id}
+                className="p-3 bg-gray-50 rounded-lg border border-gray-200 transition-all group"
                 >
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-semibold text-gray-800 text-sm flex-1 pr-2">{item.title}</h4>
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => handleOpenDialog(item)}
-                        className="p-1 hover:bg-gray-200 rounded"
-                      >
-                        <Edit2 className="w-3 h-3 text-gray-600" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item.id)}
-                        className="p-1 hover:bg-red-100 rounded"
-                      >
-                        <Trash2 className="w-3 h-3 text-red-600" />
-                      </button>
-                    </div>
+                <div className="flex items-start justify-between mb-2">
+                  <h4 className="font-semibold text-gray-800 text-sm flex-1 pr-2">{item.title}</h4>
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => handleOpenDialog(item)}
+                      className="p-1 hover:bg-gray-200 rounded"
+                    >
+                      <Edit2 className="w-3 h-3 text-gray-600" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      className="p-1 hover:bg-red-100 rounded"
+                    >
+                      <Trash2 className="w-3 h-3 text-red-600" />
+                    </button>
                   </div>
+                </div>
 
-                  <p className="text-xs text-gray-600 mb-2 line-clamp-2">{item.description}</p>
+                <p className="text-xs text-gray-600 mb-2 line-clamp-2">{item.description}</p>
 
-                  <div className="flex flex-wrap gap-1">
-                    {item.category && (
-                      <Badge variant="outline" className="text-xs">
-                        <Target className="w-3 h-3 mr-1" />
-                        {item.category}
-                      </Badge>
-                    )}
-                    <Badge className={`text-xs ${complexityColors[item.complexity]}`}>
-                      <Zap className="w-3 h-3 mr-1" />
-                      {item.complexity}
+                <div className="flex items-center gap-2 mb-2">
+                  <Select 
+                    value={item.timeline} 
+                    onValueChange={(value) => updateMutation.mutate({ id: item.id, data: { ...item, timeline: value } })}
+                  >
+                    <SelectTrigger className="h-7 text-xs w-20">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Q1'26">Q1'26</SelectItem>
+                      <SelectItem value="Q2'26">Q2'26</SelectItem>
+                      <SelectItem value="Q3'26">Q3'26</SelectItem>
+                      <SelectItem value="Q4'26">Q4'26</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Select 
+                    value={item.status} 
+                    onValueChange={(value) => updateMutation.mutate({ id: item.id, data: { ...item, status: value } })}
+                  >
+                    <SelectTrigger className="h-7 text-xs flex-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="planned">Planned</SelectItem>
+                      <SelectItem value="in_progress">In Progress</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex flex-wrap gap-1">
+                  {item.category && (
+                    <Badge variant="outline" className="text-xs">
+                      <Target className="w-3 h-3 mr-1" />
+                      {item.category}
                     </Badge>
-                    <Badge className={`text-xs ${statusColors[item.status]}`}>
-                      {item.status === 'completed' && <CheckCircle2 className="w-3 h-3 mr-1" />}
-                      {item.status}
-                    </Badge>
-                  </div>
+                  )}
+                  <Badge className={`text-xs ${complexityColors[item.complexity]}`}>
+                    <Zap className="w-3 h-3 mr-1" />
+                    {item.complexity}
+                  </Badge>
+                </div>
                 </div>
               ))}
 
@@ -307,10 +335,20 @@ Examples of good categories: "Patient Experience", "AI Features", "Data Analytic
                         <p className="text-sm text-gray-600 line-clamp-2 max-w-md">{item.description}</p>
                       </td>
                       <td className="px-6 py-4">
-                        <Badge variant="outline" className="text-xs">
-                          <Calendar className="w-3 h-3 mr-1" />
-                          {item.timeline}
-                        </Badge>
+                        <Select 
+                          value={item.timeline} 
+                          onValueChange={(value) => updateMutation.mutate({ id: item.id, data: { ...item, timeline: value } })}
+                        >
+                          <SelectTrigger className="h-8 text-xs w-24">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Q1'26">Q1'26</SelectItem>
+                            <SelectItem value="Q2'26">Q2'26</SelectItem>
+                            <SelectItem value="Q3'26">Q3'26</SelectItem>
+                            <SelectItem value="Q4'26">Q4'26</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </td>
                       <td className="px-6 py-4">
                         {item.category ? (
@@ -329,10 +367,20 @@ Examples of good categories: "Patient Experience", "AI Features", "Data Analytic
                         </Badge>
                       </td>
                       <td className="px-6 py-4">
-                        <Badge className={`text-xs ${statusColors[item.status]}`}>
-                          {item.status === 'completed' && <CheckCircle2 className="w-3 h-3 mr-1" />}
-                          {item.status}
-                        </Badge>
+                        <Select 
+                          value={item.status} 
+                          onValueChange={(value) => updateMutation.mutate({ id: item.id, data: { ...item, status: value } })}
+                        >
+                          <SelectTrigger className="h-8 text-xs w-32">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="planned">Planned</SelectItem>
+                            <SelectItem value="in_progress">In Progress</SelectItem>
+                            <SelectItem value="completed">Completed</SelectItem>
+                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
