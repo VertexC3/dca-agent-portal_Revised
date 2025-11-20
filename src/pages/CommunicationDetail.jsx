@@ -285,8 +285,8 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
         </div>
 
         {/* Next Patient Widget */}
-        <div className="bg-white rounded-lg border border-gray-200 p-3 flex items-center gap-3 shadow-sm">
-          <div className="text-right">
+        <div className="bg-white rounded-lg border border-gray-200 p-3 flex items-center gap-4 shadow-sm" style={{minWidth: '300px'}}>
+          <div className="text-right flex-1">
             <p className="text-xs text-gray-500 mb-0.5">Next Patient</p>
             <p className="text-sm font-bold text-gray-800">Sarah Williams</p>
             <p className="text-xs text-gray-600">Delivery Status</p>
@@ -539,14 +539,21 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                 { med: 'Aspirin 81mg', date: '2025-08-01', prescriber: 'Dr. Smith', status: 'Discontinued' },
               ].map((rx, idx) => (
                 <div key={idx} className="bg-gray-50 rounded-lg p-2 border border-gray-200">
-                  <div className="flex items-start justify-between mb-1">
-                    <p className="text-xs font-semibold text-gray-800">{rx.med}</p>
-                    <Badge className={rx.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'} style={{fontSize: '10px', padding: '1px 6px'}}>
+                  <div className="flex items-start gap-2">
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-gray-800 mb-1">{rx.med}</p>
+                      <p className="text-xs text-gray-600">Prescribed by {rx.prescriber}</p>
+                      <p className="text-xs text-gray-500">Last filled: {rx.date}</p>
+                    </div>
+                    <img 
+                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6915f90e9513d40c38a60116/a43f1a648_LisinoprilPills_5mg-scaled.jpg"
+                      alt="Medication"
+                      className="w-8 h-8 rounded object-cover"
+                    />
+                    <Badge className={rx.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'} style={{fontSize: '10px', padding: '1px 6px', height: 'fit-content'}}>
                       {rx.status}
                     </Badge>
                   </div>
-                  <p className="text-xs text-gray-600">Prescribed by {rx.prescriber}</p>
-                  <p className="text-xs text-gray-500">Last filled: {rx.date}</p>
                 </div>
               ))}
             </div>
