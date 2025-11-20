@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Plus } from 'lucide-react';
 import PatientInfoPanel from '../components/communication/PatientInfoPanel';
 import SharedNotes from '../components/communication/SharedNotes';
 import PatientProfileDialog from '../components/communication/PatientProfileDialog';
@@ -49,6 +50,9 @@ export default function CommunicationDetail() {
   const [showAddressDropdown, setShowAddressDropdown] = useState(false);
   const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
   const [selectedWorkflowType, setSelectedWorkflowType] = useState(null);
+  const [showTranscriptDialog, setShowTranscriptDialog] = useState(false);
+  const [showAddAddressDialog, setShowAddAddressDialog] = useState(false);
+  const [newAddress, setNewAddress] = useState({ address: '', type: 'billing' });
   const [feedbackData, setFeedbackData] = useState({
     feedback_type: 'positive',
     feedback_notes: '',
@@ -279,9 +283,55 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
         <h1 className="text-2xl font-bold text-gray-800">Communication Details</h1>
       </div>
 
+      {/* Medical Info - Horizontal across all columns */}
+      <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm mb-4">
+        <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+          <User className="w-4 h-4 text-blue-600" />
+          Medical Information
+        </h3>
+        <div className="grid grid-cols-4 gap-4 text-xs">
+          {communication.patient_allergies && (
+            <div className="flex items-start gap-2 text-gray-700">
+              <AlertCircle className="w-3 h-3 text-red-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <span className="font-medium text-red-700 block">Allergies</span>
+                <span>{communication.patient_allergies}</span>
+              </div>
+            </div>
+          )}
+          {communication.current_medications && (
+            <div className="flex items-start gap-2 text-gray-700">
+              <Pill className="w-3 h-3 text-blue-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <span className="font-medium block">Medications</span>
+                <span>{communication.current_medications}</span>
+              </div>
+            </div>
+          )}
+          {communication.known_conditions && (
+            <div className="flex items-start gap-2 text-gray-700">
+              <AlertCircle className="w-3 h-3 text-purple-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <span className="font-medium block">Conditions</span>
+                <span>{communication.known_conditions}</span>
+              </div>
+            </div>
+          )}
+          {communication.insurance_provider && (
+            <div className="flex items-start gap-2 text-gray-700">
+              <CreditCard className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
+              <div>
+                <span className="font-medium block">Insurance</span>
+                <span>{communication.insurance_provider}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Column 1: Patient Info & Message */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {/* Patient Info Card */}
           <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
             <div className="flex items-start justify-between mb-3">
@@ -343,6 +393,18 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                           <span className="text-xs text-gray-700">456 Oak Ave, Portland, OR 97201</span>
                           <Badge className="bg-green-100 text-green-800 text-xs">Delivery</Badge>
                         </div>
+                      </div>
+                      <div className="border-t pt-2">
+                        <button
+                          onClick={() => {
+                            setShowAddressDropdown(false);
+                            setShowAddAddressDialog(true);
+                          }}
+                          className="w-full p-2 text-xs text-[#8B1F1F] hover:bg-gray-50 rounded font-medium flex items-center gap-1"
+                        >
+                          <Plus className="w-3 h-3" />
+                          Add New Address
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -426,10 +488,14 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
               <MessageSquare className="w-4 h-4" />
               {communication.channel === 'phone' ? 'Transcript' : 'Message'}
             </h3>
-            <div className="bg-gray-50 rounded-lg p-3 max-h-32 overflow-y-auto">
-              <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap">
+            <div 
+              className="bg-gray-50 rounded-lg p-3 cursor-pointer hover:bg-gray-100 transition-colors"
+              onClick={() => setShowTranscriptDialog(true)}
+            >
+              <p className="text-xs text-gray-700 leading-relaxed line-clamp-3">
                 {communication.transcript || communication.message_content}
               </p>
+              <p className="text-xs text-[#8B1F1F] mt-2 font-medium">Click to view full transcript →</p>
             </div>
             {communication.channel === 'phone' && communication.voice_recording_url && (
               <audio controls className="w-full mt-2" style={{height: '32px'}}>
@@ -438,88 +504,79 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
             )}
           </div>
 
-          {/* Patient Information */}
-          <PatientInfoPanel communication={communication} />
-
-          {/* Shared Notes */}
-          <SharedNotes communicationId={communication.id} />
-
         </div>
 
-        {/* Column 2: Medical Info & Notes */}
-        <div className="space-y-4">
-          {/* Patient Information */}
-          <PatientInfoPanel communication={communication} />
-
+        {/* Column 2: Notes */}
+        <div className="space-y-3">
           {/* Shared Notes */}
-          <SharedNotes communicationId={communication.id} />
+          <SharedNotes communicationId={communication.id} compact={true} />
         </div>
 
         {/* Column 3: Request Type Actions */}
         <div className="space-y-2">
-          <h3 className="text-sm font-bold text-gray-800 mb-2">Request Types</h3>
+          <h3 className="text-xs font-bold text-gray-800 mb-2">Request Types</h3>
           
           <button
             onClick={() => { setSelectedWorkflowType('prescription_refill'); setShowWorkflowDialog(true); }}
-            className="w-full p-3 bg-white hover:bg-blue-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+            className="w-full p-2 bg-white hover:bg-blue-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
           >
-            <Pill className="w-4 h-4 text-blue-600" />
+            <Pill className="w-3 h-3 text-blue-600" />
             <span className="text-xs font-medium text-gray-800">Prescription Refill</span>
           </button>
 
           <button
             onClick={() => { setSelectedWorkflowType('medication_inquiry'); setShowWorkflowDialog(true); }}
-            className="w-full p-3 bg-white hover:bg-purple-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+            className="w-full p-2 bg-white hover:bg-purple-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
           >
-            <HelpCircle className="w-4 h-4 text-purple-600" />
+            <HelpCircle className="w-3 h-3 text-purple-600" />
             <span className="text-xs font-medium text-gray-800">Medication Inquiry</span>
           </button>
 
           <button
             onClick={() => { setSelectedWorkflowType('delivery_status'); setShowWorkflowDialog(true); }}
-            className="w-full p-3 bg-white hover:bg-green-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+            className="w-full p-2 bg-white hover:bg-green-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
           >
-            <Package className="w-4 h-4 text-green-600" />
+            <Package className="w-3 h-3 text-green-600" />
             <span className="text-xs font-medium text-gray-800">Delivery Status</span>
           </button>
 
           <button
             onClick={() => { setSelectedWorkflowType('billing_question'); setShowWorkflowDialog(true); }}
-            className="w-full p-3 bg-white hover:bg-yellow-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+            className="w-full p-2 bg-white hover:bg-yellow-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
           >
-            <CreditCard className="w-4 h-4 text-yellow-600" />
+            <CreditCard className="w-3 h-3 text-yellow-600" />
             <span className="text-xs font-medium text-gray-800">Billing Question</span>
           </button>
 
           <button
             onClick={() => { setSelectedWorkflowType('side_effects'); setShowWorkflowDialog(true); }}
-            className="w-full p-3 bg-white hover:bg-red-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+            className="w-full p-2 bg-white hover:bg-red-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
           >
-            <AlertTriangle className="w-4 h-4 text-red-600" />
+            <AlertTriangle className="w-3 h-3 text-red-600" />
             <span className="text-xs font-medium text-gray-800">Side Effects</span>
           </button>
 
           <button
             onClick={() => { setSelectedWorkflowType('appointment_scheduling'); setShowWorkflowDialog(true); }}
-            className="w-full p-3 bg-white hover:bg-indigo-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+            className="w-full p-2 bg-white hover:bg-indigo-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
           >
-            <CalendarClock className="w-4 h-4 text-indigo-600" />
+            <CalendarClock className="w-3 h-3 text-indigo-600" />
             <span className="text-xs font-medium text-gray-800">Appointment</span>
           </button>
 
           <button
             onClick={() => { setSelectedWorkflowType('insurance_question'); setShowWorkflowDialog(true); }}
-            className="w-full p-3 bg-white hover:bg-teal-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+            className="w-full p-2 bg-white hover:bg-teal-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
           >
-            <FileQuestion className="w-4 h-4 text-teal-600" />
+            <FileQuestion className="w-3 h-3 text-teal-600" />
             <span className="text-xs font-medium text-gray-800">Insurance Question</span>
           </button>
 
           <button
             onClick={() => { setSelectedWorkflowType('general_inquiry'); setShowWorkflowDialog(true); }}
-            className="w-full p-3 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+            className="w-full p-2 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
           >
-            <MessageCircle className="w-4 h-4 text-gray-600" />
+            <MessageCircle className="w-3 h-3 text-gray-600" />
             <span className="text-xs font-medium text-gray-800">General Inquiry</span>
           </button>
         </div>
@@ -545,6 +602,87 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
             patientName={communication.patient_name}
             communication={communication}
           />
+        </DialogContent>
+      </Dialog>
+
+      {/* Transcript Dialog */}
+      <Dialog open={showTranscriptDialog} onOpenChange={setShowTranscriptDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
+              <MessageSquare className="w-5 h-5" />
+              Full {communication.channel === 'phone' ? 'Transcript' : 'Message'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+              {communication.transcript || communication.message_content}
+            </p>
+          </div>
+          {communication.channel === 'phone' && communication.voice_recording_url && (
+            <div className="mt-4">
+              <h4 className="text-sm font-semibold text-gray-800 mb-2">Voice Recording</h4>
+              <audio controls className="w-full">
+                <source src={communication.voice_recording_url} type="audio/mpeg" />
+              </audio>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Address Dialog */}
+      <Dialog open={showAddAddressDialog} onOpenChange={setShowAddAddressDialog}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-gray-800">Add New Address</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-sm">Address</Label>
+              <Input
+                value={newAddress.address}
+                onChange={(e) => setNewAddress({ ...newAddress, address: e.target.value })}
+                placeholder="123 Main St, City, State ZIP"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Type</Label>
+              <Select value={newAddress.type} onValueChange={(val) => setNewAddress({ ...newAddress, type: val })}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="billing">Billing</SelectItem>
+                  <SelectItem value="delivery">Delivery</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowAddAddressDialog(false);
+                  setNewAddress({ address: '', type: 'billing' });
+                }}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  // Save address logic here
+                  alert(`Address saved: ${newAddress.address} (${newAddress.type})`);
+                  setShowAddAddressDialog(false);
+                  setNewAddress({ address: '', type: 'billing' });
+                }}
+                disabled={!newAddress.address.trim()}
+                className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white"
+              >
+                Save Address
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

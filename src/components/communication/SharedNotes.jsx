@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 
-export default function SharedNotes({ communicationId }) {
+export default function SharedNotes({ communicationId, compact = false }) {
   const queryClient = useQueryClient();
   const [noteContent, setNoteContent] = useState('');
   const [noteType, setNoteType] = useState('general');
@@ -137,14 +137,13 @@ export default function SharedNotes({ communicationId }) {
       )}
 
       {/* Notes List */}
-      <div className="space-y-2 max-h-48 overflow-y-auto">
+      <div className={compact ? "space-y-1" : "space-y-2 max-h-48 overflow-y-auto"}>
         {notes.length === 0 ? (
-          <div className="text-center py-6 text-gray-400">
-            <MessageSquare className="w-6 h-6 mx-auto mb-1 opacity-50" />
+          <div className="text-center py-4 text-gray-400">
             <p className="text-xs">No notes</p>
           </div>
         ) : (
-          notes.slice(0, 3).map(note => (
+          notes.slice(0, compact ? 1 : 3).map(note => (
             <div key={note.id} className="bg-gray-50 rounded-lg p-2 border border-gray-200">
               <div className="flex items-start justify-between mb-1">
                 <Badge className={`${noteTypeColors[note.note_type]} border text-xs flex items-center gap-1`}>
@@ -156,7 +155,7 @@ export default function SharedNotes({ communicationId }) {
                 </span>
               </div>
 
-              <p className="text-xs text-gray-700 mb-1 line-clamp-2">{note.note_content}</p>
+              <p className="text-xs text-gray-700 mb-1 line-clamp-1">{note.note_content}</p>
 
               <span className="text-xs text-gray-500 font-medium">{note.created_by_name || note.created_by}</span>
             </div>
