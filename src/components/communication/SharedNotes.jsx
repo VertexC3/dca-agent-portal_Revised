@@ -66,53 +66,46 @@ export default function SharedNotes({ communicationId }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="p-3 rounded-xl bg-purple-50 border border-purple-200">
-            <MessageSquare className="w-6 h-6 text-purple-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-gray-800">Shared Notes</h3>
-            <p className="text-sm text-gray-600">Visible to all agents handling this case</p>
-          </div>
-        </div>
+    <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
+          <MessageSquare className="w-4 h-4 text-purple-600" />
+          Notes
+        </h3>
 
         {!showForm && (
           <Button
             onClick={() => setShowForm(true)}
             size="sm"
-            className="bg-[#8B1F1F] hover:bg-[#721919] text-white"
+            className="bg-[#8B1F1F] hover:bg-[#721919] text-white h-7 text-xs"
           >
-            <Plus className="w-4 h-4 mr-1" />
-            Add Note
+            <Plus className="w-3 h-3 mr-1" />
+            Add
           </Button>
         )}
       </div>
 
       {/* Add Note Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-purple-50 rounded-xl p-4 border border-purple-200 mb-4">
-          <div className="space-y-3">
-            <div>
-              <Select value={noteType} onValueChange={setNoteType}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="general">General Note</SelectItem>
-                  <SelectItem value="action_item">Action Item</SelectItem>
-                  <SelectItem value="follow_up">Follow-up Required</SelectItem>
-                  <SelectItem value="alert">Alert</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+        <form onSubmit={handleSubmit} className="bg-purple-50 rounded-lg p-3 border border-purple-200 mb-3">
+          <div className="space-y-2">
+            <Select value={noteType} onValueChange={setNoteType}>
+              <SelectTrigger className="h-7 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="general">General</SelectItem>
+                <SelectItem value="action_item">Action</SelectItem>
+                <SelectItem value="follow_up">Follow-up</SelectItem>
+                <SelectItem value="alert">Alert</SelectItem>
+              </SelectContent>
+            </Select>
 
             <Textarea
               value={noteContent}
               onChange={(e) => setNoteContent(e.target.value)}
-              placeholder="Add a note for other agents..."
-              className="min-h-[80px]"
+              placeholder="Add note..."
+              className="min-h-[60px] text-xs resize-none"
               required
             />
 
@@ -121,14 +114,15 @@ export default function SharedNotes({ communicationId }) {
                 type="submit"
                 size="sm"
                 disabled={createNoteMutation.isPending}
-                className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white"
+                className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white h-7 text-xs"
               >
-                Save Note
+                Save
               </Button>
               <Button
                 type="button"
                 size="sm"
                 variant="outline"
+                className="h-7 text-xs"
                 onClick={() => {
                   setShowForm(false);
                   setNoteContent('');
@@ -143,32 +137,28 @@ export default function SharedNotes({ communicationId }) {
       )}
 
       {/* Notes List */}
-      <div className="space-y-3">
+      <div className="space-y-2 max-h-48 overflow-y-auto">
         {notes.length === 0 ? (
-          <div className="text-center py-8 text-gray-400">
-            <MessageSquare className="w-10 h-10 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">No notes yet</p>
+          <div className="text-center py-6 text-gray-400">
+            <MessageSquare className="w-6 h-6 mx-auto mb-1 opacity-50" />
+            <p className="text-xs">No notes</p>
           </div>
         ) : (
-          notes.map(note => (
-            <div key={note.id} className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Badge className={`${noteTypeColors[note.note_type]} border text-xs flex items-center gap-1`}>
-                    {noteTypeIcons[note.note_type]}
-                    {note.note_type.replace(/_/g, ' ')}
-                  </Badge>
-                </div>
+          notes.slice(0, 3).map(note => (
+            <div key={note.id} className="bg-gray-50 rounded-lg p-2 border border-gray-200">
+              <div className="flex items-start justify-between mb-1">
+                <Badge className={`${noteTypeColors[note.note_type]} border text-xs flex items-center gap-1`}>
+                  {noteTypeIcons[note.note_type]}
+                  {note.note_type.replace(/_/g, ' ')}
+                </Badge>
                 <span className="text-xs text-gray-500">
                   {format(new Date(note.created_date), 'MMM d, h:mm a')}
                 </span>
               </div>
 
-              <p className="text-sm text-gray-700 mb-2 whitespace-pre-wrap">{note.note_content}</p>
+              <p className="text-xs text-gray-700 mb-1 line-clamp-2">{note.note_content}</p>
 
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <span className="font-medium">{note.created_by_name || note.created_by}</span>
-              </div>
+              <span className="text-xs text-gray-500 font-medium">{note.created_by_name || note.created_by}</span>
             </div>
           ))
         )}
