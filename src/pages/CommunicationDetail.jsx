@@ -298,7 +298,7 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
             <p className="text-xs text-gray-600">Delivery Status</p>
           </div>
           <Button 
-            onClick={() => window.location.href = createPageUrl('CommunicationDetail?id=dummy-next-patient')}
+            onClick={() => window.location.href = createPageUrl('CommunicationDetail?id=691e78ce9d438618100a7172')}
             size="sm"
             className="bg-[#8B1F1F] hover:bg-[#721919] text-white h-8"
           >
