@@ -7,7 +7,9 @@ import { format } from 'date-fns';
 import { 
   ArrowLeft, Phone, Mail, MessageSquare, User, Clock, 
   Calendar, Sparkles, Send, Loader2, Play, FileText,
-  CheckCircle, AlertCircle, ThumbsUp, ThumbsDown, Edit3
+  CheckCircle, AlertCircle, ThumbsUp, ThumbsDown, Edit3,
+  MapPin, ChevronDown, Package, CreditCard, Pill, AlertTriangle,
+  CalendarClock, HelpCircle, FileQuestion, MessageCircle
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,11 +17,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import ExportShareButtons from '../components/communication/ExportShareButtons';
 import PatientInfoPanel from '../components/communication/PatientInfoPanel';
 import SharedNotes from '../components/communication/SharedNotes';
 import PatientProfileDialog from '../components/communication/PatientProfileDialog';
 import ActionWorkflow from '../components/communication/ActionWorkflow';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const channelIcons = {
   phone: Phone,
@@ -44,6 +46,9 @@ export default function CommunicationDetail() {
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
   const [showPatientProfile, setShowPatientProfile] = useState(false);
   const [isEditingRequestType, setIsEditingRequestType] = useState(false);
+  const [showAddressDropdown, setShowAddressDropdown] = useState(false);
+  const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
+  const [selectedWorkflowType, setSelectedWorkflowType] = useState(null);
   const [feedbackData, setFeedbackData] = useState({
     feedback_type: 'positive',
     feedback_notes: '',
@@ -264,20 +269,14 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link 
-            to={createPageUrl('Dashboard')}
-            className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 transition-all"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">Communication Details</h1>
-            <p className="text-gray-600">Review and respond to patient communication</p>
-          </div>
-        </div>
-        <ExportShareButtons data={[communication]} filename={`communication-${communication.id}`} />
+      <div className="flex items-center gap-3 mb-4">
+        <Link 
+          to={createPageUrl('Dashboard')}
+          className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 transition-all"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Link>
+        <h1 className="text-2xl font-bold text-gray-800">Communication Details</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -321,6 +320,34 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                   <span className="text-xs">{communication.patient_phone}</span>
                 </div>
               )}
+              <div className="relative">
+                <button
+                  onClick={() => setShowAddressDropdown(!showAddressDropdown)}
+                  className="flex items-center gap-2 text-gray-700 hover:text-gray-900 w-full text-left"
+                >
+                  <MapPin className="w-3 h-3 text-gray-500" />
+                  <span className="text-xs flex-1">{communication.patient_address || '123 Main St, Springfield, IL 62701'}</span>
+                  <ChevronDown className="w-3 h-3 text-gray-500" />
+                </button>
+                {showAddressDropdown && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 p-2">
+                    <div className="space-y-2">
+                      <div className="p-2 hover:bg-gray-50 rounded cursor-pointer">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-700">{communication.patient_address || '123 Main St, Springfield, IL 62701'}</span>
+                          <Badge className="bg-blue-100 text-blue-800 text-xs">Billing</Badge>
+                        </div>
+                      </div>
+                      <div className="p-2 hover:bg-gray-50 rounded cursor-pointer">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-700">456 Oak Ave, Portland, OR 97201</span>
+                          <Badge className="bg-green-100 text-green-800 text-xs">Delivery</Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -419,158 +446,82 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
 
         </div>
 
-        {/* Column 2: Response & Actions */}
+        {/* Column 2: Medical Info & Notes */}
         <div className="space-y-4">
-          {/* Response Section */}
-          <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
-                <Send className="w-4 h-4" />
-                Response
-              </h3>
-              <Button
-                onClick={handleGenerateResponse}
-                disabled={isGenerating}
-                size="sm"
-                className="bg-[#8B1F1F] hover:bg-[#721919] text-white text-xs h-7"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                    AI...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-3 h-3 mr-1" />
-                    AI
-                  </>
-                )}
-              </Button>
-            </div>
+          {/* Patient Information */}
+          <PatientInfoPanel communication={communication} />
 
-            <Textarea
-              value={responseText}
-              onChange={(e) => setResponseText(e.target.value)}
-              placeholder="Type response or use AI..."
-              className="min-h-[120px] text-xs bg-gray-50 border-gray-200 mb-3 resize-none"
-            />
-
-            <div className="flex items-center gap-2">
-              <Select value={newStatus || communication.status} onValueChange={handleStatusChange}>
-                <SelectTrigger className="flex-1 h-8 text-xs bg-gray-50 border-gray-200">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="in_progress">In Progress</SelectItem>
-                  <SelectItem value="resolved">Resolved</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Button
-                onClick={handleSendResponse}
-                disabled={!responseText.trim() || updateMutation.isPending}
-                size="sm"
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs h-8"
-              >
-                {updateMutation.isPending ? (
-                  <>
-                    <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                    Sending
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-3 h-3 mr-1" />
-                    Send
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-
-          {/* AI Feedback */}
-          {communication.recommended_response && !showFeedbackForm && (
-            <div className="bg-white rounded-xl p-3 border border-gray-200 shadow-sm">
-              <h3 className="text-xs font-bold text-gray-800 mb-2">AI Response Quality</h3>
-              <div className="flex gap-1">
-                <Button
-                  onClick={() => {
-                    setFeedbackData({ ...feedbackData, feedback_type: 'positive' });
-                    setShowFeedbackForm(true);
-                  }}
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 text-xs h-7"
-                >
-                  <ThumbsUp className="w-3 h-3" />
-                </Button>
-                <Button
-                  onClick={() => {
-                    setFeedbackData({ ...feedbackData, feedback_type: 'negative' });
-                    setShowFeedbackForm(true);
-                  }}
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 text-xs h-7"
-                >
-                  <ThumbsDown className="w-3 h-3" />
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {/* Activity History */}
-          <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
-            <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              Activity
-            </h3>
-            <div className="space-y-2 text-xs">
-              <div className="flex items-start gap-2 pb-2 border-b border-gray-100">
-                <MessageSquare className="w-3 h-3 text-blue-600 mt-0.5" />
-                <div>
-                  <p className="text-gray-800 font-medium">Received</p>
-                  <p className="text-gray-500">
-                    {format(new Date(communication.timestamp || communication.date), 'MMM d, h:mm a')}
-                  </p>
-                </div>
-              </div>
-
-              {communication.recommended_response && (
-                <div className="flex items-start gap-2 pb-2 border-b border-gray-100">
-                  <Sparkles className="w-3 h-3 text-[#8B1F1F] mt-0.5" />
-                  <div>
-                    <p className="text-gray-800 font-medium">AI Generated</p>
-                    <p className="text-gray-500">Ready</p>
-                  </div>
-                </div>
-              )}
-
-              {communication.response_sent && (
-                <div className="flex items-start gap-2">
-                  <CheckCircle className="w-3 h-3 text-green-600 mt-0.5" />
-                  <div>
-                    <p className="text-gray-800 font-medium">Sent</p>
-                    <p className="text-gray-500">
-                      {communication.response_timestamp 
-                        ? format(new Date(communication.response_timestamp), 'MMM d, h:mm a')
-                        : 'Recently'
-                      }
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+          {/* Shared Notes */}
+          <SharedNotes communicationId={communication.id} />
         </div>
 
-        {/* Column 3: Request-Specific Actions */}
-        <div className="space-y-4">
-          <ActionWorkflow 
-            requestType={communication.request_type} 
-            patientName={communication.patient_name}
-            communication={communication}
-          />
+        {/* Column 3: Request Type Actions */}
+        <div className="space-y-2">
+          <h3 className="text-sm font-bold text-gray-800 mb-2">Request Types</h3>
+          
+          <button
+            onClick={() => { setSelectedWorkflowType('prescription_refill'); setShowWorkflowDialog(true); }}
+            className="w-full p-3 bg-white hover:bg-blue-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+          >
+            <Pill className="w-4 h-4 text-blue-600" />
+            <span className="text-xs font-medium text-gray-800">Prescription Refill</span>
+          </button>
+
+          <button
+            onClick={() => { setSelectedWorkflowType('medication_inquiry'); setShowWorkflowDialog(true); }}
+            className="w-full p-3 bg-white hover:bg-purple-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+          >
+            <HelpCircle className="w-4 h-4 text-purple-600" />
+            <span className="text-xs font-medium text-gray-800">Medication Inquiry</span>
+          </button>
+
+          <button
+            onClick={() => { setSelectedWorkflowType('delivery_status'); setShowWorkflowDialog(true); }}
+            className="w-full p-3 bg-white hover:bg-green-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+          >
+            <Package className="w-4 h-4 text-green-600" />
+            <span className="text-xs font-medium text-gray-800">Delivery Status</span>
+          </button>
+
+          <button
+            onClick={() => { setSelectedWorkflowType('billing_question'); setShowWorkflowDialog(true); }}
+            className="w-full p-3 bg-white hover:bg-yellow-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+          >
+            <CreditCard className="w-4 h-4 text-yellow-600" />
+            <span className="text-xs font-medium text-gray-800">Billing Question</span>
+          </button>
+
+          <button
+            onClick={() => { setSelectedWorkflowType('side_effects'); setShowWorkflowDialog(true); }}
+            className="w-full p-3 bg-white hover:bg-red-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+          >
+            <AlertTriangle className="w-4 h-4 text-red-600" />
+            <span className="text-xs font-medium text-gray-800">Side Effects</span>
+          </button>
+
+          <button
+            onClick={() => { setSelectedWorkflowType('appointment_scheduling'); setShowWorkflowDialog(true); }}
+            className="w-full p-3 bg-white hover:bg-indigo-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+          >
+            <CalendarClock className="w-4 h-4 text-indigo-600" />
+            <span className="text-xs font-medium text-gray-800">Appointment</span>
+          </button>
+
+          <button
+            onClick={() => { setSelectedWorkflowType('insurance_question'); setShowWorkflowDialog(true); }}
+            className="w-full p-3 bg-white hover:bg-teal-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+          >
+            <FileQuestion className="w-4 h-4 text-teal-600" />
+            <span className="text-xs font-medium text-gray-800">Insurance Question</span>
+          </button>
+
+          <button
+            onClick={() => { setSelectedWorkflowType('general_inquiry'); setShowWorkflowDialog(true); }}
+            className="w-full p-3 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+          >
+            <MessageCircle className="w-4 h-4 text-gray-600" />
+            <span className="text-xs font-medium text-gray-800">General Inquiry</span>
+          </button>
         </div>
       </div>
 
@@ -580,6 +531,22 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
         onClose={() => setShowPatientProfile(false)} 
         patient={communication}
       />
+
+      {/* Workflow Dialog */}
+      <Dialog open={showWorkflowDialog} onOpenChange={setShowWorkflowDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-gray-800">
+              {selectedWorkflowType?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} Workflow
+            </DialogTitle>
+          </DialogHeader>
+          <ActionWorkflow 
+            requestType={selectedWorkflowType} 
+            patientName={communication.patient_name}
+            communication={communication}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
