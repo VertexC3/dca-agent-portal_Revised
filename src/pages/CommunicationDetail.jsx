@@ -506,17 +506,41 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
 
         </div>
 
-        {/* Column 2: Notes */}
+        {/* Column 2: Prescription History */}
         <div className="space-y-3">
-          {/* Shared Notes */}
-          <SharedNotes communicationId={communication.id} compact={true} />
+          <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+            <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+              <Pill className="w-4 h-4 text-blue-600" />
+              Prescription History
+            </h3>
+            <div className="space-y-2 max-h-[calc(100vh-400px)] overflow-y-auto">
+              {[
+                { med: 'Lisinopril 10mg', date: '2025-11-15', prescriber: 'Dr. Smith', status: 'Active' },
+                { med: 'Metformin 500mg', date: '2025-11-10', prescriber: 'Dr. Johnson', status: 'Active' },
+                { med: 'Atorvastatin 20mg', date: '2025-10-25', prescriber: 'Dr. Smith', status: 'Active' },
+                { med: 'Aspirin 81mg', date: '2025-08-01', prescriber: 'Dr. Smith', status: 'Discontinued' },
+              ].map((rx, idx) => (
+                <div key={idx} className="bg-gray-50 rounded-lg p-2 border border-gray-200">
+                  <div className="flex items-start justify-between mb-1">
+                    <p className="text-xs font-semibold text-gray-800">{rx.med}</p>
+                    <Badge className={rx.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'} style={{fontSize: '10px', padding: '1px 6px'}}>
+                      {rx.status}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-gray-600">Prescribed by {rx.prescriber}</p>
+                  <p className="text-xs text-gray-500">Last filled: {rx.date}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* Column 3: Request Type Actions */}
-        <div className="space-y-2">
-          <h3 className="text-xs font-bold text-gray-800 mb-2">Request Types</h3>
-          
-          <button
+        {/* Column 3: Request Type Actions & Notes */}
+        <div className="space-y-3">
+          <div>
+            <h3 className="text-xs font-bold text-gray-800 mb-2">Request Types</h3>
+            <div className="space-y-2">
+              <button
             onClick={() => { setSelectedWorkflowType('prescription_refill'); setShowWorkflowDialog(true); }}
             className="w-full p-2 bg-white hover:bg-blue-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
           >
@@ -579,6 +603,11 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
             <MessageCircle className="w-3 h-3 text-gray-600" />
             <span className="text-xs font-medium text-gray-800">General Inquiry</span>
           </button>
+            </div>
+          </div>
+
+          {/* Shared Notes */}
+          <SharedNotes communicationId={communication.id} compact={true} />
         </div>
       </div>
 
