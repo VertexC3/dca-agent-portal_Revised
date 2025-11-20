@@ -312,7 +312,7 @@ export default function WorkflowBuilder() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
+                      <SelectItem value="inactive">On Hold</SelectItem>
                       <SelectItem value="testing">Testing</SelectItem>
                     </SelectContent>
                   </Select>
