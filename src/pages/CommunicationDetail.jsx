@@ -53,6 +53,7 @@ export default function CommunicationDetail() {
   const [showTranscriptDialog, setShowTranscriptDialog] = useState(false);
   const [showAddAddressDialog, setShowAddAddressDialog] = useState(false);
   const [newAddress, setNewAddress] = useState({ address: '', type: 'billing' });
+  const [showPillImageDialog, setShowPillImageDialog] = useState(false);
   const [feedbackData, setFeedbackData] = useState({
     feedback_type: 'positive',
     feedback_notes: '',
@@ -286,6 +287,11 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
 
         {/* Next Patient Widget */}
         <div className="bg-white rounded-lg border border-gray-200 p-3 flex items-center gap-4 shadow-sm" style={{minWidth: '300px'}}>
+          <img 
+            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6915f90e9513d40c38a60116/e256ef5d8_MiddleAgeWoman.jpg"
+            alt="Sarah Williams"
+            className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+          />
           <div className="text-right flex-1">
             <p className="text-xs text-gray-500 mb-0.5">Next Patient</p>
             <p className="text-sm font-bold text-gray-800">Sarah Williams</p>
@@ -531,7 +537,7 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
               <Pill className="w-4 h-4 text-blue-600" />
               Prescription History
             </h3>
-            <div className="space-y-2 max-h-[200px] overflow-y-auto">
+            <div className="space-y-2 max-h-[280px] overflow-y-auto">
               {[
                 { med: 'Lisinopril 10mg', date: '2025-11-15', prescriber: 'Dr. Smith', status: 'Active' },
                 { med: 'Metformin 500mg', date: '2025-11-10', prescriber: 'Dr. Johnson', status: 'Active' },
@@ -548,7 +554,8 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                     <img 
                       src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6915f90e9513d40c38a60116/a43f1a648_LisinoprilPills_5mg-scaled.jpg"
                       alt="Medication"
-                      className="w-8 h-8 rounded object-cover"
+                      onClick={() => setShowPillImageDialog(true)}
+                      className="w-16 h-auto rounded object-cover cursor-pointer hover:opacity-80 transition-opacity"
                     />
                     <Badge className={rx.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'} style={{fontSize: '10px', padding: '1px 6px', height: 'fit-content'}}>
                       {rx.status}
@@ -769,6 +776,20 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
-}
+
+      {/* Pill Image Popup */}
+      <Dialog open={showPillImageDialog} onOpenChange={setShowPillImageDialog}>
+        <DialogContent className="max-w-2xl bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-gray-800">Medication Image</DialogTitle>
+          </DialogHeader>
+          <img 
+            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6915f90e9513d40c38a60116/a43f1a648_LisinoprilPills_5mg-scaled.jpg"
+            alt="Medication"
+            className="w-full h-auto rounded-lg"
+          />
+        </DialogContent>
+      </Dialog>
+      </div>
+      );
+      }
