@@ -273,14 +273,32 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
-        <Link 
-          to={createPageUrl('Dashboard')}
-          className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 transition-all"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
-        <h1 className="text-2xl font-bold text-gray-800">Communication Details</h1>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <Link 
+            to={createPageUrl('Dashboard')}
+            className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 transition-all"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <h1 className="text-2xl font-bold text-gray-800">Communication Details</h1>
+        </div>
+
+        {/* Next Patient Widget */}
+        <div className="bg-white rounded-lg border border-gray-200 p-3 flex items-center gap-3 shadow-sm">
+          <div className="text-right">
+            <p className="text-xs text-gray-500 mb-0.5">Next Patient</p>
+            <p className="text-sm font-bold text-gray-800">Sarah Williams</p>
+            <p className="text-xs text-gray-600">Delivery Status</p>
+          </div>
+          <Button 
+            onClick={() => window.location.href = createPageUrl('CommunicationDetail?id=dummy-next-patient')}
+            size="sm"
+            className="bg-[#8B1F1F] hover:bg-[#721919] text-white h-8"
+          >
+            Review
+          </Button>
+        </div>
       </div>
 
       {/* Medical Info - Horizontal across all columns */}
@@ -506,14 +524,14 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
 
         </div>
 
-        {/* Column 2: Prescription History */}
+        {/* Column 2: Prescription History & Billing */}
         <div className="space-y-3">
           <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
             <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
               <Pill className="w-4 h-4 text-blue-600" />
               Prescription History
             </h3>
-            <div className="space-y-2 max-h-[calc(100vh-400px)] overflow-y-auto">
+            <div className="space-y-2 max-h-[200px] overflow-y-auto">
               {[
                 { med: 'Lisinopril 10mg', date: '2025-11-15', prescriber: 'Dr. Smith', status: 'Active' },
                 { med: 'Metformin 500mg', date: '2025-11-10', prescriber: 'Dr. Johnson', status: 'Active' },
@@ -531,6 +549,36 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                   <p className="text-xs text-gray-500">Last filled: {rx.date}</p>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Billing Information */}
+          <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+            <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+              <CreditCard className="w-4 h-4 text-green-600" />
+              Billing Information
+            </h3>
+            <div className="space-y-2">
+              <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-gray-600" />
+                    <span className="text-xs font-semibold text-gray-800">•••• •••• •••• 4242</span>
+                  </div>
+                  <Badge className="bg-blue-100 text-blue-800" style={{fontSize: '10px', padding: '1px 6px'}}>Visa</Badge>
+                </div>
+                <p className="text-xs text-gray-600">Expires 12/2026</p>
+                <p className="text-xs text-gray-500">Primary card on file</p>
+              </div>
+              <Button 
+                onClick={() => alert('Update payment method functionality')}
+                variant="outline"
+                size="sm"
+                className="w-full h-7 text-xs"
+              >
+                <Edit3 className="w-3 h-3 mr-1" />
+                Update Payment Method
+              </Button>
             </div>
           </div>
         </div>
