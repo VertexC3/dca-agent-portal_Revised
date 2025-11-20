@@ -280,166 +280,169 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
         <ExportShareButtons data={[communication]} filename={`communication-${communication.id}`} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content - Left Side (2 columns) */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Patient Info & Message */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="p-4 rounded-xl bg-[#8B1F1F]/10 border border-[#8B1F1F]/30">
-                <User className="w-8 h-8 text-[#8B1F1F]" />
-              </div>
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-gray-800 mb-1">{communication.patient_name}</h2>
-                <div className="flex flex-wrap gap-3 text-gray-600 text-sm">
-                  {communication.patient_email && (
-                    <span className="flex items-center gap-1">
-                      <Mail className="w-4 h-4" />
-                      {communication.patient_email}
-                    </span>
-                  )}
-                  {communication.patient_phone && (
-                    <span className="flex items-center gap-1">
-                      <Phone className="w-4 h-4" />
-                      {communication.patient_phone}
-                    </span>
-                  )}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Column 1: Patient Info & Message */}
+        <div className="space-y-4">
+          {/* Patient Info Card */}
+          <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-lg bg-[#8B1F1F]/10 border border-[#8B1F1F]/30">
+                  <User className="w-5 h-5 text-[#8B1F1F]" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-gray-800">{communication.patient_name}</h2>
+                  <Badge className={`${statusColors[communication.status]} border text-xs px-2 py-0.5 mt-1`}>
+                    {communication.status.replace(/_/g, ' ')}
+                  </Badge>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  onClick={() => setShowPatientProfile(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  <User className="w-4 h-4 mr-2" />
-                  Patient Profile
-                </Button>
-                <Badge className={`${statusColors[communication.status]} border text-base px-3 py-1`}>
-                  {communication.status.replace(/_/g, ' ')}
-                </Badge>
-              </div>
+              <Button
+                onClick={() => setShowPatientProfile(true)}
+                variant="outline"
+                size="sm"
+                className="text-xs"
+              >
+                <Edit3 className="w-3 h-3 mr-1" />
+                Edit
+              </Button>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                <div className="flex items-center gap-2 text-gray-600 mb-1 text-sm">
-                  <ChannelIcon className="w-4 h-4" />
+            <div className="space-y-2 text-sm">
+              {communication.patient_email && (
+                <div className="flex items-center gap-2 text-gray-700">
+                  <Mail className="w-3 h-3 text-gray-500" />
+                  <span className="text-xs">{communication.patient_email}</span>
+                </div>
+              )}
+              {communication.patient_phone && (
+                <div className="flex items-center gap-2 text-gray-700">
+                  <Phone className="w-3 h-3 text-gray-500" />
+                  <span className="text-xs">{communication.patient_phone}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Communication Details Card */}
+          <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+            <h3 className="text-sm font-bold text-gray-800 mb-3">Communication Details</h3>
+
+            <div className="space-y-2 text-xs">
+              <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+                <span className="text-gray-600 flex items-center gap-1">
+                  <ChannelIcon className="w-3 h-3" />
                   Channel
-                </div>
-                <p className="text-gray-800 font-semibold capitalize">{communication.channel}</p>
+                </span>
+                <span className="text-gray-800 font-semibold capitalize">{communication.channel}</span>
               </div>
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                <div className="flex items-center gap-2 text-gray-600 mb-1 text-sm">
-                  <FileText className="w-4 h-4" />
+              <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+                <span className="text-gray-600 flex items-center gap-1">
+                  <FileText className="w-3 h-3" />
                   Request Type
-                </div>
+                </span>
                 {isEditingRequestType ? (
                   <Select 
                     value={communication.request_type} 
                     onValueChange={handleRequestTypeChange}
                   >
-                    <SelectTrigger className="w-full bg-white border-gray-200 text-sm">
+                    <SelectTrigger className="h-6 text-xs w-32">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="prescription_refill">Prescription Refill</SelectItem>
-                      <SelectItem value="prescription_renewal">Prescription Renewal</SelectItem>
                       <SelectItem value="medication_inquiry">Medication Inquiry</SelectItem>
                       <SelectItem value="delivery_status">Delivery Status</SelectItem>
                       <SelectItem value="billing_question">Billing Question</SelectItem>
                       <SelectItem value="side_effects">Side Effects</SelectItem>
-                      <SelectItem value="address_update">Address Update</SelectItem>
-                      <SelectItem value="insurance_question">Insurance Question</SelectItem>
-                      <SelectItem value="appointment_scheduling">Appointment Scheduling</SelectItem>
-                      <SelectItem value="general_inquiry">General Inquiry</SelectItem>
+                      <SelectItem value="appointment_scheduling">Appointment</SelectItem>
+                      <SelectItem value="insurance_question">Insurance</SelectItem>
+                      <SelectItem value="general_inquiry">General</SelectItem>
+                      <SelectItem value="complaint">Complaint</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
                 ) : (
                   <button
                     onClick={() => setIsEditingRequestType(true)}
-                    className="text-gray-800 font-semibold text-sm hover:text-[#8B1F1F] transition-colors flex items-center gap-1"
+                    className="text-gray-800 font-semibold hover:text-[#8B1F1F] flex items-center gap-1"
                   >
                     {communication.request_type?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                    <Edit3 className="w-3 h-3" />
+                    <Edit3 className="w-2.5 h-2.5" />
                   </button>
                 )}
               </div>
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                <div className="flex items-center gap-2 text-gray-600 mb-1 text-sm">
-                  <Calendar className="w-4 h-4" />
+              <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
+                <span className="text-gray-600 flex items-center gap-1">
+                  <Calendar className="w-3 h-3" />
                   Date
-                </div>
-                <p className="text-gray-800 font-semibold text-sm">
+                </span>
+                <span className="text-gray-800 font-semibold">
                   {format(new Date(communication.date), 'MMM d, yyyy')}
-                </p>
+                </span>
               </div>
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                <div className="flex items-center gap-2 text-gray-600 mb-1 text-sm">
-                  <Clock className="w-4 h-4" />
+              <div className="flex items-center justify-between py-1.5">
+                <span className="text-gray-600 flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
                   Time
-                </div>
-                <p className="text-gray-800 font-semibold text-sm">
+                </span>
+                <span className="text-gray-800 font-semibold">
                   {format(new Date(communication.timestamp || communication.date), 'h:mm a')}
-                </p>
+                </span>
               </div>
             </div>
+          </div>
 
-            {/* Patient Message/Transcript - Only show if no request type is selected or not changed */}
-            {!isEditingRequestType && communication.request_type && (
-              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                  <MessageSquare className="w-5 h-5" />
-                  {communication.channel === 'phone' ? 'Transcript' : 'Message'}
-                </h3>
-                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                  {communication.transcript || communication.message_content}
-                </p>
-              </div>
-            )}
-
-            {/* Voice Recording */}
+          {/* Message Content */}
+          <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+            <h3 className="text-sm font-bold text-gray-800 mb-2 flex items-center gap-2">
+              <MessageSquare className="w-4 h-4" />
+              {communication.channel === 'phone' ? 'Transcript' : 'Message'}
+            </h3>
+            <div className="bg-gray-50 rounded-lg p-3 max-h-32 overflow-y-auto">
+              <p className="text-xs text-gray-700 leading-relaxed whitespace-pre-wrap">
+                {communication.transcript || communication.message_content}
+              </p>
+            </div>
             {communication.channel === 'phone' && communication.voice_recording_url && (
-              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 mt-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                  <Play className="w-5 h-5" />
-                  Voice Recording
-                </h3>
-                <audio controls className="w-full">
-                  <source src={communication.voice_recording_url} type="audio/mpeg" />
-                  Your browser does not support the audio element.
-                </audio>
-              </div>
+              <audio controls className="w-full mt-2" style={{height: '32px'}}>
+                <source src={communication.voice_recording_url} type="audio/mpeg" />
+              </audio>
             )}
           </div>
 
-          {/* Action Workflow */}
-          <ActionWorkflow 
-            requestType={communication.request_type} 
-            patientName={communication.patient_name}
-            communication={communication}
-          />
+          {/* Patient Information */}
+          <PatientInfoPanel communication={communication} />
 
+          {/* Shared Notes */}
+          <SharedNotes communicationId={communication.id} />
+
+        </div>
+
+        {/* Column 2: Response & Actions */}
+        <div className="space-y-4">
           {/* Response Section */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                <Send className="w-6 h-6" />
-                Send Response
+          <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                <Send className="w-4 h-4" />
+                Response
               </h3>
               <Button
                 onClick={handleGenerateResponse}
                 disabled={isGenerating}
-                className="bg-[#8B1F1F] hover:bg-[#721919] text-white"
+                size="sm"
+                className="bg-[#8B1F1F] hover:bg-[#721919] text-white text-xs h-7"
               >
                 {isGenerating ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Generating...
+                    <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                    AI...
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Generate AI Response
+                    <Sparkles className="w-3 h-3 mr-1" />
+                    AI
                   </>
                 )}
               </Button>
@@ -448,13 +451,13 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
             <Textarea
               value={responseText}
               onChange={(e) => setResponseText(e.target.value)}
-              placeholder="Type your response here or generate one using AI..."
-              className="min-h-[200px] bg-gray-50 border-gray-200 text-gray-800 placeholder:text-gray-400 mb-4"
+              placeholder="Type response or use AI..."
+              className="min-h-[120px] text-xs bg-gray-50 border-gray-200 mb-3 resize-none"
             />
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <Select value={newStatus || communication.status} onValueChange={handleStatusChange}>
-                <SelectTrigger className="w-48 bg-gray-50 border-gray-200 text-gray-800">
+                <SelectTrigger className="flex-1 h-8 text-xs bg-gray-50 border-gray-200">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -467,213 +470,107 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
               <Button
                 onClick={handleSendResponse}
                 disabled={!responseText.trim() || updateMutation.isPending}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                size="sm"
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white text-xs h-8"
               >
                 {updateMutation.isPending ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Sending...
+                    <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                    Sending
                   </>
                 ) : (
                   <>
-                    <Send className="w-4 h-4 mr-2" />
-                    Send Response
+                    <Send className="w-3 h-3 mr-1" />
+                    Send
                   </>
                 )}
               </Button>
             </div>
           </div>
 
-          {/* AI Training Feedback - Only shown if recommended response exists */}
-          {communication.recommended_response && (
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
-              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-[#8B1F1F]" />
-                AI Response Feedback
-              </h3>
-
-              {!showFeedbackForm ? (
-                <div className="space-y-2">
-                  <p className="text-sm text-gray-600 mb-3">Rate the AI-generated response quality:</p>
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => {
-                        setFeedbackData({ ...feedbackData, feedback_type: 'positive' });
-                        setShowFeedbackForm(true);
-                      }}
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                    >
-                      <ThumbsUp className="w-4 h-4 mr-1" />
-                      Good
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        setFeedbackData({ ...feedbackData, feedback_type: 'negative' });
-                        setShowFeedbackForm(true);
-                      }}
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                    >
-                      <ThumbsDown className="w-4 h-4 mr-1" />
-                      Needs Work
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        setFeedbackData({ ...feedbackData, feedback_type: 'correction' });
-                        setShowFeedbackForm(true);
-                      }}
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                    >
-                      <Edit3 className="w-4 h-4 mr-1" />
-                      Correct
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-purple-50 rounded-xl p-4 border border-purple-200 space-y-3">
-                  <h4 className="text-sm font-semibold text-gray-800">Provide AI Training Feedback</h4>
-                  
-                  <div>
-                    <Label className="text-xs">Quality Score (1-5)</Label>
-                    <Input
-                      type="number"
-                      min="1"
-                      max="5"
-                      value={feedbackData.conversation_quality}
-                      onChange={(e) => setFeedbackData({ ...feedbackData, conversation_quality: parseInt(e.target.value) })}
-                      className="mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <Label className="text-xs">Improvement Area</Label>
-                    <Select 
-                      value={feedbackData.improvement_area} 
-                      onValueChange={(value) => setFeedbackData({ ...feedbackData, improvement_area: value })}
-                    >
-                      <SelectTrigger className="mt-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="accuracy">Accuracy</SelectItem>
-                        <SelectItem value="tone">Tone</SelectItem>
-                        <SelectItem value="completeness">Completeness</SelectItem>
-                        <SelectItem value="empathy">Empathy</SelectItem>
-                        <SelectItem value="policy_compliance">Policy Compliance</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label className="text-xs">Feedback Notes</Label>
-                    <Textarea
-                      value={feedbackData.feedback_notes}
-                      onChange={(e) => setFeedbackData({ ...feedbackData, feedback_notes: e.target.value })}
-                      placeholder="What could be improved?"
-                      className="mt-1 min-h-[60px]"
-                    />
-                  </div>
-
-                  {feedbackData.feedback_type === 'correction' && (
-                    <div>
-                      <Label className="text-xs">Corrected Response</Label>
-                      <Textarea
-                        value={feedbackData.corrected_response}
-                        onChange={(e) => setFeedbackData({ ...feedbackData, corrected_response: e.target.value })}
-                        placeholder="Provide the corrected response..."
-                        className="mt-1 min-h-[80px]"
-                      />
-                    </div>
-                  )}
-
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={handleSubmitFeedback}
-                      size="sm"
-                      className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white"
-                    >
-                      Submit Feedback
-                    </Button>
-                    <Button
-                      onClick={() => setShowFeedbackForm(false)}
-                      size="sm"
-                      variant="outline"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              )}
+          {/* AI Feedback */}
+          {communication.recommended_response && !showFeedbackForm && (
+            <div className="bg-white rounded-xl p-3 border border-gray-200 shadow-sm">
+              <h3 className="text-xs font-bold text-gray-800 mb-2">AI Response Quality</h3>
+              <div className="flex gap-1">
+                <Button
+                  onClick={() => {
+                    setFeedbackData({ ...feedbackData, feedback_type: 'positive' });
+                    setShowFeedbackForm(true);
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 text-xs h-7"
+                >
+                  <ThumbsUp className="w-3 h-3" />
+                </Button>
+                <Button
+                  onClick={() => {
+                    setFeedbackData({ ...feedbackData, feedback_type: 'negative' });
+                    setShowFeedbackForm(true);
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 text-xs h-7"
+                >
+                  <ThumbsDown className="w-3 h-3" />
+                </Button>
+              </div>
             </div>
           )}
-        </div>
 
-        {/* Sidebar - Right Side (1 column) */}
-        <div className="space-y-6">
           {/* Activity History */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
-            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Clock className="w-5 h-5" />
-              Activity History
+          <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+            <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              Activity
             </h3>
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center flex-shrink-0">
-                  <MessageSquare className="w-4 h-4 text-blue-600" />
-                </div>
+            <div className="space-y-2 text-xs">
+              <div className="flex items-start gap-2 pb-2 border-b border-gray-100">
+                <MessageSquare className="w-3 h-3 text-blue-600 mt-0.5" />
                 <div>
-                  <p className="text-gray-800 font-medium">Message received</p>
-                  <p className="text-gray-500 text-sm">
-                    {format(new Date(communication.timestamp || communication.date), 'MMM d, yyyy h:mm a')}
+                  <p className="text-gray-800 font-medium">Received</p>
+                  <p className="text-gray-500">
+                    {format(new Date(communication.timestamp || communication.date), 'MMM d, h:mm a')}
                   </p>
                 </div>
               </div>
 
               {communication.recommended_response && (
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#8B1F1F]/10 border border-[#8B1F1F]/30 flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-4 h-4 text-[#8B1F1F]" />
-                  </div>
+                <div className="flex items-start gap-2 pb-2 border-b border-gray-100">
+                  <Sparkles className="w-3 h-3 text-[#8B1F1F] mt-0.5" />
                   <div>
-                    <p className="text-gray-800 font-medium">AI response generated</p>
-                    <p className="text-gray-500 text-sm">Ready to send</p>
+                    <p className="text-gray-800 font-medium">AI Generated</p>
+                    <p className="text-gray-500">Ready</p>
                   </div>
                 </div>
               )}
 
               {communication.response_sent && (
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-green-50 border border-green-200 flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
-                  </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="w-3 h-3 text-green-600 mt-0.5" />
                   <div>
-                    <p className="text-gray-800 font-medium">Response sent</p>
-                    <p className="text-gray-500 text-sm">
+                    <p className="text-gray-800 font-medium">Sent</p>
+                    <p className="text-gray-500">
                       {communication.response_timestamp 
-                        ? format(new Date(communication.response_timestamp), 'MMM d, yyyy h:mm a')
+                        ? format(new Date(communication.response_timestamp), 'MMM d, h:mm a')
                         : 'Recently'
                       }
                     </p>
-                    {communication.handled_by && (
-                      <p className="text-gray-500 text-xs mt-1">By: {communication.handled_by}</p>
-                    )}
                   </div>
                 </div>
               )}
             </div>
           </div>
+        </div>
 
-          {/* Patient Information Panel */}
-          <PatientInfoPanel communication={communication} />
-
-          {/* Shared Notes */}
-          <SharedNotes communicationId={communication.id} />
+        {/* Column 3: Request-Specific Actions */}
+        <div className="space-y-4">
+          <ActionWorkflow 
+            requestType={communication.request_type} 
+            patientName={communication.patient_name}
+            communication={communication}
+          />
         </div>
       </div>
 
