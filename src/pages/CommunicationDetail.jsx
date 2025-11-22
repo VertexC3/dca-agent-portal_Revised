@@ -70,6 +70,13 @@ export default function CommunicationDetail() {
   const [showMedicationsDialog, setShowMedicationsDialog] = useState(false);
   const [showConditionsDialog, setShowConditionsDialog] = useState(false);
   const [showInsuranceCardDialog, setShowInsuranceCardDialog] = useState(false);
+  const [showPaymentMethodDialog, setShowPaymentMethodDialog] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState({ cardNumber: '', expiry: '', cvv: '', cardholderName: '' });
+  const [showEditEmailDialog, setShowEditEmailDialog] = useState(false);
+  const [editEmail, setEditEmail] = useState('');
+  const [editingMedication, setEditingMedication] = useState(null);
+  const [showEditMedicationDialog, setShowEditMedicationDialog] = useState(false);
+  const [editMedicationData, setEditMedicationData] = useState({ name: '', dosage: '' });
   const [feedbackData, setFeedbackData] = useState({
     feedback_type: 'positive',
     feedback_notes: '',
@@ -333,19 +340,9 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
   const patientHistory = allCommunications.filter(c => c.patient_email === communication.patient_email).sort((a, b) => new Date(b.timestamp || b.date) - new Date(a.timestamp || a.date));
 
   return (
-    <div className="space-y-0 relative">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <Link 
-          to={createPageUrl('Dashboard')}
-          className="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 transition-all text-sm font-medium"
-        >
-          Back
-        </Link>
-      </div>
-
+    <div className="space-y-0 relative pt-0">
       {/* Medical Info */}
-      <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm mb-6">{/* ... rest of ... */}
+      <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm mb-8">{/* ... rest of ... */}
         <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
           <User className="w-4 h-4 text-blue-600" />
           Medical Information
@@ -353,52 +350,43 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
         <div className="grid grid-cols-4 gap-4 text-xs">
           {communication.patient_allergies && (
             <div 
-              className="flex items-start gap-2 text-gray-700 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+              className="text-gray-700 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
               onClick={() => setShowAllergiesDialog(true)}
             >
-              <AlertCircle className="w-3 h-3 text-red-500 mt-0.5 flex-shrink-0" />
-              <div>
-                <span className="font-medium text-red-700 block">Allergies</span>
-                <span>{communication.patient_allergies}</span>
-              </div>
+              <span className="font-medium text-red-700 block mb-1">Allergies</span>
+              <span>{communication.patient_allergies}</span>
             </div>
           )}
           {communication.current_medications && (
             <div 
-              className="flex items-start gap-2 text-gray-700 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+              className="text-gray-700 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
               onClick={() => setShowMedicationsDialog(true)}
             >
-              <Pill className="w-3 h-3 text-blue-500 mt-0.5 flex-shrink-0" />
-              <div>
-                <span className="font-medium block">Medications</span>
-                <span>{communication.current_medications}</span>
-              </div>
+              <span className="font-medium block mb-1">Medications</span>
+              <span>{communication.current_medications}</span>
             </div>
           )}
           {communication.known_conditions && (
             <div 
-              className="flex items-start gap-2 text-gray-700 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+              className="text-gray-700 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
               onClick={() => setShowConditionsDialog(true)}
             >
-              <AlertCircle className="w-3 h-3 text-purple-500 mt-0.5 flex-shrink-0" />
-              <div>
-                <span className="font-medium block">Conditions</span>
-                <span>{communication.known_conditions}</span>
-              </div>
+              <span className="font-medium block mb-1">Conditions</span>
+              <span>{communication.known_conditions}</span>
             </div>
           )}
           {communication.insurance_provider && (
-            <div className="flex items-start gap-2 text-gray-700">
-              <button
-                onClick={() => setShowInsuranceCardDialog(true)}
-                className="flex items-center gap-1 text-green-600 hover:text-green-700 text-xs"
-              >
-                <CreditCard className="w-3 h-3" />
-              </button>
-              <div>
-                <span className="font-medium block">Insurance</span>
-                <span>{communication.insurance_provider}</span>
+            <div className="text-gray-700 p-2">
+              <div className="flex items-center justify-between">
+                <span className="font-medium block mb-1">Insurance</span>
+                <button
+                  onClick={() => setShowInsuranceCardDialog(true)}
+                  className="text-green-600 hover:text-green-700"
+                >
+                  <CreditCard className="w-3 h-3" />
+                </button>
               </div>
+              <span>{communication.insurance_provider}</span>
             </div>
           )}
         </div>
@@ -434,10 +422,17 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
 
             <div className="space-y-2 text-sm">
               {communication.patient_email && (
-                <div className="flex items-center gap-2 text-gray-700">
+                <button
+                  onClick={() => {
+                    setEditEmail(communication.patient_email);
+                    setShowEditEmailDialog(true);
+                  }}
+                  className="flex items-center gap-2 text-gray-700 hover:text-gray-900 w-full text-left"
+                >
                   <Mail className="w-3 h-3 text-gray-500" />
-                  <span className="text-xs">{communication.patient_email}</span>
-                </div>
+                  <span className="text-xs flex-1">{communication.patient_email}</span>
+                  <Edit3 className="w-2.5 h-2.5 text-gray-400" />
+                </button>
               )}
               {communication.patient_phone && (
                 <div className="relative">
@@ -452,16 +447,34 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                   {showPhoneDropdown && (
                     <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 p-2">
                       <div className="space-y-2">
-                        <div className="p-2 hover:bg-gray-50 rounded cursor-pointer">
+                        <div className="p-2 hover:bg-gray-50 rounded group">
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-700">{communication.patient_phone}</span>
-                            <Badge className="bg-blue-100 text-blue-800 text-xs">Primary</Badge>
+                            <span className="text-xs text-gray-700 flex-1">{communication.patient_phone}</span>
+                            <Badge className="bg-blue-100 text-blue-800 text-xs mr-2">Primary</Badge>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                alert('Edit phone functionality');
+                              }}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <span className="text-gray-400 hover:text-gray-600">⋯</span>
+                            </button>
                           </div>
                         </div>
-                        <div className="p-2 hover:bg-gray-50 rounded cursor-pointer">
+                        <div className="p-2 hover:bg-gray-50 rounded group">
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-700">(555) 987-6543</span>
-                            <Badge className="bg-green-100 text-green-800 text-xs">Mobile</Badge>
+                            <span className="text-xs text-gray-700 flex-1">(555) 987-6543</span>
+                            <Badge className="bg-green-100 text-green-800 text-xs mr-2">Mobile</Badge>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                alert('Edit phone functionality');
+                              }}
+                              className="opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <span className="text-gray-400 hover:text-gray-600">⋯</span>
+                            </button>
                           </div>
                         </div>
                         <div className="border-t pt-2">
@@ -709,7 +722,7 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                 <p className="text-xs text-gray-500">Primary card on file</p>
               </div>
               <Button 
-                onClick={() => alert('Update payment method functionality')}
+                onClick={() => setShowPaymentMethodDialog(true)}
                 variant="outline"
                 size="sm"
                 className="w-full h-7 text-xs"
@@ -1019,14 +1032,23 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
           </DialogHeader>
           <div className="space-y-3">
             {(communication.current_medications || '').split(',').map((med, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200">
+              <div 
+                key={idx} 
+                className="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200 cursor-pointer hover:bg-gray-100"
+                onClick={() => {
+                  const parts = med.trim().split(' ');
+                  setEditMedicationData({ name: parts[0], dosage: parts.slice(1).join(' ') });
+                  setEditingMedication(idx);
+                  setShowEditMedicationDialog(true);
+                }}
+              >
                 <div>
                   <p className="text-sm font-semibold text-gray-800">{med.trim().split(' ')[0]}</p>
                   <p className="text-xs text-gray-600">{med.trim().split(' ').slice(1).join(' ')}</p>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="ghost" size="sm" className="h-6 text-xs">Edit</Button>
-                  <Button variant="ghost" size="sm" className="h-6 text-xs text-red-600">Delete</Button>
+                  <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={(e) => e.stopPropagation()}>Edit</Button>
+                  <Button variant="ghost" size="sm" className="h-6 text-xs text-red-600" onClick={(e) => { e.stopPropagation(); alert('Delete medication'); }}>Delete</Button>
                 </div>
               </div>
             ))}
@@ -1034,6 +1056,53 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
               <Plus className="w-3 h-3 mr-1" />
               Add Medication
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Medication Dialog */}
+      <Dialog open={showEditMedicationDialog} onOpenChange={setShowEditMedicationDialog}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-gray-800">Edit Medication</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-sm">Medication Name</Label>
+              <Input
+                value={editMedicationData.name}
+                onChange={(e) => setEditMedicationData({ ...editMedicationData, name: e.target.value })}
+                placeholder="Lisinopril"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Dosage</Label>
+              <Input
+                value={editMedicationData.dosage}
+                onChange={(e) => setEditMedicationData({ ...editMedicationData, dosage: e.target.value })}
+                placeholder="10mg, once daily"
+                className="mt-1"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowEditMedicationDialog(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  alert(`Medication updated: ${editMedicationData.name} ${editMedicationData.dosage}`);
+                  setShowEditMedicationDialog(false);
+                }}
+                className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white"
+              >
+                Save
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -1073,6 +1142,127 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
             alt="Insurance Card"
             className="w-full h-auto rounded-lg"
           />
+        </DialogContent>
+      </Dialog>
+
+      {/* Update Payment Method Dialog */}
+      <Dialog open={showPaymentMethodDialog} onOpenChange={setShowPaymentMethodDialog}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-gray-800">Update Payment Method</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-sm">Cardholder Name</Label>
+              <Input
+                value={paymentMethod.cardholderName}
+                onChange={(e) => setPaymentMethod({ ...paymentMethod, cardholderName: e.target.value })}
+                placeholder="John Doe"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Card Number</Label>
+              <Input
+                value={paymentMethod.cardNumber}
+                onChange={(e) => setPaymentMethod({ ...paymentMethod, cardNumber: e.target.value })}
+                placeholder="1234 5678 9012 3456"
+                className="mt-1"
+                maxLength={19}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm">Expiry Date</Label>
+                <Input
+                  value={paymentMethod.expiry}
+                  onChange={(e) => setPaymentMethod({ ...paymentMethod, expiry: e.target.value })}
+                  placeholder="MM/YY"
+                  className="mt-1"
+                  maxLength={5}
+                />
+              </div>
+              <div>
+                <Label className="text-sm">CVV</Label>
+                <Input
+                  value={paymentMethod.cvv}
+                  onChange={(e) => setPaymentMethod({ ...paymentMethod, cvv: e.target.value })}
+                  placeholder="123"
+                  className="mt-1"
+                  maxLength={4}
+                  type="password"
+                />
+              </div>
+            </div>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <p className="text-xs text-blue-800">
+                <strong>Secure Payment:</strong> Your payment information is encrypted and stored securely. We never share your card details.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowPaymentMethodDialog(false);
+                  setPaymentMethod({ cardNumber: '', expiry: '', cvv: '', cardholderName: '' });
+                }}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  alert('Payment method updated successfully!');
+                  setShowPaymentMethodDialog(false);
+                  setPaymentMethod({ cardNumber: '', expiry: '', cvv: '', cardholderName: '' });
+                }}
+                disabled={!paymentMethod.cardNumber || !paymentMethod.expiry || !paymentMethod.cvv || !paymentMethod.cardholderName}
+                className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white"
+              >
+                Save Card
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Email Dialog */}
+      <Dialog open={showEditEmailDialog} onOpenChange={setShowEditEmailDialog}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-gray-800">Edit Email Address</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-sm">Email Address</Label>
+              <Input
+                type="email"
+                value={editEmail}
+                onChange={(e) => setEditEmail(e.target.value)}
+                placeholder="patient@email.com"
+                className="mt-1"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowEditEmailDialog(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  alert(`Email updated to: ${editEmail}`);
+                  setShowEditEmailDialog(false);
+                }}
+                disabled={!editEmail.includes('@')}
+                className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white"
+              >
+                Save
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -1326,23 +1516,32 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
         </div>
       )}
 
-      {/* Keyboard Shortcuts Indicator */}
-      <div className="fixed bottom-6 left-6 bg-white rounded-lg border border-gray-200 shadow-sm text-xs text-gray-600 overflow-hidden">
-        <button
-          onClick={() => setShortcutsCollapsed(!shortcutsCollapsed)}
-          className="w-full p-3 text-left font-semibold hover:bg-gray-50 transition-colors"
+      {/* Keyboard Shortcuts Indicator with Back Button */}
+      <div className="fixed bottom-6 left-6 flex items-end gap-3 z-40">
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm text-xs text-gray-600 overflow-hidden">
+          <button
+            onClick={() => setShortcutsCollapsed(!shortcutsCollapsed)}
+            className="w-full p-3 text-left font-semibold hover:bg-gray-50 transition-colors"
+          >
+            Shortcuts {shortcutsCollapsed ? '›' : '›'}
+          </button>
+          {!shortcutsCollapsed && (
+            <div className="px-3 pb-3 space-y-1">
+              <p>{modifierKey}+T = Transcript</p>
+              <p>{modifierKey}+B = Billing</p>
+              <p>{modifierKey}+P = Profile</p>
+              <p>{modifierKey}+R = Request Types</p>
+              <p>{modifierKey}+X = Prescription</p>
+            </div>
+          )}
+        </div>
+        
+        <Link 
+          to={createPageUrl('Dashboard')}
+          className="px-4 py-3 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 transition-all text-sm font-medium shadow-sm"
         >
-          Shortcuts {shortcutsCollapsed ? '›' : '›'}
-        </button>
-        {!shortcutsCollapsed && (
-          <div className="px-3 pb-3 space-y-1">
-            <p>{modifierKey}+T = Transcript</p>
-            <p>{modifierKey}+B = Billing</p>
-            <p>{modifierKey}+P = Profile</p>
-            <p>{modifierKey}+R = Request Types</p>
-            <p>{modifierKey}+X = Prescription</p>
-          </div>
-        )}
+          Back
+        </Link>
       </div>
 
       <style jsx>{`
