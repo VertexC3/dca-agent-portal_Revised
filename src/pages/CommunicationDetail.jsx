@@ -148,7 +148,7 @@ export default function CommunicationDetail() {
             setShowTranscriptDialog(true);
             break;
           case 'b':
-            setShowBillingDialog(true);
+            setShowPaymentMethodDialog(true);
             break;
           case 'p':
             setShowPatientProfile(true);
@@ -1621,10 +1621,10 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
           </DialogHeader>
           <div className="space-y-2">
             {[
-              { med: 'Lisinopril 10mg', date: '2025-11-15', prescriber: 'Dr. Smith', status: 'Active' },
-              { med: 'Metformin 500mg', date: '2025-11-10', prescriber: 'Dr. Johnson', status: 'Active' },
-              { med: 'Atorvastatin 20mg', date: '2025-10-25', prescriber: 'Dr. Smith', status: 'Active' },
-              { med: 'Aspirin 81mg', date: '2025-08-01', prescriber: 'Dr. Smith', status: 'Discontinued' },
+              { med: 'Lisinopril 10mg', date: '2025-11-15', prescriber: 'Dr. Smith', status: 'Active', refillsRemaining: 2 },
+              { med: 'Metformin 500mg', date: '2025-11-10', prescriber: 'Dr. Johnson', status: 'Active', refillsRemaining: 1 },
+              { med: 'Atorvastatin 20mg', date: '2025-10-25', prescriber: 'Dr. Smith', status: 'Active', refillsRemaining: 3 },
+              { med: 'Aspirin 81mg', date: '2025-08-01', prescriber: 'Dr. Smith', status: 'Discontinued', refillsRemaining: 0 },
             ].map((rx, idx) => (
               <div key={idx} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                 <div className="flex items-start gap-2">
@@ -1636,13 +1636,46 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                       variant="outline"
                       size="sm"
                       className="h-6 text-xs mt-2"
+                      onClick={() => {
+                        setSelectedPrescription(rx);
+                        setShowFillHistoryDialog(true);
+                      }}
                     >
                       Fill History
                     </Button>
                   </div>
-                  <Badge className={rx.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}>
-                    {rx.status}
-                  </Badge>
+                  <div className="flex flex-col items-end gap-1">
+                    <Badge className={rx.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}>
+                      {rx.status}
+                    </Badge>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="text-gray-400 hover:text-gray-600 p-1">
+                          <span className="text-lg leading-none">⋯</span>
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48 bg-white">
+                        <DropdownMenuItem onClick={() => alert('Request refill')}>
+                          Request Refill
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => {
+                          setSelectedPrescription(rx);
+                          setShowFillHistoryDialog(true);
+                        }}>
+                          View Fill History
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setShowPillImageDialog(true)}>
+                          View Medication Image
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => alert('Contact prescriber')}>
+                          Contact Prescriber
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => alert('View drug information')}>
+                          Drug Information
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
               </div>
             ))}
