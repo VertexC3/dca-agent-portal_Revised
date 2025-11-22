@@ -62,6 +62,14 @@ export default function CommunicationDetail() {
   const [showPrescriptionDialog, setShowPrescriptionDialog] = useState(false);
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [nextPatientDismissed, setNextPatientDismissed] = useState(false);
+  const [shortcutsCollapsed, setShortcutsCollapsed] = useState(false);
+  const [editingAddress, setEditingAddress] = useState(null);
+  const [showEditAddressDialog, setShowEditAddressDialog] = useState(false);
+  const [editAddressData, setEditAddressData] = useState({ address: '', name: '', type: 'billing' });
+  const [showAllergiesDialog, setShowAllergiesDialog] = useState(false);
+  const [showMedicationsDialog, setShowMedicationsDialog] = useState(false);
+  const [showConditionsDialog, setShowConditionsDialog] = useState(false);
+  const [showInsuranceCardDialog, setShowInsuranceCardDialog] = useState(false);
   const [feedbackData, setFeedbackData] = useState({
     feedback_type: 'positive',
     feedback_notes: '',
@@ -327,24 +335,27 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
   return (
     <div className="space-y-0 relative">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-4">
         <Link 
           to={createPageUrl('Dashboard')}
-          className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 transition-all"
+          className="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 transition-all text-sm font-medium"
         >
-          <ArrowLeft className="w-5 h-5" />
+          Back
         </Link>
       </div>
 
       {/* Medical Info */}
-      <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">{/* ... rest of ... */}
+      <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm mb-6">{/* ... rest of ... */}
         <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
           <User className="w-4 h-4 text-blue-600" />
           Medical Information
         </h3>
         <div className="grid grid-cols-4 gap-4 text-xs">
           {communication.patient_allergies && (
-            <div className="flex items-start gap-2 text-gray-700">
+            <div 
+              className="flex items-start gap-2 text-gray-700 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+              onClick={() => setShowAllergiesDialog(true)}
+            >
               <AlertCircle className="w-3 h-3 text-red-500 mt-0.5 flex-shrink-0" />
               <div>
                 <span className="font-medium text-red-700 block">Allergies</span>
@@ -353,7 +364,10 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
             </div>
           )}
           {communication.current_medications && (
-            <div className="flex items-start gap-2 text-gray-700">
+            <div 
+              className="flex items-start gap-2 text-gray-700 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+              onClick={() => setShowMedicationsDialog(true)}
+            >
               <Pill className="w-3 h-3 text-blue-500 mt-0.5 flex-shrink-0" />
               <div>
                 <span className="font-medium block">Medications</span>
@@ -362,7 +376,10 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
             </div>
           )}
           {communication.known_conditions && (
-            <div className="flex items-start gap-2 text-gray-700">
+            <div 
+              className="flex items-start gap-2 text-gray-700 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+              onClick={() => setShowConditionsDialog(true)}
+            >
               <AlertCircle className="w-3 h-3 text-purple-500 mt-0.5 flex-shrink-0" />
               <div>
                 <span className="font-medium block">Conditions</span>
@@ -372,7 +389,12 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
           )}
           {communication.insurance_provider && (
             <div className="flex items-start gap-2 text-gray-700">
-              <CreditCard className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
+              <button
+                onClick={() => setShowInsuranceCardDialog(true)}
+                className="flex items-center gap-1 text-green-600 hover:text-green-700 text-xs"
+              >
+                <CreditCard className="w-3 h-3" />
+              </button>
               <div>
                 <span className="font-medium block">Insurance</span>
                 <span>{communication.insurance_provider}</span>
@@ -471,16 +493,40 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                 {showAddressDropdown && (
                   <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 p-2">
                     <div className="space-y-2">
-                      <div className="p-2 hover:bg-gray-50 rounded cursor-pointer">
+                      <div className="p-2 hover:bg-gray-50 rounded group">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-700">{communication.patient_address || '123 Main St, Springfield, IL 62701'}</span>
-                          <Badge className="bg-blue-100 text-blue-800 text-xs">Billing</Badge>
+                          <span className="text-xs text-gray-700 flex-1">{communication.patient_address || '123 Main St, Springfield, IL 62701'}</span>
+                          <Badge className="bg-blue-100 text-blue-800 text-xs mr-2">Billing</Badge>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditAddressData({ address: communication.patient_address || '123 Main St, Springfield, IL 62701', name: 'Home', type: 'billing' });
+                              setEditingAddress(0);
+                              setShowEditAddressDialog(true);
+                              setShowAddressDropdown(false);
+                            }}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <span className="text-gray-400 hover:text-gray-600">⋯</span>
+                          </button>
                         </div>
                       </div>
-                      <div className="p-2 hover:bg-gray-50 rounded cursor-pointer">
+                      <div className="p-2 hover:bg-gray-50 rounded group">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-gray-700">456 Oak Ave, Portland, OR 97201</span>
-                          <Badge className="bg-green-100 text-green-800 text-xs">Delivery</Badge>
+                          <span className="text-xs text-gray-700 flex-1">456 Oak Ave, Portland, OR 97201</span>
+                          <Badge className="bg-green-100 text-green-800 text-xs mr-2">Home</Badge>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditAddressData({ address: '456 Oak Ave, Portland, OR 97201', name: 'Work', type: 'home' });
+                              setEditingAddress(1);
+                              setShowEditAddressDialog(true);
+                              setShowAddressDropdown(false);
+                            }}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <span className="text-gray-400 hover:text-gray-600">⋯</span>
+                          </button>
                         </div>
                       </div>
                       <div className="border-t pt-2">
@@ -807,6 +853,15 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
           </DialogHeader>
           <div className="space-y-4">
             <div>
+              <Label className="text-sm">Address Name</Label>
+              <Input
+                value={newAddress.name || ''}
+                onChange={(e) => setNewAddress({ ...newAddress, name: e.target.value })}
+                placeholder="Home, Work, etc."
+                className="mt-1"
+              />
+            </div>
+            <div>
               <Label className="text-sm">Address</Label>
               <Input
                 value={newAddress.address}
@@ -823,7 +878,10 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="billing">Billing</SelectItem>
-                  <SelectItem value="delivery">Delivery</SelectItem>
+                  <SelectItem value="home">Home</SelectItem>
+                  <SelectItem value="work">Work</SelectItem>
+                  <SelectItem value="business">Business</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -832,7 +890,7 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                 variant="outline"
                 onClick={() => {
                   setShowAddAddressDialog(false);
-                  setNewAddress({ address: '', type: 'billing' });
+                  setNewAddress({ address: '', name: '', type: 'billing' });
                 }}
                 className="flex-1"
               >
@@ -840,10 +898,9 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
               </Button>
               <Button
                 onClick={() => {
-                  // Save address logic here
-                  alert(`Address saved: ${newAddress.address} (${newAddress.type})`);
+                  alert(`Address saved: ${newAddress.name} - ${newAddress.address} (${newAddress.type})`);
                   setShowAddAddressDialog(false);
-                  setNewAddress({ address: '', type: 'billing' });
+                  setNewAddress({ address: '', name: '', type: 'billing' });
                 }}
                 disabled={!newAddress.address.trim()}
                 className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white"
@@ -852,6 +909,170 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Address Dialog */}
+      <Dialog open={showEditAddressDialog} onOpenChange={setShowEditAddressDialog}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-gray-800">Edit Address</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-sm">Address Name</Label>
+              <Input
+                value={editAddressData.name}
+                onChange={(e) => setEditAddressData({ ...editAddressData, name: e.target.value })}
+                placeholder="Home, Work, etc."
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Address</Label>
+              <Input
+                value={editAddressData.address}
+                onChange={(e) => setEditAddressData({ ...editAddressData, address: e.target.value })}
+                placeholder="123 Main St, City, State ZIP"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Type</Label>
+              <Select value={editAddressData.type} onValueChange={(val) => setEditAddressData({ ...editAddressData, type: val })}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="billing">Billing</SelectItem>
+                  <SelectItem value="home">Home</SelectItem>
+                  <SelectItem value="work">Work</SelectItem>
+                  <SelectItem value="business">Business</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (confirm('Are you sure you want to delete this address?')) {
+                    alert('Address deleted');
+                    setShowEditAddressDialog(false);
+                  }
+                }}
+                className="text-red-600 hover:text-red-700"
+              >
+                Delete
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setShowEditAddressDialog(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  alert(`Address updated: ${editAddressData.name} - ${editAddressData.address} (${editAddressData.type})`);
+                  setShowEditAddressDialog(false);
+                }}
+                disabled={!editAddressData.address.trim()}
+                className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white"
+              >
+                Save
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Allergies Dialog */}
+      <Dialog open={showAllergiesDialog} onOpenChange={setShowAllergiesDialog}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-gray-800">Manage Allergies</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            {(communication.patient_allergies || '').split(',').map((allergy, idx) => (
+              <div key={idx} className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200">
+                <span className="text-sm text-gray-800">{allergy.trim()}</span>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="sm" className="h-6 text-xs">Edit</Button>
+                  <Button variant="ghost" size="sm" className="h-6 text-xs text-red-600">Delete</Button>
+                </div>
+              </div>
+            ))}
+            <Button className="w-full bg-[#8B1F1F] hover:bg-[#721919] text-white">
+              <Plus className="w-3 h-3 mr-1" />
+              Add Allergy
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Medications Dialog */}
+      <Dialog open={showMedicationsDialog} onOpenChange={setShowMedicationsDialog}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-gray-800">Manage Medications</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            {(communication.current_medications || '').split(',').map((med, idx) => (
+              <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200">
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">{med.trim().split(' ')[0]}</p>
+                  <p className="text-xs text-gray-600">{med.trim().split(' ').slice(1).join(' ')}</p>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="sm" className="h-6 text-xs">Edit</Button>
+                  <Button variant="ghost" size="sm" className="h-6 text-xs text-red-600">Delete</Button>
+                </div>
+              </div>
+            ))}
+            <Button className="w-full bg-[#8B1F1F] hover:bg-[#721919] text-white">
+              <Plus className="w-3 h-3 mr-1" />
+              Add Medication
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Conditions Dialog */}
+      <Dialog open={showConditionsDialog} onOpenChange={setShowConditionsDialog}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-gray-800">Manage Conditions</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            {(communication.known_conditions || '').split(',').map((condition, idx) => (
+              <div key={idx} className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200">
+                <span className="text-sm text-gray-800">{condition.trim()}</span>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="sm" className="h-6 text-xs">Edit</Button>
+                  <Button variant="ghost" size="sm" className="h-6 text-xs text-red-600">Delete</Button>
+                </div>
+              </div>
+            ))}
+            <Button className="w-full bg-[#8B1F1F] hover:bg-[#721919] text-white">
+              <Plus className="w-3 h-3 mr-1" />
+              Add Condition
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Insurance Card Dialog */}
+      <Dialog open={showInsuranceCardDialog} onOpenChange={setShowInsuranceCardDialog}>
+        <DialogContent className="max-w-3xl bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-gray-800">Insurance Card</DialogTitle>
+          </DialogHeader>
+          <img 
+            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6915f90e9513d40c38a60116/0e2c1ec48_InsuranceCard.png"
+            alt="Insurance Card"
+            className="w-full h-auto rounded-lg"
+          />
         </DialogContent>
       </Dialog>
 
@@ -1106,13 +1327,22 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
       )}
 
       {/* Keyboard Shortcuts Indicator */}
-      <div className="fixed bottom-6 left-6 bg-white rounded-lg border border-gray-200 p-3 shadow-sm text-xs text-gray-600">
-        <p className="font-semibold mb-1">Shortcuts:</p>
-        <p>{modifierKey}+T = Transcript</p>
-        <p>{modifierKey}+B = Billing</p>
-        <p>{modifierKey}+P = Profile</p>
-        <p>{modifierKey}+R = Request Types</p>
-        <p>{modifierKey}+X = Prescription</p>
+      <div className="fixed bottom-6 left-6 bg-white rounded-lg border border-gray-200 shadow-sm text-xs text-gray-600 overflow-hidden">
+        <button
+          onClick={() => setShortcutsCollapsed(!shortcutsCollapsed)}
+          className="w-full p-3 text-left font-semibold hover:bg-gray-50 transition-colors"
+        >
+          Shortcuts {shortcutsCollapsed ? '›' : '›'}
+        </button>
+        {!shortcutsCollapsed && (
+          <div className="px-3 pb-3 space-y-1">
+            <p>{modifierKey}+T = Transcript</p>
+            <p>{modifierKey}+B = Billing</p>
+            <p>{modifierKey}+P = Profile</p>
+            <p>{modifierKey}+R = Request Types</p>
+            <p>{modifierKey}+X = Prescription</p>
+          </div>
+        )}
       </div>
 
       <style jsx>{`
