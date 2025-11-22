@@ -11,6 +11,12 @@ import {
   MapPin, ChevronDown, Package, CreditCard, Pill, AlertTriangle,
   CalendarClock, HelpCircle, FileQuestion, MessageCircle, X, History
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -77,6 +83,8 @@ export default function CommunicationDetail() {
   const [editingMedication, setEditingMedication] = useState(null);
   const [showEditMedicationDialog, setShowEditMedicationDialog] = useState(false);
   const [editMedicationData, setEditMedicationData] = useState({ name: '', dosage: '' });
+  const [showFillHistoryDialog, setShowFillHistoryDialog] = useState(false);
+  const [selectedPrescription, setSelectedPrescription] = useState(null);
   const [feedbackData, setFeedbackData] = useState({
     feedback_type: 'positive',
     feedback_notes: '',
@@ -121,27 +129,28 @@ export default function CommunicationDetail() {
 
       if (!modifier) return;
 
-      switch(e.key.toLowerCase()) {
-        case 't':
-          e.preventDefault();
-          setShowTranscriptDialog(true);
-          break;
-        case 'b':
-          e.preventDefault();
-          setShowBillingDialog(true);
-          break;
-        case 'p':
-          e.preventDefault();
-          setShowPatientProfile(true);
-          break;
-        case 'r':
-          e.preventDefault();
-          setShowRequestTypesDialog(true);
-          break;
-        case 'x':
-          e.preventDefault();
-          setShowPrescriptionDialog(true);
-          break;
+      const key = e.key.toLowerCase();
+      
+      if (['t', 'b', 'p', 'r', 'x'].includes(key)) {
+        e.preventDefault();
+        
+        switch(key) {
+          case 't':
+            setShowTranscriptDialog(true);
+            break;
+          case 'b':
+            setShowBillingDialog(true);
+            break;
+          case 'p':
+            setShowPatientProfile(true);
+            break;
+          case 'r':
+            setShowRequestTypesDialog(true);
+            break;
+          case 'x':
+            setShowPrescriptionDialog(true);
+            break;
+        }
       }
     };
 
@@ -670,10 +679,10 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
             </h3>
             <div className="space-y-2 max-h-[280px] overflow-y-auto">
               {[
-                { med: 'Lisinopril 10mg', date: '2025-11-15', prescriber: 'Dr. Smith', status: 'Active' },
-                { med: 'Metformin 500mg', date: '2025-11-10', prescriber: 'Dr. Johnson', status: 'Active' },
-                { med: 'Atorvastatin 20mg', date: '2025-10-25', prescriber: 'Dr. Smith', status: 'Active' },
-                { med: 'Aspirin 81mg', date: '2025-08-01', prescriber: 'Dr. Smith', status: 'Discontinued' },
+                { med: 'Lisinopril 10mg', date: '2025-11-15', prescriber: 'Dr. Smith', status: 'Active', refillsRemaining: 2 },
+                { med: 'Metformin 500mg', date: '2025-11-10', prescriber: 'Dr. Johnson', status: 'Active', refillsRemaining: 1 },
+                { med: 'Atorvastatin 20mg', date: '2025-10-25', prescriber: 'Dr. Smith', status: 'Active', refillsRemaining: 3 },
+                { med: 'Aspirin 81mg', date: '2025-08-01', prescriber: 'Dr. Smith', status: 'Discontinued', refillsRemaining: 0 },
               ].map((rx, idx) => (
                 <div key={idx} className="bg-gray-50 rounded-lg p-2 border border-gray-200">
                   <div className="flex items-start gap-2">
@@ -685,6 +694,10 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                         variant="outline"
                         size="sm"
                         className="h-6 text-xs mt-1"
+                        onClick={() => {
+                          setSelectedPrescription(rx);
+                          setShowFillHistoryDialog(true);
+                        }}
                       >
                         Fill History
                       </Button>
@@ -695,9 +708,38 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                       onClick={() => setShowPillImageDialog(true)}
                       className="w-16 h-auto rounded object-cover cursor-pointer hover:opacity-80 transition-opacity"
                     />
-                    <Badge className={rx.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'} style={{fontSize: '10px', padding: '1px 6px', height: 'fit-content'}}>
-                      {rx.status}
-                    </Badge>
+                    <div className="flex flex-col items-end gap-1">
+                      <Badge className={rx.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'} style={{fontSize: '10px', padding: '1px 6px', height: 'fit-content'}}>
+                        {rx.status}
+                      </Badge>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button className="text-gray-400 hover:text-gray-600 p-1">
+                            <span className="text-lg leading-none">⋯</span>
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48 bg-white">
+                          <DropdownMenuItem onClick={() => alert('Request refill')}>
+                            Request Refill
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => {
+                            setSelectedPrescription(rx);
+                            setShowFillHistoryDialog(true);
+                          }}>
+                            View Fill History
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => setShowPillImageDialog(true)}>
+                            View Medication Image
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => alert('Contact prescriber')}>
+                            Contact Prescriber
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => alert('View drug information')}>
+                            Drug Information
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -1277,6 +1319,43 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
             alt="Medication"
             className="w-full h-auto rounded-lg"
           />
+        </DialogContent>
+      </Dialog>
+
+      {/* Fill History Dialog */}
+      <Dialog open={showFillHistoryDialog} onOpenChange={setShowFillHistoryDialog}>
+        <DialogContent className="max-w-2xl bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-gray-800">
+              Fill History - {selectedPrescription?.med}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <p className="text-sm font-semibold text-gray-800 mb-1">{selectedPrescription?.med}</p>
+              <p className="text-xs text-gray-600">Prescribed by {selectedPrescription?.prescriber}</p>
+              <p className="text-xs text-gray-600">Refills Remaining: {selectedPrescription?.refillsRemaining}</p>
+            </div>
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-gray-800">Fill History</h4>
+              {[
+                { date: '2025-11-15', quantity: 30, pharmacy: 'DCA Pharmacy - Main', cost: '$15.00' },
+                { date: '2025-10-15', quantity: 30, pharmacy: 'DCA Pharmacy - Main', cost: '$15.00' },
+                { date: '2025-09-15', quantity: 30, pharmacy: 'DCA Pharmacy - Main', cost: '$15.00' },
+                { date: '2025-08-15', quantity: 30, pharmacy: 'DCA Pharmacy - Downtown', cost: '$15.00' },
+              ].map((fill, idx) => (
+                <div key={idx} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-semibold text-gray-800">{fill.date}</span>
+                    <Badge className="bg-green-100 text-green-800 text-xs">Filled</Badge>
+                  </div>
+                  <p className="text-xs text-gray-600">Quantity: {fill.quantity} tablets</p>
+                  <p className="text-xs text-gray-600">{fill.pharmacy}</p>
+                  <p className="text-xs text-gray-600">Cost: {fill.cost}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
