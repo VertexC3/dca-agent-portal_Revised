@@ -342,7 +342,7 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
   return (
     <div className="space-y-0 relative pt-0">
       {/* Medical Info */}
-      <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm mb-8">{/* ... rest of ... */}
+      <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm mb-3">{/* ... rest of ... */}
         <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
           <User className="w-4 h-4 text-blue-600" />
           Medical Information
