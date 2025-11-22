@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -9,7 +9,7 @@ import {
   Calendar, Sparkles, Send, Loader2, Play, FileText,
   CheckCircle, AlertCircle, ThumbsUp, ThumbsDown, Edit3,
   MapPin, ChevronDown, Package, CreditCard, Pill, AlertTriangle,
-  CalendarClock, HelpCircle, FileQuestion, MessageCircle
+  CalendarClock, HelpCircle, FileQuestion, MessageCircle, X, History
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -54,6 +54,14 @@ export default function CommunicationDetail() {
   const [showAddAddressDialog, setShowAddAddressDialog] = useState(false);
   const [newAddress, setNewAddress] = useState({ address: '', type: 'billing' });
   const [showPillImageDialog, setShowPillImageDialog] = useState(false);
+  const [showPhoneDropdown, setShowPhoneDropdown] = useState(false);
+  const [showAddPhoneDialog, setShowAddPhoneDialog] = useState(false);
+  const [newPhone, setNewPhone] = useState({ phone: '', type: 'primary' });
+  const [showBillingDialog, setShowBillingDialog] = useState(false);
+  const [showRequestTypesDialog, setShowRequestTypesDialog] = useState(false);
+  const [showPrescriptionDialog, setShowPrescriptionDialog] = useState(false);
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
+  const [nextPatientDismissed, setNextPatientDismissed] = useState(false);
   const [feedbackData, setFeedbackData] = useState({
     feedback_type: 'positive',
     feedback_notes: '',
@@ -84,6 +92,47 @@ export default function CommunicationDetail() {
     },
     enabled: !!commId
   });
+
+  const { data: allCommunications = [] } = useQuery({
+    queryKey: ['communications'],
+    queryFn: () => base44.entities.PatientCommunication.list(),
+  });
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      const modifier = isMac ? e.metaKey : e.ctrlKey;
+
+      if (!modifier) return;
+
+      switch(e.key.toLowerCase()) {
+        case 't':
+          e.preventDefault();
+          setShowTranscriptDialog(true);
+          break;
+        case 'b':
+          e.preventDefault();
+          setShowBillingDialog(true);
+          break;
+        case 'p':
+          e.preventDefault();
+          setShowPatientProfile(true);
+          break;
+        case 'r':
+          e.preventDefault();
+          setShowRequestTypesDialog(true);
+          break;
+        case 'x':
+          e.preventDefault();
+          setShowPrescriptionDialog(true);
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Dummy data generators
   const getDummyDOB = (name) => {
@@ -270,45 +319,25 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
   }
 
   const ChannelIcon = channelIcons[communication.channel];
+  const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+  const modifierKey = isMac ? '⌘' : 'Ctrl';
+
+  const patientHistory = allCommunications.filter(c => c.patient_email === communication.patient_email).sort((a, b) => new Date(b.timestamp || b.date) - new Date(a.timestamp || a.date));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-0 relative">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <Link 
-            to={createPageUrl('Dashboard')}
-            className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 transition-all"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <h1 className="text-2xl font-bold text-gray-800">Communication Details</h1>
-        </div>
-
-        {/* Next Patient Widget */}
-        <div className="bg-white rounded-lg border border-gray-200 p-3 flex items-center gap-4 shadow-sm" style={{minWidth: '300px'}}>
-          <img 
-            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6915f90e9513d40c38a60116/e256ef5d8_MiddleAgeWoman.jpg"
-            alt="Sarah Williams"
-            className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
-          />
-          <div className="text-right flex-1">
-            <p className="text-xs text-gray-500 mb-0.5">Next Patient</p>
-            <p className="text-sm font-bold text-gray-800">Sarah Williams</p>
-            <p className="text-xs text-gray-600">Delivery Status</p>
-          </div>
-          <Button 
-            onClick={() => window.location.href = createPageUrl('CommunicationDetail?id=691e78ce9d438618100a7172')}
-            size="sm"
-            className="bg-[#8B1F1F] hover:bg-[#721919] text-white h-8"
-          >
-            Review
-          </Button>
-        </div>
+      <div className="flex items-center justify-between">
+        <Link 
+          to={createPageUrl('Dashboard')}
+          className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 border border-gray-200 text-gray-700 transition-all"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Link>
       </div>
 
-      {/* Medical Info - Horizontal across all columns */}
-      <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm mb-4">
+      {/* Medical Info */}
+      <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">{/* ... rest of ... */}
         <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
           <User className="w-4 h-4 text-blue-600" />
           Medical Information
@@ -389,9 +418,45 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                 </div>
               )}
               {communication.patient_phone && (
-                <div className="flex items-center gap-2 text-gray-700">
-                  <Phone className="w-3 h-3 text-gray-500" />
-                  <span className="text-xs">{communication.patient_phone}</span>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowPhoneDropdown(!showPhoneDropdown)}
+                    className="flex items-center gap-2 text-gray-700 hover:text-gray-900 w-full text-left"
+                  >
+                    <Phone className="w-3 h-3 text-gray-500" />
+                    <span className="text-xs flex-1">{communication.patient_phone}</span>
+                    <ChevronDown className="w-3 h-3 text-gray-500" />
+                  </button>
+                  {showPhoneDropdown && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 p-2">
+                      <div className="space-y-2">
+                        <div className="p-2 hover:bg-gray-50 rounded cursor-pointer">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-gray-700">{communication.patient_phone}</span>
+                            <Badge className="bg-blue-100 text-blue-800 text-xs">Primary</Badge>
+                          </div>
+                        </div>
+                        <div className="p-2 hover:bg-gray-50 rounded cursor-pointer">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-gray-700">(555) 987-6543</span>
+                            <Badge className="bg-green-100 text-green-800 text-xs">Mobile</Badge>
+                          </div>
+                        </div>
+                        <div className="border-t pt-2">
+                          <button
+                            onClick={() => {
+                              setShowPhoneDropdown(false);
+                              setShowAddPhoneDialog(true);
+                            }}
+                            className="w-full p-2 text-xs text-[#8B1F1F] hover:bg-gray-50 rounded font-medium flex items-center gap-1"
+                          >
+                            <Plus className="w-3 h-3" />
+                            Add New Phone
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
               <div className="relative">
@@ -439,7 +504,16 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
 
           {/* Communication Details Card */}
           <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
-            <h3 className="text-sm font-bold text-gray-800 mb-3">Communication Details</h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold text-gray-800">Communication Details</h3>
+              <button
+                onClick={() => setShowHistoryDialog(true)}
+                className="text-xs text-[#8B1F1F] hover:underline flex items-center gap-1"
+              >
+                <History className="w-3 h-3" />
+                See History
+              </button>
+            </div>
 
             <div className="space-y-2 text-xs">
               <div className="flex items-center justify-between py-1.5 border-b border-gray-100">
@@ -508,8 +582,7 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
 
           {/* Message Content */}
           <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
-            <h3 className="text-sm font-bold text-gray-800 mb-2 flex items-center gap-2">
-              <MessageSquare className="w-4 h-4" />
+            <h3 className="text-sm font-bold text-gray-800 mb-2">
               {communication.channel === 'phone' ? 'Transcript' : 'Message'}
             </h3>
             <div 
@@ -533,8 +606,7 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
         {/* Column 2: Prescription History & Billing */}
         <div className="space-y-3">
           <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
-            <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
-              <Pill className="w-4 h-4 text-blue-600" />
+            <h3 className="text-sm font-bold text-gray-800 mb-3">
               Prescription History
             </h3>
             <div className="space-y-2 max-h-[280px] overflow-y-auto">
@@ -550,6 +622,13 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                       <p className="text-xs font-semibold text-gray-800 mb-1">{rx.med}</p>
                       <p className="text-xs text-gray-600">Prescribed by {rx.prescriber}</p>
                       <p className="text-xs text-gray-500">Last filled: {rx.date}</p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-6 text-xs mt-1"
+                      >
+                        Fill History
+                      </Button>
                     </div>
                     <img 
                       src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6915f90e9513d40c38a60116/a43f1a648_LisinoprilPills_5mg-scaled.jpg"
@@ -568,8 +647,7 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
 
           {/* Billing Information */}
           <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
-            <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-green-600" />
+            <h3 className="text-sm font-bold text-gray-800 mb-3">
               Billing Information
             </h3>
             <div className="space-y-2">
@@ -790,6 +868,259 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
           />
         </DialogContent>
       </Dialog>
+
+      {/* Add Phone Dialog */}
+      <Dialog open={showAddPhoneDialog} onOpenChange={setShowAddPhoneDialog}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-gray-800">Add New Phone</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-sm">Phone Number</Label>
+              <Input
+                value={newPhone.phone}
+                onChange={(e) => setNewPhone({ ...newPhone, phone: e.target.value })}
+                placeholder="(555) 123-4567"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Type</Label>
+              <Select value={newPhone.type} onValueChange={(val) => setNewPhone({ ...newPhone, type: val })}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="primary">Primary</SelectItem>
+                  <SelectItem value="mobile">Mobile</SelectItem>
+                  <SelectItem value="home">Home</SelectItem>
+                  <SelectItem value="work">Work</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowAddPhoneDialog(false);
+                  setNewPhone({ phone: '', type: 'primary' });
+                }}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  alert(`Phone saved: ${newPhone.phone} (${newPhone.type})`);
+                  setShowAddPhoneDialog(false);
+                  setNewPhone({ phone: '', type: 'primary' });
+                }}
+                disabled={!newPhone.phone.trim()}
+                className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white"
+              >
+                Save Phone
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Billing Dialog (triggered by Ctrl/Cmd+B) */}
+      <Dialog open={showBillingDialog} onOpenChange={setShowBillingDialog}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-gray-800">Billing Information</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-gray-600" />
+                  <span className="text-xs font-semibold text-gray-800">•••• •••• •••• 4242</span>
+                </div>
+                <Badge className="bg-blue-100 text-blue-800" style={{fontSize: '10px', padding: '1px 6px'}}>Visa</Badge>
+              </div>
+              <p className="text-xs text-gray-600">Expires 12/2026</p>
+              <p className="text-xs text-gray-500">Primary card on file</p>
+            </div>
+            <Button 
+              onClick={() => alert('Update payment method functionality')}
+              variant="outline"
+              size="sm"
+              className="w-full h-7 text-xs"
+            >
+              <Edit3 className="w-3 h-3 mr-1" />
+              Update Payment Method
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Request Types Dialog (triggered by Ctrl/Cmd+R) */}
+      <Dialog open={showRequestTypesDialog} onOpenChange={setShowRequestTypesDialog}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-gray-800">Request Types</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            <button
+              onClick={() => { setSelectedWorkflowType('prescription_refill'); setShowWorkflowDialog(true); setShowRequestTypesDialog(false); }}
+              className="w-full p-2 bg-white hover:bg-blue-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+            >
+              <Pill className="w-3 h-3 text-blue-600" />
+              <span className="text-xs font-medium text-gray-800">Prescription Refill</span>
+            </button>
+            <button
+              onClick={() => { setSelectedWorkflowType('medication_inquiry'); setShowWorkflowDialog(true); setShowRequestTypesDialog(false); }}
+              className="w-full p-2 bg-white hover:bg-purple-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+            >
+              <HelpCircle className="w-3 h-3 text-purple-600" />
+              <span className="text-xs font-medium text-gray-800">Medication Inquiry</span>
+            </button>
+            <button
+              onClick={() => { setSelectedWorkflowType('delivery_status'); setShowWorkflowDialog(true); setShowRequestTypesDialog(false); }}
+              className="w-full p-2 bg-white hover:bg-green-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+            >
+              <Package className="w-3 h-3 text-green-600" />
+              <span className="text-xs font-medium text-gray-800">Delivery Status</span>
+            </button>
+            <button
+              onClick={() => { setSelectedWorkflowType('billing_question'); setShowWorkflowDialog(true); setShowRequestTypesDialog(false); }}
+              className="w-full p-2 bg-white hover:bg-yellow-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
+            >
+              <CreditCard className="w-3 h-3 text-yellow-600" />
+              <span className="text-xs font-medium text-gray-800">Billing Question</span>
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Prescription Dialog (triggered by Ctrl/Cmd+X) */}
+      <Dialog open={showPrescriptionDialog} onOpenChange={setShowPrescriptionDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-gray-800">Prescription History</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            {[
+              { med: 'Lisinopril 10mg', date: '2025-11-15', prescriber: 'Dr. Smith', status: 'Active' },
+              { med: 'Metformin 500mg', date: '2025-11-10', prescriber: 'Dr. Johnson', status: 'Active' },
+              { med: 'Atorvastatin 20mg', date: '2025-10-25', prescriber: 'Dr. Smith', status: 'Active' },
+              { med: 'Aspirin 81mg', date: '2025-08-01', prescriber: 'Dr. Smith', status: 'Discontinued' },
+            ].map((rx, idx) => (
+              <div key={idx} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                <div className="flex items-start gap-2">
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-gray-800 mb-1">{rx.med}</p>
+                    <p className="text-xs text-gray-600">Prescribed by {rx.prescriber}</p>
+                    <p className="text-xs text-gray-500">Last filled: {rx.date}</p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-6 text-xs mt-2"
+                    >
+                      Fill History
+                    </Button>
+                  </div>
+                  <Badge className={rx.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}>
+                    {rx.status}
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Communication History Dialog */}
+      <Dialog open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-gray-800">Communication History - {communication.patient_name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            {patientHistory.map((comm, idx) => (
+              <div key={comm.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Badge className={`${statusColors[comm.status]} border text-xs`}>
+                      {comm.status.replace(/_/g, ' ')}
+                    </Badge>
+                    <Badge className="bg-purple-100 text-purple-800 border-purple-200 text-xs capitalize">
+                      {comm.channel}
+                    </Badge>
+                  </div>
+                  <span className="text-xs text-gray-500">
+                    {format(new Date(comm.timestamp || comm.date), 'MMM d, yyyy h:mm a')}
+                  </span>
+                </div>
+                <p className="text-sm font-semibold text-gray-800 mb-1">
+                  {comm.request_type?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                </p>
+                <p className="text-xs text-gray-700 line-clamp-2">{comm.message_content}</p>
+              </div>
+            ))}
+            {patientHistory.length === 0 && (
+              <p className="text-center text-gray-400 py-8">No communication history found</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Next Patient Widget - Bottom Right */}
+      {!nextPatientDismissed && (
+        <div 
+          className="fixed bottom-6 right-6 bg-white rounded-lg border border-gray-200 p-3 shadow-lg transition-all duration-300 z-50"
+          style={{
+            minWidth: '300px',
+            animation: nextPatientDismissed ? 'slideOut 0.3s ease-in' : 'none'
+          }}
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6915f90e9513d40c38a60116/e256ef5d8_MiddleAgeWoman.jpg"
+              alt="Sarah Williams"
+              className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+            />
+            <div className="flex-1">
+              <p className="text-xs text-gray-500 mb-0.5">Next Patient</p>
+              <p className="text-sm font-bold text-gray-800">Sarah Williams</p>
+              <p className="text-xs text-gray-600">Delivery Status</p>
+            </div>
+          </div>
+          <Button 
+            onClick={() => window.location.href = createPageUrl('CommunicationDetail?id=691e78ce9d438618100a7172')}
+            size="sm"
+            className="bg-[#8B1F1F] hover:bg-[#721919] text-white h-8 w-full mb-1"
+          >
+            Review
+          </Button>
+          <button
+            onClick={() => setNextPatientDismissed(true)}
+            className="text-xs text-gray-500 hover:text-gray-700 w-full text-center"
+          >
+            dismiss
+          </button>
+        </div>
+      )}
+
+      {/* Keyboard Shortcuts Indicator */}
+      <div className="fixed bottom-6 left-6 bg-white rounded-lg border border-gray-200 p-3 shadow-sm text-xs text-gray-600">
+        <p className="font-semibold mb-1">Shortcuts:</p>
+        <p>{modifierKey}+T = Transcript</p>
+        <p>{modifierKey}+B = Billing</p>
+        <p>{modifierKey}+P = Profile</p>
+        <p>{modifierKey}+R = Request Types</p>
+        <p>{modifierKey}+X = Prescription</p>
+      </div>
+
+      <style jsx>{`
+        @keyframes slideOut {
+          from { transform: translateX(0); opacity: 1; }
+          to { transform: translateX(120%); opacity: 0; }
+        }
+      `}</style>
       </div>
       );
       }
