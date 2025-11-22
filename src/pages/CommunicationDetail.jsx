@@ -85,6 +85,15 @@ export default function CommunicationDetail() {
   const [editMedicationData, setEditMedicationData] = useState({ name: '', dosage: '' });
   const [showFillHistoryDialog, setShowFillHistoryDialog] = useState(false);
   const [selectedPrescription, setSelectedPrescription] = useState(null);
+  const [showInsuranceDialog, setShowInsuranceDialog] = useState(false);
+  const [insuranceData, setInsuranceData] = useState({
+    provider: '',
+    memberName: '',
+    memberNumber: '',
+    groupNumber: '',
+    phone: '',
+    planType: ''
+  });
   const [feedbackData, setFeedbackData] = useState({
     feedback_type: 'positive',
     feedback_notes: '',
@@ -385,11 +394,27 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
             </div>
           )}
           {communication.insurance_provider && (
-            <div className="text-gray-700 p-2">
+            <div 
+              className="text-gray-700 p-2 cursor-pointer hover:bg-gray-50 rounded-lg transition-colors"
+              onClick={() => {
+                setInsuranceData({
+                  provider: communication.insurance_provider,
+                  memberName: communication.patient_name,
+                  memberNumber: 'INS' + Math.random().toString().slice(2, 12),
+                  groupNumber: 'GRP' + Math.random().toString().slice(2, 9),
+                  phone: '1-800-555-' + Math.floor(1000 + Math.random() * 9000),
+                  planType: communication.insurance_provider.includes('PPO') ? 'PPO' : communication.insurance_provider.includes('HMO') ? 'HMO' : 'Other'
+                });
+                setShowInsuranceDialog(true);
+              }}
+            >
               <div className="flex items-center justify-between">
                 <span className="font-medium block mb-1">Insurance</span>
                 <button
-                  onClick={() => setShowInsuranceCardDialog(true)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowInsuranceCardDialog(true);
+                  }}
                   className="text-green-600 hover:text-green-700"
                 >
                   <CreditCard className="w-3 h-3" />
@@ -1184,6 +1209,108 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
             alt="Insurance Card"
             className="w-full h-auto rounded-lg"
           />
+        </DialogContent>
+      </Dialog>
+
+      {/* Insurance Information Dialog */}
+      <Dialog open={showInsuranceDialog} onOpenChange={setShowInsuranceDialog}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-gray-800">Insurance Information</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-sm">Insurance Provider</Label>
+              <Input
+                value={insuranceData.provider}
+                onChange={(e) => setInsuranceData({ ...insuranceData, provider: e.target.value })}
+                placeholder="Blue Cross Blue Shield"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Member Name</Label>
+              <Input
+                value={insuranceData.memberName}
+                onChange={(e) => setInsuranceData({ ...insuranceData, memberName: e.target.value })}
+                placeholder="John Doe"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Member/Policy Number</Label>
+              <Input
+                value={insuranceData.memberNumber}
+                onChange={(e) => setInsuranceData({ ...insuranceData, memberNumber: e.target.value })}
+                placeholder="INS123456789"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Group Number</Label>
+              <Input
+                value={insuranceData.groupNumber}
+                onChange={(e) => setInsuranceData({ ...insuranceData, groupNumber: e.target.value })}
+                placeholder="GRP123456"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Customer Service Phone</Label>
+              <Input
+                value={insuranceData.phone}
+                onChange={(e) => setInsuranceData({ ...insuranceData, phone: e.target.value })}
+                placeholder="1-800-555-1234"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Plan Type</Label>
+              <Select value={insuranceData.planType} onValueChange={(val) => setInsuranceData({ ...insuranceData, planType: val })}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PPO">PPO</SelectItem>
+                  <SelectItem value="HMO">HMO</SelectItem>
+                  <SelectItem value="EPO">EPO</SelectItem>
+                  <SelectItem value="POS">POS</SelectItem>
+                  <SelectItem value="Medicare">Medicare</SelectItem>
+                  <SelectItem value="Medicaid">Medicaid</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="pt-2">
+              <Button
+                onClick={() => setShowInsuranceCardDialog(true)}
+                variant="outline"
+                size="sm"
+                className="w-full"
+              >
+                <CreditCard className="w-3 h-3 mr-2" />
+                View Insurance Card
+              </Button>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowInsuranceDialog(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  alert(`Insurance updated: ${insuranceData.provider}`);
+                  setShowInsuranceDialog(false);
+                }}
+                className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white"
+              >
+                Save
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
