@@ -716,17 +716,6 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                       <p className="text-xs text-gray-600">Prescribed by {rx.prescriber}</p>
                       <p className="text-xs text-gray-500">Last filled: {rx.date}</p>
                       <div className="flex gap-1 mt-1">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-6 text-xs"
-                          onClick={() => {
-                            setSelectedPrescription(rx);
-                            setShowFillHistoryDialog(true);
-                          }}
-                        >
-                          Fill History
-                        </Button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
