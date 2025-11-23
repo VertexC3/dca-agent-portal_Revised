@@ -9,7 +9,8 @@ import {
   Calendar, Sparkles, Send, Loader2, Play, FileText,
   CheckCircle, AlertCircle, ThumbsUp, ThumbsDown, Edit3,
   MapPin, ChevronDown, Package, CreditCard, Pill, AlertTriangle,
-  CalendarClock, HelpCircle, FileQuestion, MessageCircle, X, History
+  CalendarClock, HelpCircle, FileQuestion, MessageCircle, X, History,
+  RefreshCw, BookOpen, StopCircle
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -730,30 +731,38 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-48 bg-white">
                             <DropdownMenuItem onClick={() => alert('Request refill')}>
+                              <RefreshCw className="w-4 h-4 mr-2" />
                               Request Refill
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => alert('Request renewal')}>
+                              <FileText className="w-4 h-4 mr-2" />
                               Request Renewal
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => alert('Payment')}>
+                              <CreditCard className="w-4 h-4 mr-2" />
                               Payment
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => alert('View orders')}>
+                              <Package className="w-4 h-4 mr-2" />
                               Orders
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => {
                               setSelectedPrescription(rx);
                               setShowFillHistoryDialog(true);
                             }}>
+                              <History className="w-4 h-4 mr-2" />
                               Fill History
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => alert('View video guide')}>
+                              <Play className="w-4 h-4 mr-2" />
                               Video Guide
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => alert('View medical guide')}>
+                              <BookOpen className="w-4 h-4 mr-2" />
                               Medical Guide
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => alert('Stop prescription')}>
+                            <DropdownMenuItem onClick={() => alert('Stop prescription')} className="text-red-600">
+                              <StopCircle className="w-4 h-4 mr-2" />
                               Stop Prescription
                             </DropdownMenuItem>
                           </DropdownMenuContent>
