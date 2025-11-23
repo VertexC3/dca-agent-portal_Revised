@@ -74,14 +74,14 @@ export default function PrescriptionCard({ prescription }) {
                     <Package className="w-4 h-4 mr-2" />
                     Orders
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setShowHistory(true)}>
+                    <History className="w-4 h-4 mr-2" />
+                    Fill History
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => setShowVideo(true)}>
                     <Play className="w-4 h-4 mr-2" />
                     Video Guide
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setShowHistory(true)}>
-                    <History className="w-4 h-4 mr-2" />
-                    Fill History
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setShowMedicalGuide(true)}>
                     <BookOpen className="w-4 h-4 mr-2" />
