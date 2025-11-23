@@ -25,6 +25,8 @@ export default function ActionWorkflow({ requestType, patientName, communication
     notes: ''
   });
 
+  const [selectedMed, setSelectedMed] = useState('');
+
   const handleMedicationChange = (medName) => {
     const med = medications.find(m => m.name === medName);
     if (med) {
@@ -280,8 +282,6 @@ export default function ActionWorkflow({ requestType, patientName, communication
   }
 
   if (requestType === 'side_effects') {
-    const [selectedMed, setSelectedMed] = React.useState('');
-    
     const sideEffectsData = {
       'Lisinopril 10mg': ['Dizziness', 'Dry cough', 'Headache', 'Fatigue', 'Nausea', 'Low blood pressure', 'Elevated potassium levels', 'Kidney problems', 'Angioedema (rare but serious)'],
       'Metformin 500mg': ['Nausea', 'Diarrhea', 'Stomach upset', 'Metallic taste', 'Loss of appetite', 'Vitamin B12 deficiency', 'Lactic acidosis (rare but serious)'],
