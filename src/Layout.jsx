@@ -47,7 +47,6 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Communications', icon: MessageSquare, page: 'Communications' },
     { name: 'Messages', icon: MessageSquare, page: 'StaffMessaging' },
     { name: 'Analytics', icon: BarChart3, page: 'Analytics' },
-    { name: 'Rx Trends', icon: Pill, page: 'PrescriptionTrends' },
   ];
 
   const patientNavItems = [
@@ -194,6 +193,12 @@ export default function Layout({ children, currentPageName }) {
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to={createPageUrl('PrescriptionTrends')} className="flex items-center gap-2 cursor-pointer text-gray-700">
+                          <Pill className="w-4 h-4" />
+                          Rx Trends
+                        </Link>
+                      </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link to={createPageUrl('Roadmap')} className="flex items-center gap-2 cursor-pointer text-gray-700">
                           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
