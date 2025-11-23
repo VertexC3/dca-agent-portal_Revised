@@ -732,20 +732,29 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                             <DropdownMenuItem onClick={() => alert('Request refill')}>
                               Request Refill
                             </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => alert('Request renewal')}>
+                              Request Renewal
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => alert('Payment')}>
+                              Payment
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => alert('View orders')}>
+                              Orders
+                            </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => {
                               setSelectedPrescription(rx);
                               setShowFillHistoryDialog(true);
                             }}>
-                              View Fill History
+                              Fill History
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setShowPillImageDialog(true)}>
-                              View Medication Image
+                            <DropdownMenuItem onClick={() => alert('View video guide')}>
+                              Video Guide
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => alert('Contact prescriber')}>
-                              Contact Prescriber
+                            <DropdownMenuItem onClick={() => alert('View medical guide')}>
+                              Medical Guide
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => alert('View drug information')}>
-                              Drug Information
+                            <DropdownMenuItem onClick={() => alert('Stop prescription')}>
+                              Stop Prescription
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
