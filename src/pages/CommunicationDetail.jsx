@@ -359,75 +359,8 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
 
   return (
     <div className="space-y-0 relative pt-0">
-      {/* Medical Info */}
-      <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm mb-3">{/* ... rest of ... */}
-        <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
-          <User className="w-4 h-4 text-blue-600" />
-          Medical Information
-        </h3>
-        <div className="grid grid-cols-4 gap-4 text-xs">
-          {communication.patient_allergies && (
-            <div 
-              className="text-gray-700 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
-              onClick={() => setShowAllergiesDialog(true)}
-            >
-              <span className="font-medium text-red-700 block mb-1">Allergies</span>
-              <span>{communication.patient_allergies}</span>
-            </div>
-          )}
-          {communication.current_medications && (
-            <div 
-              className="text-gray-700 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
-              onClick={() => setShowMedicationsDialog(true)}
-            >
-              <span className="font-medium block mb-1">Medications</span>
-              <span>{communication.current_medications}</span>
-            </div>
-          )}
-          {communication.known_conditions && (
-            <div 
-              className="text-gray-700 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
-              onClick={() => setShowConditionsDialog(true)}
-            >
-              <span className="font-medium block mb-1">Conditions</span>
-              <span>{communication.known_conditions}</span>
-            </div>
-          )}
-          {communication.insurance_provider && (
-            <div 
-              className="text-gray-700 p-2 cursor-pointer hover:bg-gray-50 rounded-lg transition-colors"
-              onClick={() => {
-                setInsuranceData({
-                  provider: communication.insurance_provider,
-                  memberName: communication.patient_name,
-                  memberNumber: 'INS' + Math.random().toString().slice(2, 12),
-                  groupNumber: 'GRP' + Math.random().toString().slice(2, 9),
-                  phone: '1-800-555-' + Math.floor(1000 + Math.random() * 9000),
-                  planType: communication.insurance_provider.includes('PPO') ? 'PPO' : communication.insurance_provider.includes('HMO') ? 'HMO' : 'Other'
-                });
-                setShowInsuranceDialog(true);
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-medium block mb-1">Insurance</span>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowInsuranceCardDialog(true);
-                  }}
-                  className="text-green-600 hover:text-green-700"
-                >
-                  <CreditCard className="w-3 h-3" />
-                </button>
-              </div>
-              <span>{communication.insurance_provider}</span>
-            </div>
-          )}
-        </div>
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Column 1: Patient Info & Message */}
+        {/* Column 1: Patient Info, Communication Details & Transcript */}
         <div className="space-y-3">
           {/* Patient Info Card */}
           <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
@@ -696,8 +629,75 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
 
         </div>
 
-        {/* Column 2: Prescription History & Billing */}
+        {/* Column 2: Medical Info, Prescription History & Billing */}
         <div className="space-y-3">
+          {/* Medical Info */}
+          <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+            <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+              <User className="w-4 h-4 text-blue-600" />
+              Medical Information
+            </h3>
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              {communication.patient_allergies && (
+                <div 
+                  className="text-gray-700 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                  onClick={() => setShowAllergiesDialog(true)}
+                >
+                  <span className="font-medium text-red-700 block mb-1">Allergies</span>
+                  <span className="line-clamp-2">{communication.patient_allergies}</span>
+                </div>
+              )}
+              {communication.current_medications && (
+                <div 
+                  className="text-gray-700 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                  onClick={() => setShowMedicationsDialog(true)}
+                >
+                  <span className="font-medium block mb-1">Medications</span>
+                  <span className="line-clamp-2">{communication.current_medications}</span>
+                </div>
+              )}
+              {communication.known_conditions && (
+                <div 
+                  className="text-gray-700 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                  onClick={() => setShowConditionsDialog(true)}
+                >
+                  <span className="font-medium block mb-1">Conditions</span>
+                  <span className="line-clamp-2">{communication.known_conditions}</span>
+                </div>
+              )}
+              {communication.insurance_provider && (
+                <div 
+                  className="text-gray-700 p-2 cursor-pointer hover:bg-gray-50 rounded-lg transition-colors"
+                  onClick={() => {
+                    setInsuranceData({
+                      provider: communication.insurance_provider,
+                      memberName: communication.patient_name,
+                      memberNumber: 'INS' + Math.random().toString().slice(2, 12),
+                      groupNumber: 'GRP' + Math.random().toString().slice(2, 9),
+                      phone: '1-800-555-' + Math.floor(1000 + Math.random() * 9000),
+                      planType: communication.insurance_provider.includes('PPO') ? 'PPO' : communication.insurance_provider.includes('HMO') ? 'HMO' : 'Other'
+                    });
+                    setShowInsuranceDialog(true);
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium block mb-1">Insurance</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowInsuranceCardDialog(true);
+                      }}
+                      className="text-green-600 hover:text-green-700"
+                    >
+                      <CreditCard className="w-3 h-3" />
+                    </button>
+                  </div>
+                  <span className="line-clamp-2">{communication.insurance_provider}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
             <h3 className="text-sm font-bold text-gray-800 mb-3">
               Prescription History
@@ -715,17 +715,50 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                       <p className="text-xs font-semibold text-gray-800 mb-1">{rx.med}</p>
                       <p className="text-xs text-gray-600">Prescribed by {rx.prescriber}</p>
                       <p className="text-xs text-gray-500">Last filled: {rx.date}</p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-6 text-xs mt-1"
-                        onClick={() => {
-                          setSelectedPrescription(rx);
-                          setShowFillHistoryDialog(true);
-                        }}
-                      >
-                        Fill History
-                      </Button>
+                      <div className="flex gap-1 mt-1">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-6 text-xs"
+                          onClick={() => {
+                            setSelectedPrescription(rx);
+                            setShowFillHistoryDialog(true);
+                          }}
+                        >
+                          Fill History
+                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-6 text-xs"
+                            >
+                              Actions
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48 bg-white">
+                            <DropdownMenuItem onClick={() => alert('Request refill')}>
+                              Request Refill
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {
+                              setSelectedPrescription(rx);
+                              setShowFillHistoryDialog(true);
+                            }}>
+                              View Fill History
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setShowPillImageDialog(true)}>
+                              View Medication Image
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => alert('Contact prescriber')}>
+                              Contact Prescriber
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => alert('View drug information')}>
+                              Drug Information
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </div>
                     <img 
                       src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6915f90e9513d40c38a60116/a43f1a648_LisinoprilPills_5mg-scaled.jpg"
@@ -733,38 +766,9 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                       onClick={() => setShowPillImageDialog(true)}
                       className="w-16 h-auto rounded object-cover cursor-pointer hover:opacity-80 transition-opacity"
                     />
-                    <div className="flex flex-col items-end gap-1">
-                      <Badge className={rx.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'} style={{fontSize: '10px', padding: '1px 6px', height: 'fit-content'}}>
-                        {rx.status}
-                      </Badge>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="text-gray-400 hover:text-gray-600 p-1">
-                            <span className="text-lg leading-none">⋯</span>
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48 bg-white">
-                          <DropdownMenuItem onClick={() => alert('Request refill')}>
-                            Request Refill
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => {
-                            setSelectedPrescription(rx);
-                            setShowFillHistoryDialog(true);
-                          }}>
-                            View Fill History
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => setShowPillImageDialog(true)}>
-                            View Medication Image
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => alert('Contact prescriber')}>
-                            Contact Prescriber
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => alert('View drug information')}>
-                            Drug Information
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
+                    <Badge className={rx.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'} style={{fontSize: '10px', padding: '1px 6px', height: 'fit-content'}}>
+                      {rx.status}
+                    </Badge>
                   </div>
                 </div>
               ))}
@@ -803,73 +807,33 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
 
         {/* Column 3: Request Type Actions & Notes */}
         <div className="space-y-3">
-          <div>
+          <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
             <h3 className="text-xs font-bold text-gray-800 mb-2">Request Types</h3>
-            <div className="space-y-2">
-              <button
-            onClick={() => { setSelectedWorkflowType('prescription_refill'); setShowWorkflowDialog(true); }}
-            className="w-full p-2 bg-white hover:bg-blue-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
-          >
-            <Pill className="w-3 h-3 text-blue-600" />
-            <span className="text-xs font-medium text-gray-800">Prescription Refill</span>
-          </button>
+            <Select value={selectedWorkflowType || ''} onValueChange={(val) => setSelectedWorkflowType(val)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select request type..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="prescription_refill">Prescription Refill</SelectItem>
+                <SelectItem value="medication_inquiry">Medication Inquiry</SelectItem>
+                <SelectItem value="delivery_status">Delivery Status</SelectItem>
+                <SelectItem value="billing_question">Billing Question</SelectItem>
+                <SelectItem value="side_effects">Side Effects</SelectItem>
+                <SelectItem value="appointment_scheduling">Appointment</SelectItem>
+                <SelectItem value="insurance_question">Insurance Question</SelectItem>
+                <SelectItem value="general_inquiry">General Inquiry</SelectItem>
+              </SelectContent>
+            </Select>
 
-          <button
-            onClick={() => { setSelectedWorkflowType('medication_inquiry'); setShowWorkflowDialog(true); }}
-            className="w-full p-2 bg-white hover:bg-purple-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
-          >
-            <HelpCircle className="w-3 h-3 text-purple-600" />
-            <span className="text-xs font-medium text-gray-800">Medication Inquiry</span>
-          </button>
-
-          <button
-            onClick={() => { setSelectedWorkflowType('delivery_status'); setShowWorkflowDialog(true); }}
-            className="w-full p-2 bg-white hover:bg-green-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
-          >
-            <Package className="w-3 h-3 text-green-600" />
-            <span className="text-xs font-medium text-gray-800">Delivery Status</span>
-          </button>
-
-          <button
-            onClick={() => { setSelectedWorkflowType('billing_question'); setShowWorkflowDialog(true); }}
-            className="w-full p-2 bg-white hover:bg-yellow-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
-          >
-            <CreditCard className="w-3 h-3 text-yellow-600" />
-            <span className="text-xs font-medium text-gray-800">Billing Question</span>
-          </button>
-
-          <button
-            onClick={() => { setSelectedWorkflowType('side_effects'); setShowWorkflowDialog(true); }}
-            className="w-full p-2 bg-white hover:bg-red-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
-          >
-            <AlertTriangle className="w-3 h-3 text-red-600" />
-            <span className="text-xs font-medium text-gray-800">Side Effects</span>
-          </button>
-
-          <button
-            onClick={() => { setSelectedWorkflowType('appointment_scheduling'); setShowWorkflowDialog(true); }}
-            className="w-full p-2 bg-white hover:bg-indigo-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
-          >
-            <CalendarClock className="w-3 h-3 text-indigo-600" />
-            <span className="text-xs font-medium text-gray-800">Appointment</span>
-          </button>
-
-          <button
-            onClick={() => { setSelectedWorkflowType('insurance_question'); setShowWorkflowDialog(true); }}
-            className="w-full p-2 bg-white hover:bg-teal-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
-          >
-            <FileQuestion className="w-3 h-3 text-teal-600" />
-            <span className="text-xs font-medium text-gray-800">Insurance Question</span>
-          </button>
-
-          <button
-            onClick={() => { setSelectedWorkflowType('general_inquiry'); setShowWorkflowDialog(true); }}
-            className="w-full p-2 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 text-left transition-all flex items-center gap-2"
-          >
-            <MessageCircle className="w-3 h-3 text-gray-600" />
-            <span className="text-xs font-medium text-gray-800">General Inquiry</span>
-          </button>
-            </div>
+            {selectedWorkflowType && (
+              <div className="mt-3">
+                <ActionWorkflow 
+                  requestType={selectedWorkflowType} 
+                  patientName={communication.patient_name}
+                  communication={communication}
+                />
+              </div>
+            )}
           </div>
 
           {/* Shared Notes */}
@@ -1757,13 +1721,13 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
 
       {/* Keyboard Shortcuts Indicator with Back Button */}
       <div className="fixed bottom-6 left-6 flex items-end gap-3 z-40">
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm text-xs text-gray-600 overflow-hidden">
-          <button
-            onClick={() => setShortcutsCollapsed(!shortcutsCollapsed)}
-            className="w-full p-3 text-left font-semibold hover:bg-gray-50 transition-colors"
-          >
+        <div 
+          onClick={() => setShortcutsCollapsed(!shortcutsCollapsed)}
+          className="bg-white rounded-lg border border-gray-200 shadow-sm text-xs text-gray-600 overflow-hidden cursor-pointer"
+        >
+          <div className="w-full p-3 text-left font-semibold hover:bg-gray-50 transition-colors">
             Shortcuts {shortcutsCollapsed ? '›' : '›'}
-          </button>
+          </div>
           {!shortcutsCollapsed && (
             <div className="px-3 pb-3 space-y-1">
               <p>{modifierKey}+T = Transcript</p>
