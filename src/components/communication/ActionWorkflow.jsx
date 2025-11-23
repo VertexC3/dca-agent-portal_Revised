@@ -8,6 +8,13 @@ import { CheckCircle, Pill, Calendar, CreditCard, AlertCircle, Package } from 'l
 import { Badge } from '@/components/ui/badge';
 
 export default function ActionWorkflow({ requestType, patientName, communication }) {
+  const medications = [
+    { name: 'Lisinopril 10mg', prescriber: 'Dr. Smith', refills: 2 },
+    { name: 'Metformin 500mg', prescriber: 'Dr. Johnson', refills: 1 },
+    { name: 'Atorvastatin 20mg', prescriber: 'Dr. Smith', refills: 3 },
+    { name: 'Aspirin 81mg', prescriber: 'Dr. Smith', refills: 0 }
+  ];
+
   const [workflowState, setWorkflowState] = useState({
     step: 1,
     medication: '',
@@ -17,6 +24,18 @@ export default function ActionWorkflow({ requestType, patientName, communication
     deliveryMethod: 'pickup',
     notes: ''
   });
+
+  const handleMedicationChange = (medName) => {
+    const med = medications.find(m => m.name === medName);
+    if (med) {
+      setWorkflowState({
+        ...workflowState,
+        medication: med.name,
+        prescriber: med.prescriber,
+        refillsRemaining: med.refills.toString()
+      });
+    }
+  };
 
   if (requestType === 'prescription_refill') {
     return (
@@ -46,34 +65,33 @@ export default function ActionWorkflow({ requestType, patientName, communication
             <h4 className="text-xs font-semibold text-gray-800">Step 1: Verify Medication</h4>
             <div>
               <Label className="text-xs">Medication</Label>
-              <Input
-                value={workflowState.medication}
-                onChange={(e) => setWorkflowState({...workflowState, medication: e.target.value})}
-                placeholder="Lisinopril 10mg"
-                className="mt-1 h-8 text-xs"
-              />
-            </div>
-            <div>
-              <Label className="text-xs">Prescriber</Label>
-              <Select value={workflowState.prescriber} onValueChange={(val) => setWorkflowState({...workflowState, prescriber: val})}>
+              <Select value={workflowState.medication} onValueChange={handleMedicationChange}>
                 <SelectTrigger className="mt-1 h-8 text-xs">
-                  <SelectValue placeholder="Select" />
+                  <SelectValue placeholder="Select medication" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Dr. Smith">Dr. Smith</SelectItem>
-                  <SelectItem value="Dr. Johnson">Dr. Johnson</SelectItem>
-                  <SelectItem value="Dr. Wilson">Dr. Wilson</SelectItem>
+                  {medications.map(med => (
+                    <SelectItem key={med.name} value={med.name}>{med.name}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
+              <Label className="text-xs">Prescriber</Label>
+              <Input
+                value={workflowState.prescriber}
+                readOnly
+                placeholder="Auto-filled"
+                className="mt-1 h-8 text-xs bg-gray-50"
+              />
+            </div>
+            <div>
               <Label className="text-xs">Refills</Label>
               <Input
-                type="number"
                 value={workflowState.refillsRemaining}
-                onChange={(e) => setWorkflowState({...workflowState, refillsRemaining: e.target.value})}
-                placeholder="3"
-                className="mt-1 h-8 text-xs"
+                readOnly
+                placeholder="Auto-filled"
+                className="mt-1 h-8 text-xs bg-gray-50"
               />
             </div>
             <Button 
