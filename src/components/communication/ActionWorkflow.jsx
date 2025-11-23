@@ -279,6 +279,59 @@ export default function ActionWorkflow({ requestType, patientName, communication
     );
   }
 
+  if (requestType === 'side_effects') {
+    const [selectedMed, setSelectedMed] = React.useState('');
+    
+    const sideEffectsData = {
+      'Lisinopril 10mg': ['Dizziness', 'Dry cough', 'Headache', 'Fatigue', 'Nausea', 'Low blood pressure', 'Elevated potassium levels', 'Kidney problems', 'Angioedema (rare but serious)'],
+      'Metformin 500mg': ['Nausea', 'Diarrhea', 'Stomach upset', 'Metallic taste', 'Loss of appetite', 'Vitamin B12 deficiency', 'Lactic acidosis (rare but serious)'],
+      'Atorvastatin 20mg': ['Muscle pain', 'Headache', 'Nausea', 'Joint pain', 'Diarrhea', 'Elevated liver enzymes', 'Memory problems', 'Confusion'],
+      'Aspirin 81mg': ['Stomach irritation', 'Heartburn', 'Nausea', 'Increased bleeding risk', 'Bruising', 'Ringing in ears', 'Allergic reactions']
+    };
+
+    return (
+      <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-xl p-4 border border-red-200">
+        <div className="flex items-center gap-2 mb-3">
+          <AlertCircle className="w-4 h-4 text-red-600" />
+          <h3 className="text-sm font-bold text-gray-800">Side Effects Info</h3>
+        </div>
+        <div className="space-y-3">
+          <div>
+            <Label className="text-xs">Select Prescription</Label>
+            <Select value={selectedMed} onValueChange={setSelectedMed}>
+              <SelectTrigger className="mt-1 h-8 text-xs">
+                <SelectValue placeholder="Choose medication" />
+              </SelectTrigger>
+              <SelectContent>
+                {medications.map(med => (
+                  <SelectItem key={med.name} value={med.name}>{med.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {selectedMed && sideEffectsData[selectedMed] && (
+            <div className="p-3 bg-white rounded-lg border border-gray-200">
+              <p className="text-xs font-semibold text-gray-800 mb-2">Known Side Effects:</p>
+              <div className="max-h-48 overflow-y-auto space-y-1.5">
+                {sideEffectsData[selectedMed].map((effect, idx) => (
+                  <div key={idx} className="flex items-start gap-2 text-xs">
+                    <span className="text-red-600 mt-0.5">•</span>
+                    <span className="text-gray-700">{effect}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          <Button size="sm" className="w-full bg-red-600 hover:bg-red-700 h-8 text-xs">
+            Send Side Effects Info
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-4 border border-gray-200">
       <div className="flex items-center gap-2 mb-2">

@@ -627,14 +627,16 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
             )}
           </div>
 
+          {/* Shared Notes */}
+          <SharedNotes communicationId={communication.id} compact={true} />
+
         </div>
 
         {/* Column 2: Medical Info, Prescription History & Billing */}
         <div className="space-y-3">
           {/* Medical Info */}
           <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
-            <h3 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
-              <User className="w-4 h-4 text-blue-600" />
+            <h3 className="text-sm font-bold text-gray-800 mb-3">
               Medical Information
             </h3>
             <div className="grid grid-cols-2 gap-3 text-xs">
@@ -821,14 +823,11 @@ Generate a professional, empathetic, and helpful response to this patient. Addre
                   patientName={communication.patient_name}
                   communication={communication}
                 />
-              </div>
-            )}
-          </div>
-
-          {/* Shared Notes */}
-          <SharedNotes communicationId={communication.id} compact={true} />
-        </div>
-      </div>
+                </div>
+                )}
+                </div>
+                </div>
+                </div>
 
       {/* Patient Profile Dialog */}
       <PatientProfileDialog 

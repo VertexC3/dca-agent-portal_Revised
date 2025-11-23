@@ -68,8 +68,7 @@ export default function SharedNotes({ communicationId, compact = false }) {
   return (
     <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
-          <MessageSquare className="w-4 h-4 text-purple-600" />
+        <h3 className="text-sm font-bold text-gray-800">
           Notes
         </h3>
 
