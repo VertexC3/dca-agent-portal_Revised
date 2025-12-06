@@ -22,7 +22,8 @@ import { format } from 'date-fns';
 const statusConfig = {
   'Ready for Pickup': { color: 'bg-green-100 text-green-800 border-green-200', icon: Package },
   'Shipped': { color: 'bg-blue-100 text-blue-800 border-blue-200', icon: Truck },
-  'In Delivery': { color: 'bg-purple-100 text-purple-800 border-purple-200', icon: Truck }
+  'In Delivery': { color: 'bg-purple-100 text-purple-800 border-purple-200', icon: Truck },
+  'Discontinued': { color: 'bg-gray-100 text-gray-800 border-gray-200', icon: StopCircle }
 };
 
 export default function PrescriptionCard({ prescription }) {
@@ -60,20 +61,24 @@ export default function PrescriptionCard({ prescription }) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={() => setShowRefillRequest(true)}>
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    Request Refill
-                  </DropdownMenuItem>
+                  {prescription.category === 'Active' && (
+                    <DropdownMenuItem onClick={() => setShowRefillRequest(true)}>
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Request Refill
+                    </DropdownMenuItem>
+                  )}
                   {prescription.category === 'Inactive' && (
                     <DropdownMenuItem onClick={() => setShowRenewal(true)}>
                       <FileText className="w-4 h-4 mr-2" />
                       Request Renewal
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem onClick={() => setShowPayment(true)}>
-                    <CreditCard className="w-4 h-4 mr-2" />
-                    Payment
-                  </DropdownMenuItem>
+                  {prescription.category === 'Active' && (
+                    <DropdownMenuItem onClick={() => setShowPayment(true)}>
+                      <CreditCard className="w-4 h-4 mr-2" />
+                      Payment
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={() => setShowOrders(true)}>
                     <Package className="w-4 h-4 mr-2" />
                     Orders
@@ -82,11 +87,15 @@ export default function PrescriptionCard({ prescription }) {
                     <History className="w-4 h-4 mr-2" />
                     Fill History
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setShowStopConfirm(true)} className="text-red-600">
-                    <StopCircle className="w-4 h-4 mr-2" />
-                    Stop Prescription
-                  </DropdownMenuItem>
+                  {prescription.category === 'Active' && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => setShowStopConfirm(true)} className="text-red-600">
+                        <StopCircle className="w-4 h-4 mr-2" />
+                        Stop Prescription
+                      </DropdownMenuItem>
+                    </>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>

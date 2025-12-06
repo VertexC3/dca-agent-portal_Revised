@@ -161,10 +161,10 @@ export default function PatientDashboard() {
       lastFilled: '2025-08-01',
       dateWritten: '2025-02-01',
       dateExpires: '2026-02-01',
-      status: 'Ready for Pickup',
+      status: 'Discontinued',
       category: 'Inactive',
       image: 'https://images.unsplash.com/photo-1628771065518-0d82f1938462?w=800&auto=format&fit=crop&q=60'
-    },
+      },
     {
       id: 5,
       name: 'Ibuprofen 200mg',
