@@ -161,10 +161,10 @@ export default function PatientDashboard() {
       lastFilled: '2025-08-01',
       dateWritten: '2025-02-01',
       dateExpires: '2026-02-01',
-      status: 'Discontinued',
+      status: 'Request Renewal',
       category: 'Inactive',
       image: 'https://images.unsplash.com/photo-1628771065518-0d82f1938462?w=800&auto=format&fit=crop&q=60'
-      },
+    },
     {
       id: 5,
       name: 'Ibuprofen 200mg',
@@ -174,7 +174,7 @@ export default function PatientDashboard() {
       lastFilled: '2025-06-01',
       dateWritten: '2025-01-15',
       dateExpires: '2026-01-15',
-      status: 'Discontinued, Renewal Requested',
+      status: 'Renewal Requested',
       category: 'Inactive',
       image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=800&auto=format&fit=crop&q=60'
     },
