@@ -44,7 +44,6 @@ export default function PatientDashboard() {
     { id: 'refill', label: 'Request Refill', icon: Pill, action: () => setShowQuickRefill(true) },
     { id: 'renewal', label: 'Request Renewal', icon: FileText, action: () => alert('Renewal request will be sent to your prescriber') },
     { id: 'orders', label: 'View Orders', icon: Package, action: () => window.location.href = createPageUrl('PatientProfile#orders') },
-    { id: 'prescriptions', label: 'View Prescriptions', icon: FileText, action: () => window.location.href = createPageUrl('Prescriptions') },
     { id: 'payment', label: 'Payment Methods', icon: CreditCard, action: () => alert('Payment management coming soon') }
   ];
 

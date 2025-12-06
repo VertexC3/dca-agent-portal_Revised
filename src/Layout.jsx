@@ -59,9 +59,7 @@ export default function Layout({ children, currentPageName }) {
     { name: 'Analytics', icon: BarChart3, page: 'Analytics' },
   ];
 
-  const patientNavItems = [
-    ...(isFeatureEnabled('patient_nav_messages') && user?.patient_pref_messages_nav !== false ? [{ name: 'Communication', icon: MessageSquare, page: 'PatientMessages' }] : []),
-  ];
+  const patientNavItems = [];
 
   const staffPages = ['Dashboard', 'Communications', 'StaffMessaging', 'Analytics', 'CommunicationDetail', 'AITraining', 'Automation', 'Settings', 'DailyView', 'PrescriptionTrends'];
   const patientPages = ['PatientDashboard', 'PatientProfile', 'PatientMessages', 'PatientCommunications', 'PatientCommunicationDetail', 'Prescriptions', 'PatientLogin'];
