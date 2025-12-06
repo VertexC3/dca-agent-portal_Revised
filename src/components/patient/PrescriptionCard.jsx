@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pill, Calendar, Package, Truck, MoreVertical, RefreshCw, CreditCard, FileText, Play, History, BookOpen, StopCircle, ChevronDown } from 'lucide-react';
+import { Pill, Calendar, Package, Truck, MoreVertical, RefreshCw, CreditCard, FileText, Play, History, BookOpen, StopCircle, ChevronDown, Download, Receipt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,6 +35,7 @@ export default function PrescriptionCard({ prescription }) {
   const [showPayment, setShowPayment] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
   const [showPrescriberProfile, setShowPrescriberProfile] = useState(false);
+  const [selectedReceipt, setSelectedReceipt] = useState(null);
 
   const StatusIcon = statusConfig[prescription.status]?.icon || Package;
 
@@ -222,7 +223,7 @@ export default function PrescriptionCard({ prescription }) {
       {/* Orders Dialog */}
       {showOrders && (
         <Dialog open={showOrders} onOpenChange={() => setShowOrders(false)}>
-          <DialogContent className="max-w-2xl bg-white">
+          <DialogContent className="max-w-3xl bg-white">
             <DialogHeader>
               <DialogTitle>Orders for {prescription.name}</DialogTitle>
             </DialogHeader>
@@ -235,6 +236,7 @@ export default function PrescriptionCard({ prescription }) {
                       <th className="px-4 py-2 text-left font-medium text-gray-700">Date</th>
                       <th className="px-4 py-2 text-left font-medium text-gray-700">Status</th>
                       <th className="px-4 py-2 text-right font-medium text-gray-700">Amount</th>
+                      <th className="px-4 py-2 text-right font-medium text-gray-700">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -252,6 +254,30 @@ export default function PrescriptionCard({ prescription }) {
                           </Badge>
                         </td>
                         <td className="px-4 py-3 text-right font-medium text-gray-900">${order.amount.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-8 w-8 p-0" 
+                              title="View Receipt"
+                              onClick={() => setSelectedReceipt(order)}
+                            >
+                              <Receipt className="w-4 h-4 text-[#8B1F1F]" />
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="h-8 w-8 p-0" 
+                              title="Download Receipt"
+                              onClick={() => {
+                                alert('Downloading receipt for ' + order.id);
+                              }}
+                            >
+                              <Download className="w-4 h-4 text-[#8B1F1F]" />
+                            </Button>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -260,6 +286,51 @@ export default function PrescriptionCard({ prescription }) {
               <div className="flex justify-end">
                 <Button onClick={() => setShowOrders(false)} className="bg-[#8B1F1F] hover:bg-[#721919]">
                   Close
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Receipt Dialog */}
+      {selectedReceipt && (
+        <Dialog open={!!selectedReceipt} onOpenChange={() => setSelectedReceipt(null)}>
+          <DialogContent className="max-w-md bg-white">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Receipt className="w-5 h-5 text-[#8B1F1F]" />
+                Receipt - {selectedReceipt.id}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
+                <p className="text-gray-500 text-sm">Receipt Image Preview</p>
+                <div className="mt-2 h-32 bg-gray-200 rounded flex items-center justify-center">
+                  <Receipt className="w-8 h-8 text-gray-400" />
+                </div>
+              </div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Date:</span>
+                  <span className="font-medium">{selectedReceipt.date}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Amount:</span>
+                  <span className="font-medium">${selectedReceipt.amount.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Status:</span>
+                  <span className="text-green-600 font-medium">{selectedReceipt.status}</span>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="outline" onClick={() => setSelectedReceipt(null)}>
+                  Close
+                </Button>
+                <Button className="bg-[#8B1F1F] hover:bg-[#721919] text-white">
+                  <Download className="w-4 h-4 mr-2" />
+                  Download
                 </Button>
               </div>
             </div>
