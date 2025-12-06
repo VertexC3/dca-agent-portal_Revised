@@ -66,7 +66,7 @@ export default function Layout({ children, currentPageName }) {
   ];
 
   const staffPages = ['Dashboard', 'Communications', 'StaffMessaging', 'Analytics', 'CommunicationDetail', 'AITraining', 'Automation', 'Settings', 'DailyView', 'PrescriptionTrends'];
-  const patientPages = ['PatientDashboard', 'PatientProfile', 'PatientMessages', 'PatientCommunications', 'PatientCommunicationDetail', 'Prescriptions'];
+  const patientPages = ['PatientDashboard', 'PatientProfile', 'PatientMessages', 'PatientCommunications', 'PatientCommunicationDetail', 'Prescriptions', 'PatientLogin'];
 
   const navItems = isPatientView ? patientNavItems : adminNavItems;
 
@@ -80,8 +80,23 @@ export default function Layout({ children, currentPageName }) {
   }, [isPatientView, currentPageName]);
 
   const handleLogout = () => {
-    base44.auth.logout();
+    if (isPatientView) {
+      window.location.href = createPageUrl('PatientLogin');
+    } else {
+      base44.auth.logout();
+    }
   };
+
+  // If on PatientLogin page, render simplified layout without header/nav
+  if (currentPageName === 'PatientLogin') {
+    return (
+      <div className="min-h-screen relative bg-gray-50">
+        <main>
+          {children}
+        </main>
+      </div>
+    );
+  }
 
   React.useEffect(() => {
     if (isPatientView && isChatbotOpen) {
