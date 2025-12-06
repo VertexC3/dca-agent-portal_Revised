@@ -243,7 +243,6 @@ export default function PatientDashboard() {
             <>
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                  <Pill className="w-6 h-6 text-[#8B1F1F]" />
                   {prescriptionFilter} Prescriptions ({prescriptions.length})
                 </h2>
                 <Select value={prescriptionFilter} onValueChange={setPrescriptionFilter}>
