@@ -299,11 +299,16 @@ export default function PatientDashboard() {
           {/* Recent Orders */}
           {isFeatureEnabled('patient_orders') && user?.patient_pref_orders !== false && (
             <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
-              <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <Package className="w-5 h-5 text-[#8B1F1F]" />
-                Recent Orders
-              </h3>
-              <CollapsibleOrderHistory limit={5} showSeeAll={true} allowReporting={false} />
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                  <Package className="w-5 h-5 text-[#8B1F1F]" />
+                  Recent Orders
+                </h3>
+                <Link to={createPageUrl('PatientProfile') + '#orders'} className="text-sm text-[#8B1F1F] hover:text-[#721919] font-semibold">
+                  See All →
+                </Link>
+              </div>
+              <CollapsibleOrderHistory limit={5} showSeeAll={false} allowReporting={false} />
             </div>
           )}
         </div>
