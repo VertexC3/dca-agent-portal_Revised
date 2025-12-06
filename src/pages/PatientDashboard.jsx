@@ -255,7 +255,6 @@ export default function PatientDashboard() {
                   <SelectContent>
                     <SelectItem value="Active">Active</SelectItem>
                     <SelectItem value="Inactive">Inactive</SelectItem>
-                    <SelectItem value="Discontinued">Discontinued</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

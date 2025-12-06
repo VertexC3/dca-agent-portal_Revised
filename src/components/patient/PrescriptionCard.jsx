@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pill, Calendar, Package, Truck, MoreVertical, RefreshCw, CreditCard, FileText, Play, History, BookOpen, StopCircle, ChevronDown, Download, Receipt } from 'lucide-react';
+import { Pill, Calendar, Package, Truck, MoreVertical, RefreshCw, CreditCard, FileText, Play, History, BookOpen, StopCircle, ChevronDown, Download, Receipt, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -60,6 +60,19 @@ export default function PrescriptionCard({ prescription }) {
               <span className="text-lg">{prescription.name}</span>
             </div>
             <div className="flex items-center gap-2">
+              {prescription.category === 'Active' && (
+                <Button 
+                  size="sm" 
+                  className="bg-[#8B1F1F] hover:bg-[#721919] text-white h-8 text-xs font-semibold shadow-sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowRefillRequest(true);
+                  }}
+                >
+                  <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                  Refill
+                </Button>
+              )}
               <Badge 
                 className={`${statusConfig[prescription.status]?.color} border transition-colors`}
                 onClick={handleStatusClick}
@@ -142,12 +155,23 @@ export default function PrescriptionCard({ prescription }) {
                 <strong>Refills Remaining:</strong> {prescription.refills}
               </p>
               {prescription.tracking && (
-                <div className="p-3 bg-purple-50 rounded-lg border border-purple-200 mt-3">
-                  <p className="text-gray-800 font-semibold">Tracking Information</p>
+                <a 
+                  href="https://www.fedex.com/en-us/tracking.html" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="block p-3 bg-purple-50 rounded-lg border border-purple-200 mt-3 hover:bg-purple-100 transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-gray-800 font-semibold flex items-center gap-2">
+                      Tracking Information
+                      <ExternalLink className="w-3 h-3 text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </p>
+                    <Truck className="w-4 h-4 text-purple-600" />
+                  </div>
                   <p className="text-sm text-gray-600">Carrier: FedEx</p>
                   <p className="text-sm text-gray-600">Tracking #: {prescription.tracking}</p>
                   <p className="text-xs text-gray-500 mt-1">Expected delivery: {prescription.expectedDelivery}</p>
-                </div>
+                </a>
               )}
             </div>
             {prescription.image && (
