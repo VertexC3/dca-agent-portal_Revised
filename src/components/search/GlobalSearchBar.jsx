@@ -13,7 +13,7 @@ const statusColors = {
   resolved: 'bg-green-50 text-green-700 border-green-200'
 };
 
-export default function GlobalSearchBar() {
+export default function GlobalSearchBar({ maxWidth = 'max-w-2xl' }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
 
@@ -42,7 +42,7 @@ export default function GlobalSearchBar() {
   };
 
   return (
-    <div className="relative flex-1 max-w-2xl">
+    <div className={`relative flex-1 ${maxWidth}`}>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
         <input

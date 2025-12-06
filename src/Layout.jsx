@@ -152,7 +152,7 @@ export default function Layout({ children, currentPageName }) {
             </nav>
 
             <div className="flex items-center gap-4">
-              <GlobalSearchBar />
+              <GlobalSearchBar maxWidth={isPatientView ? 'max-w-5xl' : 'max-w-2xl'} />
 
               {/* View Toggle */}
               <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
