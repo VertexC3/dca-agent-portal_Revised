@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pill, Calendar, Package, Truck, MoreVertical, RefreshCw, CreditCard, FileText, Play, History, BookOpen, StopCircle, ChevronDown, Download, Receipt, ExternalLink } from 'lucide-react';
+import { Pill, Calendar, Package, Truck, MoreVertical, RefreshCw, CreditCard, FileText, Play, History, BookOpen, StopCircle, ChevronDown, Download, Receipt, ExternalLink, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,6 +23,7 @@ const statusConfig = {
   'Ready for Pickup': { color: 'bg-green-100 text-green-800 border-green-200', icon: Package },
   'Shipped': { color: 'bg-blue-100 text-blue-800 border-blue-200', icon: Truck },
   'In Delivery': { color: 'bg-purple-100 text-purple-800 border-purple-200', icon: Truck },
+  'Delivered': { color: 'bg-green-100 text-green-800 border-green-200', icon: CheckCircle },
   'Discontinued': { color: 'bg-gray-100 text-gray-800 border-gray-200 cursor-default', icon: StopCircle },
   'Renewal Requested': { color: 'bg-yellow-100 text-yellow-800 border-yellow-200 cursor-default', icon: RefreshCw },
   'Request Renewal': { color: 'bg-blue-600 text-white border-blue-700 hover:bg-blue-700 cursor-pointer shadow-sm', icon: RefreshCw }
@@ -56,8 +57,7 @@ export default function PrescriptionCard({ prescription }) {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Pill className="w-5 h-5 text-[#8B1F1F]" />
-              <span className="text-lg">{prescription.name}</span>
+              <span className="text-lg font-semibold">{prescription.name}</span>
             </div>
             <div className="flex items-center gap-2">
               {prescription.category === 'Active' && (
@@ -170,8 +170,10 @@ export default function PrescriptionCard({ prescription }) {
                   </div>
                   <p className="text-sm text-gray-600">Carrier: FedEx</p>
                   <p className="text-sm text-gray-600">Tracking #: {prescription.tracking}</p>
-                  <p className="text-xs text-gray-500 mt-1">Expected delivery: {prescription.expectedDelivery}</p>
-                </a>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {prescription.status === 'Delivered' ? 'Delivered' : `Expected delivery: ${prescription.expectedDelivery}`}
+                  </p>
+                  </a>
               )}
             </div>
             {prescription.image && (

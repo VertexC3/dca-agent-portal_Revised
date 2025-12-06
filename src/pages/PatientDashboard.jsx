@@ -146,7 +146,7 @@ export default function PatientDashboard() {
       lastFilled: '2025-10-20',
       dateWritten: '2025-06-10',
       dateExpires: '2026-06-10',
-      status: 'In Delivery',
+      status: 'Delivered',
       tracking: '1Z999AA10987654321',
       expectedDelivery: 'Nov 15, 2025',
       category: 'Active',
