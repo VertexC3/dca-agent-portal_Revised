@@ -99,31 +99,48 @@ export default function PrescriptionCard({ prescription }) {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2 text-sm">
-            <p className="text-gray-600">
-              <strong>Prescriber:</strong> 
-              <button 
-                onClick={() => setShowPrescriberProfile(true)}
-                className="ml-1 text-[#8B1F1F] hover:underline font-medium"
-              >
-                {prescription.prescriber}
-              </button>
-            </p>
-            <p className="text-gray-600">
-              <strong>Dosage:</strong> {prescription.dosage}
-            </p>
-            <p className="text-gray-600">
-              <strong>Refills Remaining:</strong> {prescription.refills}
-            </p>
-            <p className="text-gray-600">
-              <strong>Last Filled:</strong> {format(new Date(prescription.lastFilled), 'MMM d, yyyy')}
-            </p>
-            {prescription.tracking && (
-              <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
-                <p className="text-gray-800 font-semibold">Tracking Information</p>
-                <p className="text-sm text-gray-600">Carrier: FedEx</p>
-                <p className="text-sm text-gray-600">Tracking #: {prescription.tracking}</p>
-                <p className="text-xs text-gray-500 mt-1">Expected delivery: {prescription.expectedDelivery}</p>
+          <div className="flex gap-4">
+            <div className="flex-1 space-y-2 text-sm">
+              <p className="text-gray-600">
+                <strong>Prescriber:</strong> 
+                <button 
+                  onClick={() => setShowPrescriberProfile(true)}
+                  className="ml-1 text-[#8B1F1F] hover:underline font-medium"
+                >
+                  {prescription.prescriber}
+                </button>
+              </p>
+              <p className="text-gray-600">
+                <strong>Dosage:</strong> {prescription.dosage}
+              </p>
+              <p className="text-gray-600">
+                <strong>Date Written:</strong> {prescription.dateWritten ? format(new Date(prescription.dateWritten), 'MMM d, yyyy') : 'N/A'}
+              </p>
+              <p className="text-gray-600">
+                <strong>Last Filled:</strong> {format(new Date(prescription.lastFilled), 'MMM d, yyyy')}
+              </p>
+              <p className="text-gray-600">
+                <strong>Date Expires:</strong> {prescription.dateExpires ? format(new Date(prescription.dateExpires), 'MMM d, yyyy') : 'N/A'}
+              </p>
+              <p className="text-gray-600">
+                <strong>Refills Remaining:</strong> {prescription.refills}
+              </p>
+              {prescription.tracking && (
+                <div className="p-3 bg-purple-50 rounded-lg border border-purple-200 mt-3">
+                  <p className="text-gray-800 font-semibold">Tracking Information</p>
+                  <p className="text-sm text-gray-600">Carrier: FedEx</p>
+                  <p className="text-sm text-gray-600">Tracking #: {prescription.tracking}</p>
+                  <p className="text-xs text-gray-500 mt-1">Expected delivery: {prescription.expectedDelivery}</p>
+                </div>
+              )}
+            </div>
+            {prescription.image && (
+              <div className="flex-shrink-0 w-24 h-24">
+                <img 
+                  src={prescription.image} 
+                  alt={prescription.name} 
+                  className="w-full h-full object-cover rounded-lg border border-gray-200"
+                />
               </div>
             )}
           </div>

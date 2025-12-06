@@ -19,7 +19,10 @@ export default function Prescriptions() {
       prescriber: 'Dr. Smith',
       refills: 3,
       lastFilled: '2025-11-01',
-      status: 'Ready for Pickup'
+      dateWritten: '2025-05-01',
+      dateExpires: '2026-05-01',
+      status: 'Ready for Pickup',
+      image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6915f90e9513d40c38a60116/a43f1a648_LisinoprilPills_5mg-scaled.jpg'
     },
     {
       id: 2,
@@ -28,9 +31,12 @@ export default function Prescriptions() {
       prescriber: 'Dr. Johnson',
       refills: 2,
       lastFilled: '2025-10-25',
+      dateWritten: '2025-04-15',
+      dateExpires: '2026-04-15',
       status: 'Shipped',
       tracking: '1Z999AA10123456784',
-      expectedDelivery: 'Nov 16, 2025'
+      expectedDelivery: 'Nov 16, 2025',
+      image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop&q=60'
     },
     {
       id: 3,
@@ -39,9 +45,12 @@ export default function Prescriptions() {
       prescriber: 'Dr. Smith',
       refills: 1,
       lastFilled: '2025-10-20',
+      dateWritten: '2025-06-10',
+      dateExpires: '2026-06-10',
       status: 'In Delivery',
       tracking: '1Z999AA10987654321',
-      expectedDelivery: 'Nov 15, 2025'
+      expectedDelivery: 'Nov 15, 2025',
+      image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=800&auto=format&fit=crop&q=60'
     },
     {
       id: 4,
@@ -50,7 +59,10 @@ export default function Prescriptions() {
       prescriber: 'Dr. Johnson',
       refills: 5,
       lastFilled: '2025-10-15',
-      status: 'Ready for Pickup'
+      dateWritten: '2025-03-20',
+      dateExpires: '2026-03-20',
+      status: 'Ready for Pickup',
+      image: 'https://images.unsplash.com/photo-1628771065518-0d82f1938462?w=800&auto=format&fit=crop&q=60'
     },
     {
       id: 5,
@@ -59,9 +71,12 @@ export default function Prescriptions() {
       prescriber: 'Dr. Martinez',
       refills: 3,
       lastFilled: '2025-10-10',
+      dateWritten: '2025-07-05',
+      dateExpires: '2026-07-05',
       status: 'Shipped',
       tracking: '1Z999AA10555666777',
-      expectedDelivery: 'Nov 17, 2025'
+      expectedDelivery: 'Nov 17, 2025',
+      image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=800&auto=format&fit=crop&q=60'
     },
     {
       id: 6,
@@ -70,9 +85,12 @@ export default function Prescriptions() {
       prescriber: 'Dr. Smith',
       refills: 2,
       lastFilled: '2025-10-05',
+      dateWritten: '2025-05-25',
+      dateExpires: '2026-05-25',
       status: 'In Delivery',
       tracking: '1Z999AA10888999000',
-      expectedDelivery: 'Nov 15, 2025'
+      expectedDelivery: 'Nov 15, 2025',
+      image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=800&auto=format&fit=crop&q=60'
     }
   ];
 
