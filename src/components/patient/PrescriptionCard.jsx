@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pill, Calendar, Package, Truck, MoreVertical, RefreshCw, CreditCard, FileText, Play, History, BookOpen, StopCircle } from 'lucide-react';
+import { Pill, Calendar, Package, Truck, MoreVertical, RefreshCw, CreditCard, FileText, Play, History, BookOpen, StopCircle, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -53,8 +53,9 @@ export default function PrescriptionCard({ prescription }) {
               </Badge>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <MoreVertical className="w-4 h-4" />
+                  <Button variant="outline" size="sm" className="gap-2 text-xs h-8">
+                    Actions
+                    <ChevronDown className="w-3 h-3" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
@@ -208,10 +209,43 @@ export default function PrescriptionCard({ prescription }) {
             <DialogHeader>
               <DialogTitle>Orders for {prescription.name}</DialogTitle>
             </DialogHeader>
-            <p className="text-gray-600">Order history for this prescription will be displayed here.</p>
-            <Button onClick={() => setShowOrders(false)} className="bg-[#8B1F1F] hover:bg-[#721919]">
-              Close
-            </Button>
+            <div className="space-y-4">
+              <div className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-4 py-2 text-left font-medium text-gray-700">Order #</th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-700">Date</th>
+                      <th className="px-4 py-2 text-left font-medium text-gray-700">Status</th>
+                      <th className="px-4 py-2 text-right font-medium text-gray-700">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {[
+                      { id: 'ORD-2024-001', date: '2025-11-15', status: 'Completed', amount: 15.00 },
+                      { id: 'ORD-2024-089', date: '2025-10-15', status: 'Completed', amount: 15.00 },
+                      { id: 'ORD-2024-156', date: '2025-09-15', status: 'Completed', amount: 15.00 },
+                    ].map((order, idx) => (
+                      <tr key={idx} className="bg-white">
+                        <td className="px-4 py-3 font-medium text-gray-900">{order.id}</td>
+                        <td className="px-4 py-3 text-gray-600">{order.date}</td>
+                        <td className="px-4 py-3">
+                          <Badge className="bg-green-100 text-green-800 border-green-200 shadow-none font-normal">
+                            {order.status}
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-right font-medium text-gray-900">${order.amount.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="flex justify-end">
+                <Button onClick={() => setShowOrders(false)} className="bg-[#8B1F1F] hover:bg-[#721919]">
+                  Close
+                </Button>
+              </div>
+            </div>
           </DialogContent>
         </Dialog>
       )}

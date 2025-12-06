@@ -402,8 +402,8 @@ export default function CollapsibleOrderHistory({ limit = 5, showSeeAll = false,
                   className="w-1/2 mx-auto rounded-lg border border-gray-200"
                 />
                 <Button
-                  variant="outline"
                   size="sm"
+                  className="bg-[#8B1F1F] hover:bg-[#721919] text-white"
                   onClick={async () => {
                     try {
                       const response = await fetch(selectedReceipt.receipt_url);
