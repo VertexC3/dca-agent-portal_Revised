@@ -27,6 +27,16 @@ export default function PatientDashboard() {
     queryFn: () => base44.auth.me()
   });
 
+  const { data: featureFlags = [] } = useQuery({
+    queryKey: ['featureFlags'],
+    queryFn: () => base44.entities.FeatureFlag.list(),
+  });
+
+  const isFeatureEnabled = (key) => {
+    const flag = featureFlags.find(f => f.key === key);
+    return flag ? flag.is_enabled : true;
+  };
+
   // All available quick actions
   const allQuickActions = [
     { id: 'profile', label: 'Update Profile', icon: User, action: () => window.location.href = createPageUrl('PatientProfile') },
@@ -160,7 +170,7 @@ export default function PatientDashboard() {
   return (
     <div className="space-y-6">
       {/* Survey Alert */}
-      {showSurveyAlert && !user?.survey_completed && (
+      {isFeatureEnabled('patient_survey') && showSurveyAlert && !user?.survey_completed && (
         <SatisfactionSurveyAlert 
           user={user} 
           onDismiss={() => setShowSurveyAlert(false)} 
@@ -176,35 +186,40 @@ export default function PatientDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Active Prescriptions Section */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-              <Pill className="w-6 h-6 text-[#8B1F1F]" />
-              {prescriptionFilter} Prescriptions ({prescriptions.length})
-            </h2>
-            <Select value={prescriptionFilter} onValueChange={setPrescriptionFilter}>
-              <SelectTrigger className="w-[160px]">
-                <Filter className="w-4 h-4 mr-2" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="Inactive">Inactive</SelectItem>
-                <SelectItem value="Discontinued">Discontinued</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {isFeatureEnabled('patient_prescriptions') && (
+            <>
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                  <Pill className="w-6 h-6 text-[#8B1F1F]" />
+                  {prescriptionFilter} Prescriptions ({prescriptions.length})
+                </h2>
+                <Select value={prescriptionFilter} onValueChange={setPrescriptionFilter}>
+                  <SelectTrigger className="w-[160px]">
+                    <Filter className="w-4 h-4 mr-2" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Active">Active</SelectItem>
+                    <SelectItem value="Inactive">Inactive</SelectItem>
+                    <SelectItem value="Discontinued">Discontinued</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div className="grid grid-cols-1 gap-4">
-            {prescriptions.map(prescription => (
-              <PrescriptionCard key={prescription.id} prescription={prescription} />
-            ))}
-          </div>
+              <div className="grid grid-cols-1 gap-4">
+                {prescriptions.map(prescription => (
+                  <PrescriptionCard key={prescription.id} prescription={prescription} />
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Recent Communications */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
+          {isFeatureEnabled('patient_communications') && (
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
             <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-[#8B1F1F]" />
               Recent Communications
@@ -242,10 +257,12 @@ export default function PatientDashboard() {
                 </Link>
               </>
             )}
-          </div>
+            </div>
+          )}
 
           {/* Quick Actions */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
+          {isFeatureEnabled('patient_quick_actions') && (
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-gray-800">Quick Actions</h3>
               <button
@@ -276,16 +293,18 @@ export default function PatientDashboard() {
                 );
               })}
             </div>
-          </div>
+          )}
 
           {/* Recent Orders */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
-            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <Package className="w-5 h-5 text-[#8B1F1F]" />
-              Recent Orders
-            </h3>
-            <CollapsibleOrderHistory limit={5} showSeeAll={true} />
-          </div>
+          {isFeatureEnabled('patient_orders') && (
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
+              <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <Package className="w-5 h-5 text-[#8B1F1F]" />
+                Recent Orders
+              </h3>
+              <CollapsibleOrderHistory limit={5} showSeeAll={true} />
+            </div>
+          )}
         </div>
       </div>
 
