@@ -23,8 +23,9 @@ const statusConfig = {
   'Ready for Pickup': { color: 'bg-green-100 text-green-800 border-green-200', icon: Package },
   'Shipped': { color: 'bg-blue-100 text-blue-800 border-blue-200', icon: Truck },
   'In Delivery': { color: 'bg-purple-100 text-purple-800 border-purple-200', icon: Truck },
-  'Discontinued': { color: 'bg-gray-100 text-gray-800 border-gray-200', icon: StopCircle },
-  'Discontinued, Renewal Requested': { color: 'bg-yellow-100 text-yellow-800 border-yellow-200', icon: RefreshCw }
+  'Discontinued': { color: 'bg-gray-100 text-gray-800 border-gray-200 cursor-default', icon: StopCircle },
+  'Renewal Requested': { color: 'bg-yellow-100 text-yellow-800 border-yellow-200 cursor-default', icon: RefreshCw },
+  'Request Renewal': { color: 'bg-blue-600 text-white border-blue-700 hover:bg-blue-700 cursor-pointer shadow-sm', icon: RefreshCw }
 };
 
 export default function PrescriptionCard({ prescription }) {
@@ -38,8 +39,16 @@ export default function PrescriptionCard({ prescription }) {
   const [showOrders, setShowOrders] = useState(false);
   const [showPrescriberProfile, setShowPrescriberProfile] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState(null);
+  const [showRenewalConfirm, setShowRenewalConfirm] = useState(false);
+  const [renewalMessage, setRenewalMessage] = useState(null);
 
   const StatusIcon = statusConfig[prescription.status]?.icon || Package;
+
+  const handleStatusClick = () => {
+    if (prescription.status === 'Request Renewal') {
+      setShowRenewalConfirm(true);
+    }
+  };
 
   return (
     <>
@@ -51,7 +60,10 @@ export default function PrescriptionCard({ prescription }) {
               <span className="text-lg">{prescription.name}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Badge className={`${statusConfig[prescription.status]?.color} border`}>
+              <Badge 
+                className={`${statusConfig[prescription.status]?.color} border transition-colors`}
+                onClick={handleStatusClick}
+              >
                 {prescription.status}
               </Badge>
               <DropdownMenu>
@@ -357,6 +369,65 @@ export default function PrescriptionCard({ prescription }) {
         onClose={() => setShowPrescriberProfile(false)}
         prescriberName={prescription.prescriber}
       />
+
+      {/* Special Renewal Dialog */}
+      <Dialog open={showRenewalConfirm} onOpenChange={(open) => {
+        if (!open) setRenewalMessage(null);
+        setShowRenewalConfirm(open);
+      }}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle>{renewalMessage ? 'Request Status' : 'Request Renewal'}</DialogTitle>
+          </DialogHeader>
+          
+          {!renewalMessage ? (
+            <>
+              <p className="text-gray-600 py-4">
+                Would you like to request a renewal for {prescription.name}?
+              </p>
+              <div className="flex gap-3 justify-end">
+                <Button 
+                  variant="outline"
+                  onClick={() => setRenewalMessage({
+                    title: "Got it.",
+                    text: "This prescription has been discontinued. Thank you!"
+                  })}
+                >
+                  No
+                </Button>
+                <Button 
+                  className="bg-[#8B1F1F] hover:bg-[#721919]"
+                  onClick={() => setRenewalMessage({
+                    title: "Great!",
+                    text: "We've requested the renewal on your behalf."
+                  })}
+                >
+                  Yes
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="py-4 text-center space-y-2">
+                 <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-2">
+                    <RefreshCw className="w-6 h-6 text-green-600" />
+                 </div>
+                 <h3 className="font-semibold text-lg text-gray-900">{renewalMessage.title}</h3>
+                 <p className="text-gray-600">{renewalMessage.text}</p>
+              </div>
+              <Button 
+                onClick={() => {
+                  setShowRenewalConfirm(false);
+                  setRenewalMessage(null);
+                }}
+                className="w-full bg-[#8B1F1F] hover:bg-[#721919]"
+              >
+                Close
+              </Button>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
