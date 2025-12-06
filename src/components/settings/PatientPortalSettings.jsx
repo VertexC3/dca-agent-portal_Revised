@@ -15,6 +15,7 @@ const DEFAULT_FLAGS = [
   { key: 'patient_survey', label: 'Satisfaction Survey', description: 'Enable the satisfaction survey alert' },
   { key: 'patient_nav_prescriptions', label: 'Prescriptions Page', description: 'Show Prescriptions in the navigation menu' },
   { key: 'patient_nav_messages', label: 'Messages Page', description: 'Show Communications in the navigation menu' },
+  { key: 'patient_orders', label: 'Recent Orders', description: 'Show recent orders widget' },
 ];
 
 export default function PatientPortalSettings() {

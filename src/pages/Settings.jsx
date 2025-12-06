@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TeamManagement from '../components/settings/TeamManagement';
+import PatientPortalSettings from '../components/settings/PatientPortalSettings';
 
 export default function Settings() {
   const queryClient = useQueryClient();
@@ -153,6 +154,13 @@ export default function Settings() {
             >
               <Shield className="w-4 h-4 mr-2" />
               Security
+            </TabsTrigger>
+            <TabsTrigger 
+              value="patient_portal"
+              className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-[#8B1F1F] rounded-none px-6 py-4"
+            >
+              <Layout className="w-4 h-4 mr-2" />
+              Patient Portal
             </TabsTrigger>
             <TabsTrigger 
               value="preferences"
@@ -386,6 +394,10 @@ export default function Settings() {
                   </div>
                 </div>
               </div>
+            </TabsContent>
+
+            <TabsContent value="patient_portal" className="mt-0 space-y-6">
+              <PatientPortalSettings />
             </TabsContent>
 
             <TabsContent value="preferences" className="mt-0 space-y-6">
