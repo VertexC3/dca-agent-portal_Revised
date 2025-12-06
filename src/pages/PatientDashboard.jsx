@@ -174,11 +174,50 @@ export default function PatientDashboard() {
       lastFilled: '2025-06-01',
       dateWritten: '2025-01-15',
       dateExpires: '2026-01-15',
-      status: 'Ready for Pickup',
-      category: 'Discontinued',
+      status: 'Discontinued, Renewal Requested',
+      category: 'Inactive',
       image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=800&auto=format&fit=crop&q=60'
+    },
+    {
+      id: 6,
+      name: 'Amoxicillin 500mg',
+      dosage: 'Take 1 capsule 3 times daily',
+      prescriber: 'Dr. Smith',
+      refills: 0,
+      lastFilled: '2024-12-01',
+      dateWritten: '2024-12-01',
+      dateExpires: '2025-12-01',
+      status: 'Discontinued',
+      category: 'Inactive',
+      image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=800&auto=format&fit=crop&q=60'
+    },
+    {
+      id: 7,
+      name: 'Prednisone 10mg',
+      dosage: 'Take as directed on taper schedule',
+      prescriber: 'Dr. Martinez',
+      refills: 0,
+      lastFilled: '2024-11-15',
+      dateWritten: '2024-11-15',
+      dateExpires: '2025-11-15',
+      status: 'Discontinued',
+      category: 'Inactive',
+      image: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?w=800&auto=format&fit=crop&q=60'
+    },
+    {
+      id: 8,
+      name: 'Benzonatate 100mg',
+      dosage: 'Take 1 capsule 3 times daily as needed for cough',
+      prescriber: 'Dr. Johnson',
+      refills: 0,
+      lastFilled: '2024-10-01',
+      dateWritten: '2024-10-01',
+      dateExpires: '2025-10-01',
+      status: 'Discontinued',
+      category: 'Inactive',
+      image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop&q=60'
     }
-  ];
+    ];
 
   const prescriptions = allPrescriptions.filter(p => p.category === prescriptionFilter);
 

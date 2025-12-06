@@ -23,7 +23,8 @@ const statusConfig = {
   'Ready for Pickup': { color: 'bg-green-100 text-green-800 border-green-200', icon: Package },
   'Shipped': { color: 'bg-blue-100 text-blue-800 border-blue-200', icon: Truck },
   'In Delivery': { color: 'bg-purple-100 text-purple-800 border-purple-200', icon: Truck },
-  'Discontinued': { color: 'bg-gray-100 text-gray-800 border-gray-200', icon: StopCircle }
+  'Discontinued': { color: 'bg-gray-100 text-gray-800 border-gray-200', icon: StopCircle },
+  'Discontinued, Renewal Requested': { color: 'bg-yellow-100 text-yellow-800 border-yellow-200', icon: RefreshCw }
 };
 
 export default function PrescriptionCard({ prescription }) {
@@ -138,17 +139,21 @@ export default function PrescriptionCard({ prescription }) {
               )}
             </div>
             {prescription.image && (
-              <div className="flex flex-col gap-2 w-24">
-                <div className="w-24 h-24">
+              <div className="flex flex-col gap-2 w-28">
+                <div className="w-28 h-28">
                   <img 
                     src={prescription.image} 
                     alt={prescription.name} 
                     className="w-full h-full object-cover rounded-lg border border-gray-200"
                   />
                 </div>
-                <div className="flex gap-1">
-                   <Button size="sm" variant="outline" className="h-6 text-[10px] px-1 w-full" onClick={() => setShowVideo(true)}>Video</Button>
-                   <Button size="sm" variant="outline" className="h-6 text-[10px] px-1 w-full" onClick={() => setShowMedicalGuide(true)}>Guide</Button>
+                <div className="flex flex-col gap-2">
+                   <Button size="sm" variant="outline" className="h-8 text-xs px-2 w-full font-medium border-gray-300 hover:bg-gray-50" onClick={() => setShowVideo(true)}>
+                    <Play className="w-3 h-3 mr-1.5" /> Video
+                   </Button>
+                   <Button size="sm" variant="outline" className="h-8 text-xs px-2 w-full font-medium border-gray-300 hover:bg-gray-50" onClick={() => setShowMedicalGuide(true)}>
+                    <BookOpen className="w-3 h-3 mr-1.5" /> Guide
+                   </Button>
                 </div>
               </div>
             )}
