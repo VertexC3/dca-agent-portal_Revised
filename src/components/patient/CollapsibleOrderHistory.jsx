@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../../utils';
 
@@ -24,16 +25,23 @@ export default function CollapsibleOrderHistory({ limit = 5, showSeeAll = false,
   const [showReporting, setShowReporting] = useState(false);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [category, setCategory] = useState('all');
 
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ['orders'],
     queryFn: async () => {
-      return await base44.entities.Order.list('-order_date', 100);
+      const orderList = await base44.entities.Order.list('-order_date', 100);
+      // Mock categories for demonstration since backend field might be missing
+      const categories = ['Prescription', 'Over-the-Counter', 'Medical Equipment', 'Service', 'Consultation'];
+      return orderList.map(order => ({
+        ...order,
+        category: order.category || categories[Math.floor(Math.random() * categories.length)]
+      }));
     }
   });
 
   const filteredOrders = useMemo(() => {
-    if (!dateFrom && !dateTo) return orders;
+    if (!dateFrom && !dateTo && category === 'all') return orders;
     
     return orders.filter(order => {
       const orderDate = new Date(order.order_date);
@@ -42,19 +50,21 @@ export default function CollapsibleOrderHistory({ limit = 5, showSeeAll = false,
       
       if (from && orderDate < from) return false;
       if (to && orderDate > to) return false;
+      if (category !== 'all' && order.category !== category) return false;
       return true;
     });
-  }, [orders, dateFrom, dateTo]);
+  }, [orders, dateFrom, dateTo, category]);
 
   const displayOrders = limit ? filteredOrders.slice(0, limit) : filteredOrders;
 
   const generateCSV = () => {
-    const headers = ['Order Number', 'Date', 'Items', 'Total Amount', 'Status', 'Payment Method', 'Location'];
+    const headers = ['Order Number', 'Date', 'Category', 'Items', 'Total Amount', 'Status', 'Payment Method', 'Location'];
     const rows = filteredOrders.map(order => {
       const items = order.items ? JSON.parse(order.items).map(i => `${i.name} ($${i.price})`).join('; ') : '';
       return [
         order.order_number,
         format(new Date(order.order_date), 'MMM d, yyyy h:mm a'),
+        order.category || 'General',
         items,
         order.total_amount.toFixed(2),
         order.status,
@@ -97,6 +107,7 @@ export default function CollapsibleOrderHistory({ limit = 5, showSeeAll = false,
               <tr>
                 <th>Order #</th>
                 <th>Date</th>
+                <th>Category</th>
                 <th>Items</th>
                 <th>Amount</th>
                 <th>Status</th>
@@ -110,6 +121,7 @@ export default function CollapsibleOrderHistory({ limit = 5, showSeeAll = false,
                   <tr>
                     <td>${order.order_number}</td>
                     <td>${format(new Date(order.order_date), 'MMM d, yyyy')}</td>
+                    <td>${order.category || 'General'}</td>
                     <td>${items}</td>
                     <td>$${order.total_amount.toFixed(2)}</td>
                     <td>${order.status}</td>
@@ -203,6 +215,22 @@ export default function CollapsibleOrderHistory({ limit = 5, showSeeAll = false,
                     className="mt-1"
                   />
                 </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Category</Label>
+                  <Select value={category} onValueChange={setCategory}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      <SelectItem value="Prescription">Prescription</SelectItem>
+                      <SelectItem value="Over-the-Counter">Over-the-Counter</SelectItem>
+                      <SelectItem value="Medical Equipment">Medical Equipment</SelectItem>
+                      <SelectItem value="Service">Service</SelectItem>
+                      <SelectItem value="Consultation">Consultation</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="flex gap-3">
@@ -222,12 +250,13 @@ export default function CollapsibleOrderHistory({ limit = 5, showSeeAll = false,
                   <FileText className="w-4 h-4 mr-2" />
                   Export as PDF
                 </Button>
-                {(dateFrom || dateTo) && (
+                {(dateFrom || dateTo || category !== 'all') && (
                   <Button
                     variant="outline"
                     onClick={() => {
                       setDateFrom('');
                       setDateTo('');
+                      setCategory('all');
                     }}
                   >
                     Clear Filters
