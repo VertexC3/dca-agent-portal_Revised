@@ -64,10 +64,12 @@ export default function PrescriptionCard({ prescription }) {
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Request Refill
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setShowRenewal(true)}>
-                    <FileText className="w-4 h-4 mr-2" />
-                    Request Renewal
-                  </DropdownMenuItem>
+                  {prescription.category === 'Inactive' && (
+                    <DropdownMenuItem onClick={() => setShowRenewal(true)}>
+                      <FileText className="w-4 h-4 mr-2" />
+                      Request Renewal
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={() => setShowPayment(true)}>
                     <CreditCard className="w-4 h-4 mr-2" />
                     Payment
@@ -79,15 +81,6 @@ export default function PrescriptionCard({ prescription }) {
                   <DropdownMenuItem onClick={() => setShowHistory(true)}>
                     <History className="w-4 h-4 mr-2" />
                     Fill History
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setShowVideo(true)}>
-                    <Play className="w-4 h-4 mr-2" />
-                    Video Guide
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setShowMedicalGuide(true)}>
-                    <BookOpen className="w-4 h-4 mr-2" />
-                    Medical Guide
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => setShowStopConfirm(true)} className="text-red-600">
@@ -136,12 +129,18 @@ export default function PrescriptionCard({ prescription }) {
               )}
             </div>
             {prescription.image && (
-              <div className="flex-shrink-0 w-24 h-24">
-                <img 
-                  src={prescription.image} 
-                  alt={prescription.name} 
-                  className="w-full h-full object-cover rounded-lg border border-gray-200"
-                />
+              <div className="flex flex-col gap-2 w-24">
+                <div className="w-24 h-24">
+                  <img 
+                    src={prescription.image} 
+                    alt={prescription.name} 
+                    className="w-full h-full object-cover rounded-lg border border-gray-200"
+                  />
+                </div>
+                <div className="flex gap-1">
+                   <Button size="sm" variant="outline" className="h-6 text-[10px] px-1 w-full" onClick={() => setShowVideo(true)}>Video</Button>
+                   <Button size="sm" variant="outline" className="h-6 text-[10px] px-1 w-full" onClick={() => setShowMedicalGuide(true)}>Guide</Button>
+                </div>
               </div>
             )}
           </div>
