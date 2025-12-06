@@ -186,7 +186,7 @@ export default function PatientDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Active Prescriptions Section */}
         <div className="lg:col-span-2 space-y-6">
-          {isFeatureEnabled('patient_prescriptions') && (
+          {isFeatureEnabled('patient_prescriptions') && user?.patient_pref_prescriptions !== false && (
             <>
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
@@ -218,7 +218,7 @@ export default function PatientDashboard() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Recent Communications */}
-          {isFeatureEnabled('patient_communications') && (
+          {isFeatureEnabled('patient_communications') && user?.patient_pref_communications !== false && (
             <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
             <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-[#8B1F1F]" />
@@ -261,7 +261,7 @@ export default function PatientDashboard() {
           )}
 
           {/* Quick Actions */}
-          {isFeatureEnabled('patient_quick_actions') && (
+          {isFeatureEnabled('patient_quick_actions') && user?.patient_pref_quick_actions !== false && (
             <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-gray-800">Quick Actions</h3>
@@ -297,7 +297,7 @@ export default function PatientDashboard() {
           )}
 
           {/* Recent Orders */}
-          {isFeatureEnabled('patient_orders') && (
+          {isFeatureEnabled('patient_orders') && user?.patient_pref_orders !== false && (
             <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
               <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <Package className="w-5 h-5 text-[#8B1F1F]" />

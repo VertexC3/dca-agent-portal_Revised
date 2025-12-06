@@ -61,8 +61,8 @@ export default function Layout({ children, currentPageName }) {
 
   const patientNavItems = [
     { name: 'Dashboard', icon: Home, page: 'PatientDashboard' },
-    ...(isFeatureEnabled('patient_nav_prescriptions') ? [{ name: 'Prescriptions', icon: Pill, page: 'Prescriptions' }] : []),
-    ...(isFeatureEnabled('patient_nav_messages') ? [{ name: 'Communication', icon: MessageSquare, page: 'PatientMessages' }] : []),
+    ...(isFeatureEnabled('patient_nav_prescriptions') && user?.patient_pref_prescriptions_nav !== false ? [{ name: 'Prescriptions', icon: Pill, page: 'Prescriptions' }] : []),
+    ...(isFeatureEnabled('patient_nav_messages') && user?.patient_pref_messages_nav !== false ? [{ name: 'Communication', icon: MessageSquare, page: 'PatientMessages' }] : []),
   ];
 
   const staffPages = ['Dashboard', 'Communications', 'StaffMessaging', 'Analytics', 'CommunicationDetail', 'AITraining', 'Automation', 'Settings', 'DailyView', 'PrescriptionTrends'];
@@ -191,6 +191,12 @@ export default function Layout({ children, currentPageName }) {
                         <Link to={createPageUrl('PatientProfile')} className="flex items-center gap-2 cursor-pointer text-gray-700">
                           <User className="w-4 h-4" />
                           My Profile
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to={createPageUrl('PatientSettings')} className="flex items-center gap-2 cursor-pointer text-gray-700">
+                          <Settings className="w-4 h-4" />
+                          Settings
                         </Link>
                       </DropdownMenuItem>
                     </>
