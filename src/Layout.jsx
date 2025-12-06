@@ -30,6 +30,16 @@ export default function Layout({ children, currentPageName }) {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
+  const { data: featureFlags = [] } = useQuery({
+    queryKey: ['featureFlags'],
+    queryFn: () => base44.entities.FeatureFlag.list(),
+  });
+
+  const isFeatureEnabled = (key) => {
+    const flag = featureFlags.find(f => f.key === key);
+    return flag ? flag.is_enabled : true;
+  };
+
   const handleViewToggle = (isPatient) => {
     setIsPatientView(isPatient);
     localStorage.setItem('viewMode', isPatient ? 'patient' : 'staff');
@@ -51,8 +61,8 @@ export default function Layout({ children, currentPageName }) {
 
   const patientNavItems = [
     { name: 'Dashboard', icon: Home, page: 'PatientDashboard' },
-    { name: 'Prescriptions', icon: Pill, page: 'Prescriptions' },
-    { name: 'Communication', icon: MessageSquare, page: 'PatientMessages' },
+    ...(isFeatureEnabled('patient_nav_prescriptions') ? [{ name: 'Prescriptions', icon: Pill, page: 'Prescriptions' }] : []),
+    ...(isFeatureEnabled('patient_nav_messages') ? [{ name: 'Communication', icon: MessageSquare, page: 'PatientMessages' }] : []),
   ];
 
   const staffPages = ['Dashboard', 'Communications', 'StaffMessaging', 'Analytics', 'CommunicationDetail', 'AITraining', 'Automation', 'Settings', 'DailyView', 'PrescriptionTrends'];
