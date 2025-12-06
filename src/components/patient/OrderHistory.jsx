@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Package, Calendar, DollarSign, Receipt, Loader2, Eye, FileSpreadsheet, FileText, Filter } from 'lucide-react';
+import { Package, Calendar, DollarSign, Receipt, Loader2, Eye, FileSpreadsheet, FileText, Filter, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -300,11 +300,36 @@ export default function OrderHistory() {
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <img
-                src={selectedReceipt.receipt_url}
-                alt="Receipt"
-                className="w-1/2 mx-auto rounded-lg border border-gray-200"
-              />
+              <div className="text-center space-y-2">
+                <img
+                  src={selectedReceipt.receipt_url}
+                  alt="Receipt"
+                  className="w-1/2 mx-auto rounded-lg border border-gray-200"
+                />
+                <Button
+                  size="sm"
+                  className="bg-[#8B1F1F] hover:bg-[#721919] text-white"
+                  onClick={async () => {
+                    try {
+                      const response = await fetch(selectedReceipt.receipt_url);
+                      const blob = await response.blob();
+                      const url = window.URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `Receipt-${selectedReceipt.order_number}.png`;
+                      document.body.appendChild(a);
+                      a.click();
+                      window.URL.revokeObjectURL(url);
+                      document.body.removeChild(a);
+                    } catch (err) {
+                      window.open(selectedReceipt.receipt_url, '_blank');
+                    }
+                  }}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download Receipt
+                </Button>
+              </div>
               <div className="p-4 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-600">
                   <strong>Date:</strong> {format(new Date(selectedReceipt.order_date), 'MMM d, yyyy h:mm a')}
