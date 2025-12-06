@@ -26,13 +26,14 @@ export default function CollapsibleOrderHistory({ limit = 5, showSeeAll = false,
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [category, setCategory] = useState('all');
+  const [prescriptionName, setPrescriptionName] = useState('');
 
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ['orders'],
     queryFn: async () => {
       const orderList = await base44.entities.Order.list('-order_date', 100);
       // Mock categories for demonstration since backend field might be missing
-      const categories = ['Prescription', 'Over-the-Counter', 'Medical Equipment', 'Service', 'Consultation'];
+      const categories = ['Medical', 'Other'];
       return orderList.map(order => ({
         ...order,
         category: order.category || categories[Math.floor(Math.random() * categories.length)]
@@ -41,7 +42,7 @@ export default function CollapsibleOrderHistory({ limit = 5, showSeeAll = false,
   });
 
   const filteredOrders = useMemo(() => {
-    if (!dateFrom && !dateTo && category === 'all') return orders;
+    if (!dateFrom && !dateTo && category === 'all' && !prescriptionName) return orders;
     
     return orders.filter(order => {
       const orderDate = new Date(order.order_date);
@@ -51,9 +52,16 @@ export default function CollapsibleOrderHistory({ limit = 5, showSeeAll = false,
       if (from && orderDate < from) return false;
       if (to && orderDate > to) return false;
       if (category !== 'all' && order.category !== category) return false;
+
+      if (prescriptionName) {
+        const items = order.items ? JSON.parse(order.items) : [];
+        const hasMatch = items.some(item => item.name.toLowerCase().includes(prescriptionName.toLowerCase()));
+        if (!hasMatch) return false;
+      }
+
       return true;
     });
-  }, [orders, dateFrom, dateTo, category]);
+  }, [orders, dateFrom, dateTo, category, prescriptionName]);
 
   const displayOrders = limit ? filteredOrders.slice(0, limit) : filteredOrders;
 
@@ -223,13 +231,19 @@ export default function CollapsibleOrderHistory({ limit = 5, showSeeAll = false,
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Categories</SelectItem>
-                      <SelectItem value="Prescription">Prescription</SelectItem>
-                      <SelectItem value="Over-the-Counter">Over-the-Counter</SelectItem>
-                      <SelectItem value="Medical Equipment">Medical Equipment</SelectItem>
-                      <SelectItem value="Service">Service</SelectItem>
-                      <SelectItem value="Consultation">Consultation</SelectItem>
+                      <SelectItem value="Medical">Medical</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Prescription Name</Label>
+                  <Input
+                    value={prescriptionName}
+                    onChange={(e) => setPrescriptionName(e.target.value)}
+                    placeholder="Search medication..."
+                    className="mt-1"
+                  />
                 </div>
               </div>
 
@@ -250,13 +264,14 @@ export default function CollapsibleOrderHistory({ limit = 5, showSeeAll = false,
                   <FileText className="w-4 h-4 mr-2" />
                   Export as PDF
                 </Button>
-                {(dateFrom || dateTo || category !== 'all') && (
+                {(dateFrom || dateTo || category !== 'all' || prescriptionName) && (
                   <Button
                     variant="outline"
                     onClick={() => {
                       setDateFrom('');
                       setDateTo('');
                       setCategory('all');
+                      setPrescriptionName('');
                     }}
                   >
                     Clear Filters
