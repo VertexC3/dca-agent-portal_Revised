@@ -293,6 +293,7 @@ export default function PatientDashboard() {
                 );
               })}
             </div>
+            </div>
           )}
 
           {/* Recent Orders */}
