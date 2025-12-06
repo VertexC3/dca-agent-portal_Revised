@@ -274,7 +274,9 @@ export default function CollapsibleOrderHistory({ limit = 5, showSeeAll = false,
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <p className="font-semibold text-gray-800">Order #{order.order_number}</p>
-                      <Badge className={statusColors[order.status]}>{order.status}</Badge>
+                      {order.status !== 'completed' && (
+                        <Badge className={statusColors[order.status]}>{order.status}</Badge>
+                      )}
                     </div>
                     <p className="text-sm text-gray-600 flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
