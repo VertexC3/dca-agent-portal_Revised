@@ -18,7 +18,7 @@ const statusColors = {
   cancelled: 'bg-red-100 text-red-800'
 };
 
-export default function CollapsibleOrderHistory({ limit = 5, showSeeAll = false }) {
+export default function CollapsibleOrderHistory({ limit = 5, showSeeAll = false, allowReporting = true }) {
   const [expandedOrders, setExpandedOrders] = useState({});
   const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [showReporting, setShowReporting] = useState(false);
@@ -165,86 +165,88 @@ export default function CollapsibleOrderHistory({ limit = 5, showSeeAll = false 
   return (
     <>
       {/* Reporting Section */}
-      <div className="mb-6 bg-gray-50 rounded-xl p-4 border border-gray-200">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-            <FileText className="w-5 h-5 text-[#8B1F1F]" />
-            Reporting
-          </h3>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowReporting(!showReporting)}
-          >
-            <Filter className="w-4 h-4 mr-2" />
-            {showReporting ? 'Hide Filters' : 'Show Filters'}
-          </Button>
-        </div>
-
-        {showReporting && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm font-medium text-gray-700">From Date</Label>
-                <Input
-                  type="date"
-                  value={dateFrom}
-                  onChange={(e) => setDateFrom(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label className="text-sm font-medium text-gray-700">To Date</Label>
-                <Input
-                  type="date"
-                  value={dateTo}
-                  onChange={(e) => setDateTo(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <Button
-                onClick={generateCSV}
-                disabled={filteredOrders.length === 0}
-                className="bg-green-600 hover:bg-green-700 text-white"
-              >
-                <FileSpreadsheet className="w-4 h-4 mr-2" />
-                Export as XLS
-              </Button>
-              <Button
-                onClick={generatePDF}
-                disabled={filteredOrders.length === 0}
-                className="bg-red-600 hover:bg-red-700 text-white"
-              >
-                <FileText className="w-4 h-4 mr-2" />
-                Export as PDF
-              </Button>
-              {(dateFrom || dateTo) && (
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setDateFrom('');
-                    setDateTo('');
-                  }}
-                >
-                  Clear Filters
-                </Button>
-              )}
-            </div>
-
-            <div className="p-3 bg-white rounded-lg border border-gray-200">
-              <p className="text-sm text-gray-700">
-                <strong>Filtered Orders:</strong> {filteredOrders.length}
-              </p>
-              <p className="text-sm text-gray-700">
-                <strong>Total Amount:</strong> ${filteredOrders.reduce((sum, o) => sum + o.total_amount, 0).toFixed(2)}
-              </p>
-            </div>
+      {allowReporting && (
+        <div className="mb-6 bg-gray-50 rounded-xl p-4 border border-gray-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+              <FileText className="w-5 h-5 text-[#8B1F1F]" />
+              Reporting
+            </h3>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowReporting(!showReporting)}
+            >
+              <Filter className="w-4 h-4 mr-2" />
+              {showReporting ? 'Hide Filters' : 'Show Filters'}
+            </Button>
           </div>
-        )}
-      </div>
+
+          {showReporting && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">From Date</Label>
+                  <Input
+                    type="date"
+                    value={dateFrom}
+                    onChange={(e) => setDateFrom(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">To Date</Label>
+                  <Input
+                    type="date"
+                    value={dateTo}
+                    onChange={(e) => setDateTo(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  onClick={generateCSV}
+                  disabled={filteredOrders.length === 0}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <FileSpreadsheet className="w-4 h-4 mr-2" />
+                  Export as XLS
+                </Button>
+                <Button
+                  onClick={generatePDF}
+                  disabled={filteredOrders.length === 0}
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  Export as PDF
+                </Button>
+                {(dateFrom || dateTo) && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setDateFrom('');
+                      setDateTo('');
+                    }}
+                  >
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
+
+              <div className="p-3 bg-white rounded-lg border border-gray-200">
+                <p className="text-sm text-gray-700">
+                  <strong>Filtered Orders:</strong> {filteredOrders.length}
+                </p>
+                <p className="text-sm text-gray-700">
+                  <strong>Total Amount:</strong> ${filteredOrders.reduce((sum, o) => sum + o.total_amount, 0).toFixed(2)}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {showSeeAll && orders.length > limit && (
         <div className="flex justify-end mb-4">

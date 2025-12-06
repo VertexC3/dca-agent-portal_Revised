@@ -303,7 +303,7 @@ export default function PatientDashboard() {
                 <Package className="w-5 h-5 text-[#8B1F1F]" />
                 Recent Orders
               </h3>
-              <CollapsibleOrderHistory limit={5} showSeeAll={true} />
+              <CollapsibleOrderHistory limit={5} showSeeAll={true} allowReporting={false} />
             </div>
           )}
         </div>
