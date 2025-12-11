@@ -340,8 +340,7 @@ DCA Pharmacy Team`
                   : '2-3 business days for delivery'}
               </p>
               <div className="pt-2 border-t border-blue-200">
-                <p className="text-xs text-gray-700 flex items-center gap-1">
-                  <DollarSign className="w-3 h-3" />
+                <p className="text-xs text-gray-700">
                   <strong>Estimated Cost:</strong> ${estimatedCost.toFixed(2)}
                 </p>
                 {deliveryMethod === 'delivery' && (
