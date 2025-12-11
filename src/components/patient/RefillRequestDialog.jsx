@@ -348,13 +348,20 @@ DCA Pharmacy Team`
                   ? '2-4 hours for pickup'
                   : '2-3 business days for delivery'}
               </p>
-              <div className="pt-2 border-t border-blue-200">
+              <div className="pt-2 border-t border-blue-200 space-y-1">
+                {deliveryMethod === 'delivery' && (
+                  <>
+                    <p className="text-xs text-gray-700">
+                      <strong>Prescription Cost:</strong> $15.00
+                    </p>
+                    <p className="text-xs text-gray-700">
+                      <strong>Shipping & Handling:</strong> $5.00
+                    </p>
+                  </>
+                )}
                 <p className="text-xs text-gray-700">
                   <strong>Estimated Cost:</strong> ${estimatedCost.toFixed(2)}
                 </p>
-                {deliveryMethod === 'delivery' && (
-                  <p className="text-xs text-gray-500 mt-1">Includes $5.00 delivery fee</p>
-                )}
               </div>
             </div>
 
