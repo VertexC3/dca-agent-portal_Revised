@@ -167,6 +167,9 @@ DCA Pharmacy Team`
               <p className="text-sm font-semibold text-gray-800">Prescription</p>
               <p className="text-gray-700">{prescription?.name}</p>
               <p className="text-xs text-gray-600 mt-1">{prescription?.dosage}</p>
+              {prescription?.quantity && (
+                <p className="text-xs text-gray-600">Quantity: {prescription.quantity} units</p>
+              )}
             </div>
 
             <div>
