@@ -8,20 +8,75 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Loader2, CheckCircle, Pill, CreditCard } from 'lucide-react';
+import { Loader2, CheckCircle, Pill, CreditCard, Plus, Trash2, MapPin, Star } from 'lucide-react';
 
 export default function RefillRequestDialog({ open, onClose, prescription }) {
   const [deliveryMethod, setDeliveryMethod] = useState('pickup');
+  const [selectedAddress, setSelectedAddress] = useState('');
   const [notes, setNotes] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [cardNumber, setCardNumber] = useState('');
   const [saveCard, setSaveCard] = useState(false);
+  const [showAddAddress, setShowAddAddress] = useState(false);
+  const [newAddress, setNewAddress] = useState({ name: 'Home', address: '', is_primary: false });
   const queryClient = useQueryClient();
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
     queryFn: () => base44.auth.me()
+  });
+
+  const userAddresses = user?.addresses || [];
+
+  React.useEffect(() => {
+    if (userAddresses.length > 0 && !selectedAddress) {
+      const primary = userAddresses.find(a => a.is_primary);
+      setSelectedAddress(primary ? primary.address : userAddresses[0].address);
+    }
+  }, [userAddresses, selectedAddress]);
+
+  const addAddressMutation = useMutation({
+    mutationFn: async (address) => {
+      const updatedAddresses = [...userAddresses, address];
+      if (address.is_primary) {
+        updatedAddresses.forEach((addr, idx) => {
+          if (idx < updatedAddresses.length - 1) addr.is_primary = false;
+        });
+      }
+      await base44.auth.updateMe({ addresses: updatedAddresses });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['currentUser']);
+      setShowAddAddress(false);
+      setNewAddress({ name: 'Home', address: '', is_primary: false });
+    }
+  });
+
+  const deleteAddressMutation = useMutation({
+    mutationFn: async (addressToDelete) => {
+      const updatedAddresses = userAddresses.filter(a => a.address !== addressToDelete);
+      await base44.auth.updateMe({ addresses: updatedAddresses });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['currentUser']);
+      if (selectedAddress && !userAddresses.find(a => a.address === selectedAddress)) {
+        setSelectedAddress('');
+      }
+    }
+  });
+
+  const setPrimaryAddressMutation = useMutation({
+    mutationFn: async (addressToPrimary) => {
+      const updatedAddresses = userAddresses.map(addr => ({
+        ...addr,
+        is_primary: addr.address === addressToPrimary
+      }));
+      await base44.auth.updateMe({ addresses: updatedAddresses });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['currentUser']);
+    }
   });
 
   const createRequestMutation = useMutation({
@@ -35,7 +90,7 @@ export default function RefillRequestDialog({ open, onClose, prescription }) {
         subject: `New Refill Request - ${prescription?.name}`,
         body: `Patient ${user?.full_name} (${user?.email}) has requested a refill for ${prescription?.name}.
 
-Delivery Method: ${deliveryMethod === 'pickup' ? 'Pickup' : 'Home Delivery'}
+Delivery Method: ${deliveryMethod === 'pickup' ? 'Pickup' : `Home Delivery to ${selectedAddress}`}
 ${notes ? `Notes: ${notes}` : ''}
 
 Please process this request in the system.`
@@ -67,6 +122,7 @@ DCA Pharmacy Team`
         setSubmitted(false);
         setNotes('');
         setDeliveryMethod('pickup');
+        setSelectedAddress('');
       }, 2000);
     }
   });
@@ -82,7 +138,7 @@ DCA Pharmacy Team`
       prescription_number: prescription.id.toString(),
       requested_via: 'manual',
       status: 'pending',
-      notes: `Delivery: ${deliveryMethod}${notes ? `. Additional notes: ${notes}` : ''}`
+      notes: `Delivery: ${deliveryMethod}${deliveryMethod === 'delivery' ? ` to ${selectedAddress}` : ''}${notes ? `. Additional notes: ${notes}` : ''}`
     });
   };
 
@@ -124,6 +180,143 @@ DCA Pharmacy Team`
                 </SelectContent>
               </Select>
             </div>
+
+            {deliveryMethod === 'delivery' && (
+              <div>
+                <Label className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-[#8B1F1F]" />
+                  Delivery Address
+                </Label>
+                <div className="space-y-3 mt-2">
+                  {userAddresses.map((addr, index) => (
+                    <div
+                      key={index}
+                      className={`p-3 rounded-lg border transition-all cursor-pointer ${
+                        selectedAddress === addr.address
+                          ? 'border-[#8B1F1F] bg-red-50'
+                          : 'border-gray-200 bg-gray-50 hover:border-gray-300'
+                      }`}
+                      onClick={() => setSelectedAddress(addr.address)}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-semibold text-gray-800">{addr.name}</p>
+                            {addr.is_primary && (
+                              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-600">{addr.address}</p>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPrimaryAddressMutation.mutate(addr.address);
+                            }}
+                            className="p-1 hover:bg-white rounded transition-colors"
+                            title="Set as primary"
+                          >
+                            <Star className={`w-4 h-4 ${addr.is_primary ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'}`} />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteAddressMutation.mutate(addr.address);
+                            }}
+                            className="p-1 hover:bg-white rounded transition-colors text-red-600"
+                            title="Delete address"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {!showAddAddress && userAddresses.length < 4 && (
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowAddAddress(true)}
+                      className="w-full"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add New Address
+                    </Button>
+                  )}
+
+                  {showAddAddress && (
+                    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
+                      <div>
+                        <Label className="text-xs">Address Type</Label>
+                        <Select
+                          value={newAddress.name}
+                          onValueChange={(value) => setNewAddress({ ...newAddress, name: value })}
+                        >
+                          <SelectTrigger className="mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Home">Home</SelectItem>
+                            <SelectItem value="Work">Work</SelectItem>
+                            <SelectItem value="Business">Business</SelectItem>
+                            <SelectItem value="Other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs">Full Address</Label>
+                        <Textarea
+                          value={newAddress.address}
+                          onChange={(e) => setNewAddress({ ...newAddress, address: e.target.value })}
+                          placeholder="123 Main St, Springfield, IL 62701"
+                          className="mt-1"
+                          rows={2}
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          id="new-primary"
+                          checked={newAddress.is_primary}
+                          onCheckedChange={(checked) => setNewAddress({ ...newAddress, is_primary: checked })}
+                        />
+                        <label htmlFor="new-primary" className="text-sm text-gray-700 cursor-pointer flex items-center gap-1">
+                          <Star className={`w-4 h-4 ${newAddress.is_primary ? 'fill-yellow-400 text-yellow-400' : 'text-gray-400'}`} />
+                          Set as primary address
+                        </label>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setShowAddAddress(false);
+                            setNewAddress({ name: 'Home', address: '', is_primary: false });
+                          }}
+                          className="flex-1"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={() => addAddressMutation.mutate(newAddress)}
+                          disabled={!newAddress.address || addAddressMutation.isPending}
+                          className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white"
+                        >
+                          {addAddressMutation.isPending ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            'Add'
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {userAddresses.length >= 4 && !showAddAddress && (
+                    <p className="text-xs text-gray-500 text-center">Maximum of 4 addresses reached</p>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div>
               <Label>Additional Notes (Optional)</Label>
