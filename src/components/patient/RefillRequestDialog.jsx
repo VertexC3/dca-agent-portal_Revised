@@ -163,12 +163,21 @@ DCA Pharmacy Team`
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="text-sm font-semibold text-gray-800">Prescription</p>
-              <p className="text-gray-700">{prescription?.name}</p>
-              <p className="text-xs text-gray-600 mt-1">{prescription?.dosage}</p>
-              {prescription?.quantity && (
-                <p className="text-xs text-gray-600">Quantity: {prescription.quantity} units</p>
+            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 flex gap-3">
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-gray-800">Prescription</p>
+                <p className="text-gray-700">{prescription?.name}</p>
+                <p className="text-xs text-gray-600 mt-1">{prescription?.dosage}</p>
+                {prescription?.quantity && (
+                  <p className="text-xs text-gray-600">Quantity: {prescription.quantity} units</p>
+                )}
+              </div>
+              {prescription?.image && (
+                <img 
+                  src={prescription.image} 
+                  alt={prescription.name}
+                  className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                />
               )}
             </div>
 
