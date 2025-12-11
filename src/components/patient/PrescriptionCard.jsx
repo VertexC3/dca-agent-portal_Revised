@@ -142,6 +142,11 @@ export default function PrescriptionCard({ prescription }) {
               <p className="text-gray-600">
                 <strong>Dosage:</strong> {prescription.dosage}
               </p>
+              {prescription.quantity && (
+                <p className="text-gray-600">
+                  <strong>Quantity:</strong> {prescription.quantity} units
+                </p>
+              )}
               <p className="text-gray-600">
                 <strong>Date Written:</strong> {prescription.dateWritten ? format(new Date(prescription.dateWritten), 'MMM d, yyyy') : 'N/A'}
               </p>
