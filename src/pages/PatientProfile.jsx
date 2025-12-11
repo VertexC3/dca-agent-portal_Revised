@@ -12,6 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import OrderHistory from '../components/patient/OrderHistory';
 import CollapsibleOrderHistory from '../components/patient/CollapsibleOrderHistory';
 import PaymentManagement from '../components/patient/PaymentManagement';
+import PrescriptionHistory from '../components/patient/PrescriptionHistory';
 
 export default function PatientProfile() {
   const queryClient = useQueryClient();
@@ -188,6 +189,13 @@ export default function PatientProfile() {
           >
             <CreditCard className="w-4 h-4 mr-2" />
             Payment
+          </TabsTrigger>
+          <TabsTrigger 
+            value="prescriptions"
+            className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-[#8B1F1F] rounded-none px-6 py-4"
+          >
+            <Pill className="w-4 h-4 mr-2" />
+            Prescription History
           </TabsTrigger>
           <TabsTrigger 
             value="orders"
@@ -470,10 +478,14 @@ export default function PatientProfile() {
           <PaymentManagement user={user} />
         </TabsContent>
 
+        <TabsContent value="prescriptions" className="p-8">
+          <PrescriptionHistory />
+        </TabsContent>
+
         <TabsContent value="orders" className="p-8" id="orders">
           <CollapsibleOrderHistory limit={null} showSeeAll={false} />
         </TabsContent>
-      </Tabs>
+        </Tabs>
     </div>
   );
 }
