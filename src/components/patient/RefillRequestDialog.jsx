@@ -148,7 +148,7 @@ DCA Pharmacy Team`
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-white">
+      <DialogContent className="max-w-md bg-white max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Request Refill</DialogTitle>
         </DialogHeader>
