@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Loader2, CheckCircle, Pill, CreditCard, Plus, Trash2, MapPin, Star } from 'lucide-react';
+import { Loader2, CheckCircle, Pill, CreditCard, Plus, Trash2, MapPin, Star, DollarSign } from 'lucide-react';
 
 export default function RefillRequestDialog({ open, onClose, prescription }) {
   const [deliveryMethod, setDeliveryMethod] = useState('pickup');
@@ -20,7 +20,11 @@ export default function RefillRequestDialog({ open, onClose, prescription }) {
   const [saveCard, setSaveCard] = useState(false);
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [newAddress, setNewAddress] = useState({ name: 'Home', address: '', is_primary: false });
+  const [payAtPharmacy, setPayAtPharmacy] = useState(false);
   const queryClient = useQueryClient();
+
+  // Calculate estimated cost (base $15 for medications, plus $5 for delivery)
+  const estimatedCost = deliveryMethod === 'pickup' ? 15.00 : 20.00;
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
@@ -328,58 +332,89 @@ DCA Pharmacy Team`
               />
             </div>
 
-            <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="p-3 bg-blue-50 rounded-lg border border-blue-200 space-y-2">
               <p className="text-xs text-gray-700">
                 <strong>Expected Ready Time:</strong><br />
                 {deliveryMethod === 'pickup' 
                   ? '2-4 hours for pickup'
                   : '2-3 business days for delivery'}
               </p>
+              <div className="pt-2 border-t border-blue-200">
+                <p className="text-xs text-gray-700 flex items-center gap-1">
+                  <DollarSign className="w-3 h-3" />
+                  <strong>Estimated Cost:</strong> ${estimatedCost.toFixed(2)}
+                </p>
+                {deliveryMethod === 'delivery' && (
+                  <p className="text-xs text-gray-500 mt-1">Includes $5.00 delivery fee</p>
+                )}
+              </div>
             </div>
 
             {/* Payment Section */}
             <div className="border-t pt-4">
-              <Button
-                variant="outline"
-                onClick={() => setShowPayment(!showPayment)}
-                className="w-full mb-3"
-              >
-                <CreditCard className="w-4 h-4 mr-2" />
-                {showPayment ? 'Hide Payment' : 'Add Payment Method'}
-              </Button>
-
-              {showPayment && (
-                <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
-                  <div>
-                    <Label>Card Number</Label>
-                    <Input
-                      value={cardNumber}
-                      onChange={(e) => setCardNumber(e.target.value)}
-                      placeholder="1234 5678 9012 3456"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label>Expiry Date</Label>
-                      <Input placeholder="MM/YY" className="mt-1" />
-                    </div>
-                    <div>
-                      <Label>CVV</Label>
-                      <Input placeholder="123" className="mt-1" />
-                    </div>
-                  </div>
+              {deliveryMethod === 'pickup' && (
+                <div className="mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
                   <div className="flex items-center gap-2">
                     <Checkbox
-                      id="save-card"
-                      checked={saveCard}
-                      onCheckedChange={setSaveCard}
+                      id="pay-at-pharmacy"
+                      checked={payAtPharmacy}
+                      onCheckedChange={(checked) => {
+                        setPayAtPharmacy(checked);
+                        if (checked) setShowPayment(false);
+                      }}
                     />
-                    <label htmlFor="save-card" className="text-sm text-gray-700 cursor-pointer">
-                      Save card for future purchases
+                    <label htmlFor="pay-at-pharmacy" className="text-sm text-gray-700 cursor-pointer font-medium">
+                      Pay at Pharmacy
                     </label>
                   </div>
                 </div>
+              )}
+
+              {!payAtPharmacy && (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowPayment(!showPayment)}
+                    className="w-full mb-3"
+                  >
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    {showPayment ? 'Hide Payment' : 'Add Payment Method'}
+                  </Button>
+
+                  {showPayment && (
+                    <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+                      <div>
+                        <Label>Card Number</Label>
+                        <Input
+                          value={cardNumber}
+                          onChange={(e) => setCardNumber(e.target.value)}
+                          placeholder="1234 5678 9012 3456"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label>Expiry Date</Label>
+                          <Input placeholder="MM/YY" className="mt-1" />
+                        </div>
+                        <div>
+                          <Label>CVV</Label>
+                          <Input placeholder="123" className="mt-1" />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          id="save-card"
+                          checked={saveCard}
+                          onCheckedChange={setSaveCard}
+                        />
+                        <label htmlFor="save-card" className="text-sm text-gray-700 cursor-pointer">
+                          Save card for future purchases
+                        </label>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
