@@ -150,10 +150,7 @@ DCA Pharmacy Team`
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md bg-white">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Pill className="w-5 h-5 text-[#8B1F1F]" />
-            Request Refill
-          </DialogTitle>
+          <DialogTitle>Request Refill</DialogTitle>
         </DialogHeader>
 
         {submitted ? (
