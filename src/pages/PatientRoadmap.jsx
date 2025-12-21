@@ -301,9 +301,9 @@ export default function PatientRoadmap() {
       {/* List View */}
       {viewMode === 'list' && (
         <div className="bg-white rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto max-h-[calc(100vh-300px)] relative">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
                 <tr>
                   <th className="px-6 py-3 text-left">
                     <button
@@ -365,9 +365,30 @@ export default function PatientRoadmap() {
                   return (
                     <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">
-                        <Badge className={`${phaseColors[item.phase]} border text-gray-800 font-medium`}>
-                          {item.phase}
-                        </Badge>
+                        {isAdmin ? (
+                          <Select 
+                            value={item.phase} 
+                            onValueChange={(value) => {
+                              updateMutation.mutate({ 
+                                id: item.id, 
+                                data: { ...item, phase: value }
+                              });
+                            }}
+                          >
+                            <SelectTrigger className={`w-32 ${phaseColors[item.phase]} border font-medium`}>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {phases.map(phase => (
+                                <SelectItem key={phase} value={phase}>{phase}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Badge className={`${phaseColors[item.phase]} border text-gray-800 font-medium`}>
+                            {item.phase}
+                          </Badge>
+                        )}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">
                         {item.phase_date || 'TBD'}
