@@ -10,13 +10,13 @@ export default function FillHistoryDialog({ open, onClose, prescription }) {
 
   if (!prescription) return null;
 
-  // Dummy fill history data with receipt URLs
+  // Dummy fill history data with receipt URLs and RX numbers
   const fillHistory = [
-    { date: '2025-11-01', quantity: 30, prescriber: prescription.prescriber, pharmacy: 'DCA Pharmacy - Main', status: 'Completed', receipt_url: 'https://images.unsplash.com/photo-1554224311-beee460c201a?w=400' },
-    { date: '2025-10-01', quantity: 30, prescriber: prescription.prescriber, pharmacy: 'DCA Pharmacy - Main', status: 'Completed', receipt_url: 'https://images.unsplash.com/photo-1554224311-beee460c201a?w=400' },
-    { date: '2025-09-01', quantity: 30, prescriber: prescription.prescriber, pharmacy: 'DCA Pharmacy - Main', status: 'Completed', receipt_url: 'https://images.unsplash.com/photo-1554224311-beee460c201a?w=400' },
-    { date: '2025-08-01', quantity: 30, prescriber: prescription.prescriber, pharmacy: 'DCA Pharmacy - Main', status: 'Completed' },
-    { date: '2025-07-01', quantity: 30, prescriber: prescription.prescriber, pharmacy: 'DCA Pharmacy - Main', status: 'Completed' }
+    { date: '2025-11-01', quantity: 30, prescriber: prescription.prescriber, rx_number: 'RX-2025-89432', status: 'Completed', receipt_url: 'https://images.unsplash.com/photo-1554224311-beee460c201a?w=400' },
+    { date: '2025-10-01', quantity: 30, prescriber: prescription.prescriber, rx_number: 'RX-2025-76521', status: 'Completed', receipt_url: 'https://images.unsplash.com/photo-1554224311-beee460c201a?w=400' },
+    { date: '2025-09-01', quantity: 30, prescriber: prescription.prescriber, rx_number: 'RX-2025-63410', status: 'Completed', receipt_url: 'https://images.unsplash.com/photo-1554224311-beee460c201a?w=400' },
+    { date: '2025-08-01', quantity: 30, prescriber: prescription.prescriber, rx_number: 'RX-2025-51299', status: 'Completed' },
+    { date: '2025-07-01', quantity: 30, prescriber: prescription.prescriber, rx_number: 'RX-2025-42188', status: 'Completed' }
   ];
 
   return (
@@ -58,7 +58,7 @@ export default function FillHistoryDialog({ open, onClose, prescription }) {
                       </p>
                       <p className="text-sm text-gray-600 flex items-center gap-1 mt-1">
                         <Package className="w-3 h-3" />
-                        {fill.pharmacy}
+                        {fill.rx_number}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">Quantity: {fill.quantity} tablets</p>
                     </div>
@@ -103,7 +103,7 @@ export default function FillHistoryDialog({ open, onClose, prescription }) {
                 />
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <p className="text-sm text-gray-600">
-                    <strong>Pharmacy:</strong> {selectedReceipt.pharmacy}
+                    <strong>RX Number:</strong> {selectedReceipt.rx_number}
                   </p>
                   <p className="text-sm text-gray-600">
                     <strong>Quantity:</strong> {selectedReceipt.quantity} tablets

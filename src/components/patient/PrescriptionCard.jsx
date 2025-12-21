@@ -105,10 +105,6 @@ export default function PrescriptionCard({ prescription }) {
                       Payment
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem onClick={() => setShowOrders(true)}>
-                    <Package className="w-4 h-4 mr-2" />
-                    Orders
-                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setShowHistory(true)}>
                     <History className="w-4 h-4 mr-2" />
                     Fill History
@@ -134,7 +130,7 @@ export default function PrescriptionCard({ prescription }) {
                 <strong>Prescriber:</strong> 
                 <button 
                   onClick={() => setShowPrescriberProfile(true)}
-                  className="ml-1 text-[#8B1F1F] hover:underline font-medium"
+                  className="ml-1 text-blue-600 hover:underline font-medium"
                 >
                   {prescription.prescriber}
                 </button>
