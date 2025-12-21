@@ -417,15 +417,40 @@ export default function PatientRoadmap() {
                         {item.description || '-'}
                       </td>
                       <td className="px-6 py-4">
-                        <Badge 
-                          className={`text-xs ${
-                            item.status === 'completed' ? 'bg-green-100 text-green-800' :
-                            item.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}
-                        >
-                          {item.status.replace('_', ' ')}
-                        </Badge>
+                        {isAdmin ? (
+                          <Select 
+                            value={item.status} 
+                            onValueChange={(value) => {
+                              updateMutation.mutate({ 
+                                id: item.id, 
+                                data: { ...item, status: value }
+                              });
+                            }}
+                          >
+                            <SelectTrigger className={`w-32 text-xs ${
+                              item.status === 'completed' ? 'bg-green-100 text-green-800 border-green-200' :
+                              item.status === 'in_progress' ? 'bg-blue-100 text-blue-800 border-blue-200' :
+                              'bg-gray-100 text-gray-800 border-gray-200'
+                            }`}>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="planned">Planned</SelectItem>
+                              <SelectItem value="in_progress">In Progress</SelectItem>
+                              <SelectItem value="completed">Completed</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Badge 
+                            className={`text-xs ${
+                              item.status === 'completed' ? 'bg-green-100 text-green-800' :
+                              item.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}
+                          >
+                            {item.status.replace('_', ' ')}
+                          </Badge>
+                        )}
                       </td>
                       {isAdmin && (
                         <td className="px-6 py-4">
