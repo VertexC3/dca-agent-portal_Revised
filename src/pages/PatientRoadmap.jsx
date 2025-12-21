@@ -137,15 +137,32 @@ export default function PatientRoadmap() {
           <h1 className="text-4xl font-bold text-gray-800 mb-2">Product Roadmap</h1>
           <p className="text-gray-600">See what we're building for you</p>
         </div>
-        {isAdmin && (
-          <Button
-            onClick={() => setShowAdminDialog(true)}
-            className="bg-[#8B1F1F] hover:bg-[#721919] text-white"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Item
-          </Button>
-        )}
+        <div className="flex items-center gap-4">
+          {/* Status Legend */}
+          <div className="flex items-center gap-4 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-green-600" />
+              <span className="text-sm text-gray-600">Completed</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-blue-600" />
+              <span className="text-sm text-gray-600">In Progress</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-gray-400" />
+              <span className="text-sm text-gray-600">Planned</span>
+            </div>
+          </div>
+          {isAdmin && (
+            <Button
+              onClick={() => setShowAdminDialog(true)}
+              className="bg-[#8B1F1F] hover:bg-[#721919] text-white"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Item
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Horizontal Timeline */}
@@ -228,25 +245,6 @@ export default function PatientRoadmap() {
               )}
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Legend */}
-      <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-        <p className="text-sm font-semibold text-gray-700 mb-2">Status Legend:</p>
-        <div className="flex flex-wrap gap-4">
-          <div className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-green-600" />
-            <span className="text-sm text-gray-600">Completed</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-blue-600" />
-            <span className="text-sm text-gray-600">In Progress</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-gray-400" />
-            <span className="text-sm text-gray-600">Planned</span>
-          </div>
         </div>
       </div>
 
