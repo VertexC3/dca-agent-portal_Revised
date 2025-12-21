@@ -391,7 +391,21 @@ export default function PatientRoadmap() {
                         )}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">
-                        {item.phase_date || 'TBD'}
+                        {isAdmin ? (
+                          <Input
+                            value={item.phase_date || ''}
+                            onChange={(e) => {
+                              updateMutation.mutate({ 
+                                id: item.id, 
+                                data: { ...item, phase_date: e.target.value }
+                              });
+                            }}
+                            placeholder="e.g., Q3 2026"
+                            className="w-32 h-8"
+                          />
+                        ) : (
+                          item.phase_date || 'TBD'
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
