@@ -16,6 +16,7 @@ import Roadmap from './pages/Roadmap';
 import PrescriptionTrends from './pages/PrescriptionTrends';
 import PatientSettings from './pages/PatientSettings';
 import PatientLogin from './pages/PatientLogin';
+import PatientRoadmap from './pages/PatientRoadmap';
 import __Layout from './Layout.jsx';
 
 
@@ -38,6 +39,7 @@ export const PAGES = {
     "PrescriptionTrends": PrescriptionTrends,
     "PatientSettings": PatientSettings,
     "PatientLogin": PatientLogin,
+    "PatientRoadmap": PatientRoadmap,
 }
 
 export const pagesConfig = {
