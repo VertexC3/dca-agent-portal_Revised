@@ -1,7 +1,5 @@
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
-import { MessageSquare, Phone, Mail, Bot, Loader2 } from 'lucide-react';
+import { MessageSquare, Phone, Mail, Bot } from 'lucide-react';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
@@ -27,28 +25,47 @@ const statusColors = {
   resolved: 'bg-green-50 text-green-700 border-green-200'
 };
 
-export default function PatientCommunications() {
-  const { data: user } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
-  });
-
-  const { data: communications = [], isLoading } = useQuery({
-    queryKey: ['patient-communications'],
-    queryFn: async () => {
-      const allComms = await base44.entities.PatientCommunication.list('-timestamp', 1000);
-      return allComms.filter(c => c.patient_email === user?.email);
-    },
-    enabled: !!user
-  });
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-12 h-12 text-[#8B1F1F] animate-spin" />
-      </div>
-    );
+// Mock communications data
+const mockCommunications = [
+  {
+    id: '1',
+    request_type: 'prescription_refill',
+    channel: 'email',
+    message_content: 'I would like to request a refill for my Lisinopril prescription.',
+    timestamp: '2025-11-15T10:30:00Z',
+    status: 'resolved',
+    response_sent: 'Your refill has been processed and is ready for pickup.'
+  },
+  {
+    id: '2',
+    request_type: 'delivery_status',
+    channel: 'phone',
+    message_content: 'Could you please check the status of my recent order?',
+    timestamp: '2025-11-12T14:20:00Z',
+    status: 'resolved',
+    response_sent: 'Your order is currently out for delivery and should arrive today.'
+  },
+  {
+    id: '3',
+    request_type: 'billing_question',
+    channel: 'text',
+    message_content: 'I have a question about my recent invoice.',
+    timestamp: '2025-11-10T09:15:00Z',
+    status: 'in_progress'
+  },
+  {
+    id: '4',
+    request_type: 'medication_inquiry',
+    channel: 'ai_agent',
+    message_content: 'What are the side effects of Metformin?',
+    timestamp: '2025-11-08T16:45:00Z',
+    status: 'resolved',
+    response_sent: 'Common side effects include nausea, diarrhea, and stomach upset. Please consult your doctor if symptoms persist.'
   }
+];
+
+export default function PatientCommunications() {
+  const communications = mockCommunications;
 
   return (
     <div className="space-y-6">

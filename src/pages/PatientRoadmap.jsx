@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
-import { MapPin, Plus, Edit2, Trash2, Loader2, CheckCircle, Clock, Calendar, LayoutGrid, List, ArrowUpDown } from 'lucide-react';
+import { MapPin, CheckCircle, Clock, Calendar, LayoutGrid, List, ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -25,87 +23,70 @@ const statusIcons = {
   planned: { icon: MapPin, color: 'text-gray-400' }
 };
 
-export default function PatientRoadmap() {
-  const [showAdminDialog, setShowAdminDialog] = useState(false);
-  const [editingItem, setEditingItem] = useState(null);
-  const [viewMode, setViewMode] = useState('tile'); // 'tile' or 'list'
-  const [sortConfig, setSortConfig] = useState({ key: 'phase', direction: 'asc' });
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
+// Mock roadmap data
+const mockRoadmapItems = [
+  {
+    id: '1',
+    title: 'Messaging Center',
+    description: 'Enable direct messages between patients and DCA customer service.',
     phase: 'Phase 1',
-    phase_date: '',
+    phase_date: 'Q1 2026',
     status: 'planned',
     order: 0
-  });
-  const queryClient = useQueryClient();
+  },
+  {
+    id: '2',
+    title: 'Appointment Booking System',
+    description: 'Book appointments with healthcare providers directly through the portal.',
+    phase: 'Phase 3',
+    phase_date: 'Q2 2026',
+    status: 'planned',
+    order: 1
+  },
+  {
+    id: '3',
+    title: 'Medication Adherence Tracker',
+    description: 'Log medication intake, set smart reminders, and view comprehensive adherence reports.',
+    phase: 'Phase 3',
+    phase_date: 'Q3 2026',
+    status: 'planned',
+    order: 2
+  },
+  {
+    id: '4',
+    title: 'Secure Medical Document Hub',
+    description: 'Upload, store, and securely access all your personal medical records.',
+    phase: 'Phase 3',
+    phase_date: 'Q3 2026',
+    status: 'planned',
+    order: 3
+  },
+  {
+    id: '5',
+    title: 'Virtual Consultation Integration',
+    description: 'Book and conduct secure video consultations with healthcare providers.',
+    phase: 'Phase 3',
+    phase_date: 'Q3 2026',
+    status: 'planned',
+    order: 4
+  },
+  {
+    id: '6',
+    title: 'Family Health Management',
+    description: "Manage multiple family members' health from a single account.",
+    phase: 'Phase 3',
+    phase_date: 'Q3 2026',
+    status: 'planned',
+    order: 5
+  }
+];
 
-  const { data: user } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
-  });
+export default function PatientRoadmap() {
+  const [viewMode, setViewMode] = useState('tile');
+  const [sortConfig, setSortConfig] = useState({ key: 'phase', direction: 'asc' });
+  const roadmapItems = mockRoadmapItems;
 
-  const { data: roadmapItems = [], isLoading } = useQuery({
-    queryKey: ['patient-roadmap'],
-    queryFn: () => base44.entities.PatientRoadmapItem.list('order', 100)
-  });
 
-  const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.PatientRoadmapItem.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['patient-roadmap']);
-      handleCloseDialog();
-    }
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.PatientRoadmapItem.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['patient-roadmap']);
-      handleCloseDialog();
-    }
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.PatientRoadmapItem.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['patient-roadmap']);
-    }
-  });
-
-  const handleCloseDialog = () => {
-    setShowAdminDialog(false);
-    setEditingItem(null);
-    setFormData({
-      title: '',
-      description: '',
-      phase: 'Phase 1',
-      phase_date: '',
-      status: 'planned',
-      order: 0
-    });
-  };
-
-  const handleEdit = (item) => {
-    setEditingItem(item);
-    setFormData({
-      title: item.title,
-      description: item.description || '',
-      phase: item.phase,
-      phase_date: item.phase_date || '',
-      status: item.status,
-      order: item.order || 0
-    });
-    setShowAdminDialog(true);
-  };
-
-  const handleSubmit = () => {
-    if (editingItem) {
-      updateMutation.mutate({ id: editingItem.id, data: formData });
-    } else {
-      createMutation.mutate(formData);
-    }
-  };
 
   // Group items by phase
   const phases = ['Phase 1', 'Phase 2', 'Phase 3', 'Phase 4', 'Phase 5', 'Future'];
@@ -120,8 +101,6 @@ export default function PatientRoadmap() {
     acc[phase] = items.length > 0 ? items[0].phase_date || 'TBD' : 'TBD';
     return acc;
   }, {});
-
-  const isAdmin = user?.role === 'admin';
 
   // Sort function for list view
   const handleSort = (key) => {
@@ -143,14 +122,6 @@ export default function PatientRoadmap() {
     if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
     return 0;
   });
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-12 h-12 text-[#8B1F1F] animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -199,16 +170,6 @@ export default function PatientRoadmap() {
               <List className="w-4 h-4" />
             </button>
           </div>
-          
-          {isAdmin && (
-            <Button
-              onClick={() => setShowAdminDialog(true)}
-              className="bg-[#8B1F1F] hover:bg-[#721919] text-white"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Add Item
-            </Button>
-          )}
         </div>
       </div>
       </div>
@@ -244,26 +205,6 @@ export default function PatientRoadmap() {
                             <StatusIcon className={`w-4 h-4 ${statusColor} flex-shrink-0`} />
                             <h4 className="font-semibold text-sm text-gray-800">{item.title}</h4>
                           </div>
-                          {isAdmin && (
-                            <div className="flex items-center gap-1">
-                              <button
-                                onClick={() => handleEdit(item)}
-                                className="p-1 hover:bg-gray-100 rounded transition-colors"
-                              >
-                                <Edit2 className="w-3 h-3 text-gray-600" />
-                              </button>
-                              <button
-                                onClick={() => {
-                                  if (confirm('Delete this roadmap item?')) {
-                                    deleteMutation.mutate(item.id);
-                                  }
-                                }}
-                                className="p-1 hover:bg-gray-100 rounded transition-colors"
-                              >
-                                <Trash2 className="w-3 h-3 text-red-600" />
-                              </button>
-                            </div>
-                          )}
                         </div>
                         {item.description && (
                           <p className="text-xs text-gray-600 line-clamp-3">{item.description}</p>
@@ -365,47 +306,12 @@ export default function PatientRoadmap() {
                   return (
                     <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">
-                        {isAdmin ? (
-                          <Select 
-                            value={item.phase} 
-                            onValueChange={(value) => {
-                              updateMutation.mutate({ 
-                                id: item.id, 
-                                data: { ...item, phase: value }
-                              });
-                            }}
-                          >
-                            <SelectTrigger className={`w-32 ${phaseColors[item.phase]} border font-medium`}>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {phases.map(phase => (
-                                <SelectItem key={phase} value={phase}>{phase}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <Badge className={`${phaseColors[item.phase]} border text-gray-800 font-medium`}>
-                            {item.phase}
-                          </Badge>
-                        )}
+                        <Badge className={`${phaseColors[item.phase]} border text-gray-800 font-medium`}>
+                          {item.phase}
+                        </Badge>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">
-                        {isAdmin ? (
-                          <Input
-                            value={item.phase_date || ''}
-                            onChange={(e) => {
-                              updateMutation.mutate({ 
-                                id: item.id, 
-                                data: { ...item, phase_date: e.target.value }
-                              });
-                            }}
-                            placeholder="e.g., Q3 2026"
-                            className="w-32 h-8"
-                          />
-                        ) : (
-                          item.phase_date || 'TBD'
-                        )}
+                        {item.phase_date || 'TBD'}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
@@ -417,65 +323,16 @@ export default function PatientRoadmap() {
                         {item.description || '-'}
                       </td>
                       <td className="px-6 py-4">
-                        {isAdmin ? (
-                          <Select 
-                            value={item.status} 
-                            onValueChange={(value) => {
-                              updateMutation.mutate({ 
-                                id: item.id, 
-                                data: { ...item, status: value }
-                              });
-                            }}
-                          >
-                            <SelectTrigger className={`w-32 text-xs ${
-                              item.status === 'completed' ? 'bg-green-100 text-green-800 border-green-200' :
-                              item.status === 'in_progress' ? 'bg-blue-100 text-blue-800 border-blue-200' :
-                              'bg-gray-100 text-gray-800 border-gray-200'
-                            }`}>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="planned">Planned</SelectItem>
-                              <SelectItem value="in_progress">In Progress</SelectItem>
-                              <SelectItem value="completed">Completed</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <Badge 
-                            className={`text-xs ${
-                              item.status === 'completed' ? 'bg-green-100 text-green-800' :
-                              item.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                              'bg-gray-100 text-gray-800'
-                            }`}
-                          >
-                            {item.status.replace('_', ' ')}
-                          </Badge>
-                        )}
+                        <Badge 
+                          className={`text-xs ${
+                            item.status === 'completed' ? 'bg-green-100 text-green-800' :
+                            item.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}
+                        >
+                          {item.status.replace('_', ' ')}
+                        </Badge>
                       </td>
-                      {isAdmin && (
-                        <td className="px-6 py-4">
-                          <div className="flex items-center justify-center gap-2">
-                            <button
-                              onClick={() => handleEdit(item)}
-                              className="p-2 hover:bg-gray-100 rounded transition-colors"
-                              title="Edit"
-                            >
-                              <Edit2 className="w-4 h-4 text-gray-600" />
-                            </button>
-                            <button
-                              onClick={() => {
-                                if (confirm('Delete this roadmap item?')) {
-                                  deleteMutation.mutate(item.id);
-                                }
-                              }}
-                              className="p-2 hover:bg-gray-100 rounded transition-colors"
-                              title="Delete"
-                            >
-                              <Trash2 className="w-4 h-4 text-red-600" />
-                            </button>
-                          </div>
-                        </td>
-                      )}
                     </tr>
                   );
                 })}
@@ -483,105 +340,6 @@ export default function PatientRoadmap() {
             </table>
           </div>
         </div>
-      )}
-
-      {/* Admin Dialog */}
-      {isAdmin && (
-        <Dialog open={showAdminDialog} onOpenChange={handleCloseDialog}>
-          <DialogContent className="max-w-md bg-white">
-            <DialogHeader>
-              <DialogTitle>{editingItem ? 'Edit Roadmap Item' : 'Add Roadmap Item'}</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label>Title</Label>
-                <Input
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Feature name"
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label>Description</Label>
-                <Textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Brief description of the feature"
-                  className="mt-1"
-                  rows={3}
-                />
-              </div>
-              <div>
-                <Label>Phase</Label>
-                <Select value={formData.phase} onValueChange={(value) => setFormData({ ...formData, phase: value })}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {phases.map(phase => (
-                      <SelectItem key={phase} value={phase}>{phase}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Phase Date/Timeframe</Label>
-                <Input
-                  value={formData.phase_date}
-                  onChange={(e) => setFormData({ ...formData, phase_date: e.target.value })}
-                  placeholder="e.g., Q1 2026, January 2026"
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label>Status</Label>
-                <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="planned">Planned</SelectItem>
-                    <SelectItem value="in_progress">In Progress</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Display Order</Label>
-                <Input
-                  type="number"
-                  value={formData.order}
-                  onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-                  className="mt-1"
-                />
-              </div>
-              <div className="flex gap-2 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={handleCloseDialog}
-                  className="flex-1"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleSubmit}
-                  disabled={!formData.title || createMutation.isPending || updateMutation.isPending}
-                  className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white"
-                >
-                  {createMutation.isPending || updateMutation.isPending ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    'Save'
-                  )}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
       )}
     </div>
   );
