@@ -31,6 +31,14 @@ export default function Layout({ children, currentPageName }) {
     document.title = "DCA Pharmacy - Patient Portal";
   }, []);
 
+  // Redirect to PatientDashboard if on a non-patient page
+  React.useEffect(() => {
+    const patientPages = ['PatientDashboard', 'PatientProfile', 'PatientMessages', 'PatientCommunications', 'Prescriptions', 'PatientRoadmap', 'PatientSettings'];
+    if (!patientPages.includes(currentPageName)) {
+      window.location.href = createPageUrl('PatientDashboard');
+    }
+  }, [currentPageName]);
+
   React.useEffect(() => {
     if (isChatbotOpen) {
       const container = document.getElementById('chatbot-container');
