@@ -1,45 +1,47 @@
-import Dashboard from './pages/Dashboard';
-import DailyView from './pages/DailyView';
-import CommunicationDetail from './pages/CommunicationDetail';
-import Settings from './pages/Settings';
-import Communications from './pages/Communications';
-import Analytics from './pages/Analytics';
 import AITraining from './pages/AITraining';
+import Analytics from './pages/Analytics';
 import Automation from './pages/Automation';
-import PatientDashboard from './pages/PatientDashboard';
-import PatientProfile from './pages/PatientProfile';
+import CommunicationDetail from './pages/CommunicationDetail';
+import Communications from './pages/Communications';
+import DailyView from './pages/DailyView';
+import Dashboard from './pages/Dashboard';
+import Home from './pages/Home';
 import PatientCommunications from './pages/PatientCommunications';
+import PatientDashboard from './pages/PatientDashboard';
+import PatientLogin from './pages/PatientLogin';
 import PatientMessages from './pages/PatientMessages';
-import StaffMessaging from './pages/StaffMessaging';
+import PatientProfile from './pages/PatientProfile';
+import PatientRoadmap from './pages/PatientRoadmap';
+import PatientSettings from './pages/PatientSettings';
+import PrescriptionTrends from './pages/PrescriptionTrends';
 import Prescriptions from './pages/Prescriptions';
 import Roadmap from './pages/Roadmap';
-import PrescriptionTrends from './pages/PrescriptionTrends';
-import PatientSettings from './pages/PatientSettings';
-import PatientLogin from './pages/PatientLogin';
-import PatientRoadmap from './pages/PatientRoadmap';
+import Settings from './pages/Settings';
+import StaffMessaging from './pages/StaffMessaging';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Dashboard": Dashboard,
-    "DailyView": DailyView,
-    "CommunicationDetail": CommunicationDetail,
-    "Settings": Settings,
-    "Communications": Communications,
-    "Analytics": Analytics,
     "AITraining": AITraining,
+    "Analytics": Analytics,
     "Automation": Automation,
-    "PatientDashboard": PatientDashboard,
-    "PatientProfile": PatientProfile,
+    "CommunicationDetail": CommunicationDetail,
+    "Communications": Communications,
+    "DailyView": DailyView,
+    "Dashboard": Dashboard,
+    "Home": Home,
     "PatientCommunications": PatientCommunications,
+    "PatientDashboard": PatientDashboard,
+    "PatientLogin": PatientLogin,
     "PatientMessages": PatientMessages,
-    "StaffMessaging": StaffMessaging,
+    "PatientProfile": PatientProfile,
+    "PatientRoadmap": PatientRoadmap,
+    "PatientSettings": PatientSettings,
+    "PrescriptionTrends": PrescriptionTrends,
     "Prescriptions": Prescriptions,
     "Roadmap": Roadmap,
-    "PrescriptionTrends": PrescriptionTrends,
-    "PatientSettings": PatientSettings,
-    "PatientLogin": PatientLogin,
-    "PatientRoadmap": PatientRoadmap,
+    "Settings": Settings,
+    "StaffMessaging": StaffMessaging,
 }
 
 export const pagesConfig = {
