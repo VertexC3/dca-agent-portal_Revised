@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
-import { User, Mail, Phone, MapPin, Calendar, Save, Loader2, Plus, Trash2, Package, Star, CreditCard, Pill } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar, Save, Plus, Trash2, Package, Star, CreditCard, Pill } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,88 +12,59 @@ import CollapsibleOrderHistory from '../components/patient/CollapsibleOrderHisto
 import PaymentManagement from '../components/patient/PaymentManagement';
 import PrescriptionHistory from '../components/patient/PrescriptionHistory';
 
+// Mock user data
+const mockUser = {
+  full_name: "John Doe",
+  email: "john.doe@example.com",
+  phone: "(555) 123-4567",
+  date_of_birth: "1985-06-15",
+  addresses: [
+    {
+      name: 'Home',
+      address: '123 Main St, Springfield, IL 62701',
+      delivery_days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      delivery_time: '9:00 AM - 5:00 PM',
+      is_primary: true
+    }
+  ],
+  allergies: 'Penicillin, Peanuts',
+  current_medications: 'Lisinopril 10mg, Metformin 500mg',
+  known_conditions: 'Hypertension, Type 2 Diabetes',
+  emergency_contact_name: 'Jane Doe',
+  emergency_contact_phone: '(555) 987-6543',
+  profile_picture: null
+};
+
 export default function PatientProfile() {
-  const queryClient = useQueryClient();
-  const [uploadingImage, setUploadingImage] = useState(false);
-
-  const { data: user, isLoading } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
-  });
-
+  const [user, setUser] = useState(mockUser);
   const [profileData, setProfileData] = useState({
-    full_name: '',
-    email: '',
-    phone: '',
-    date_of_birth: '',
-    current_address: '',
-    addresses: [],
-    additional_addresses: [],
-    allergies: '',
-    current_medications: '',
-    known_conditions: '',
-    emergency_contact_name: '',
-    emergency_contact_phone: ''
-  });
-
-  React.useEffect(() => {
-    if (user) {
-      // Migrate old addresses to new format if needed
-      let addresses = user.addresses || [];
-      if (!addresses.length && user.current_address) {
-        addresses = [{
-          name: 'Home',
-          address: user.current_address,
-          delivery_days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-          delivery_time: '9:00 AM - 5:00 PM'
-        }];
-      }
-      
-      setProfileData({
-        full_name: user.full_name || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        date_of_birth: user.date_of_birth || '',
-        current_address: user.current_address || '',
-        addresses: addresses,
-        additional_addresses: user.additional_addresses || [],
-        allergies: user.allergies || '',
-        current_medications: user.current_medications || '',
-        known_conditions: user.known_conditions || '',
-        emergency_contact_name: user.emergency_contact_name || '',
-        emergency_contact_phone: user.emergency_contact_phone || ''
-      });
-    }
-  }, [user]);
-
-  const updateMutation = useMutation({
-    mutationFn: (data) => base44.auth.updateMe(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['currentUser']);
-      alert('Profile updated successfully!');
-    }
+    full_name: mockUser.full_name,
+    email: mockUser.email,
+    phone: mockUser.phone,
+    date_of_birth: mockUser.date_of_birth,
+    addresses: mockUser.addresses,
+    allergies: mockUser.allergies,
+    current_medications: mockUser.current_medications,
+    known_conditions: mockUser.known_conditions,
+    emergency_contact_name: mockUser.emergency_contact_name,
+    emergency_contact_phone: mockUser.emergency_contact_phone
   });
 
   const handleSave = () => {
-    updateMutation.mutate(profileData);
+    setUser({ ...user, ...profileData });
+    alert('Profile updated successfully!');
   };
 
-  const handleImageUpload = async (e) => {
+  const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
-    setUploadingImage(true);
-    try {
-      const result = await base44.integrations.Core.UploadFile({ file });
-      await base44.auth.updateMe({ profile_picture: result.file_url });
-      queryClient.invalidateQueries(['currentUser']);
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setUser({ ...user, profile_picture: event.target.result });
       alert('Profile picture updated successfully!');
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      alert('Failed to upload profile picture');
-    } finally {
-      setUploadingImage(false);
-    }
+    };
+    reader.readAsDataURL(file);
   };
 
   const addAddress = () => {
@@ -134,10 +103,8 @@ export default function PatientProfile() {
     const days = address.delivery_days || [];
     
     if (days.includes(day)) {
-      // Removing day - no validation needed
       address.delivery_days = days.filter(d => d !== day);
     } else {
-      // Check for overlap with other addresses
       const overlap = newAddresses.find((addr, idx) => 
         idx !== addressIndex && 
         addr.delivery_days?.includes(day)
@@ -158,14 +125,6 @@ export default function PatientProfile() {
     const newAddresses = profileData.addresses.filter((_, i) => i !== index);
     setProfileData({ ...profileData, addresses: newAddresses });
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="w-12 h-12 text-[#8B1F1F] animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
@@ -227,18 +186,13 @@ export default function PatientProfile() {
               onChange={handleImageUpload}
               className="hidden"
               id="profile-picture-upload"
-              disabled={uploadingImage}
-            />
-            <label
+              />
+              <label
               htmlFor="profile-picture-upload"
               className="absolute bottom-0 right-0 bg-[#8B1F1F] text-white p-2 rounded-full cursor-pointer hover:bg-[#721919] transition-all shadow-lg"
-            >
-              {uploadingImage ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <User className="w-5 h-5" />
-              )}
-            </label>
+              >
+              <User className="w-5 h-5" />
+              </label>
           </div>
           <p className="mt-3 text-sm text-gray-600">Click the icon to upload a profile picture</p>
         </div>
@@ -456,20 +410,10 @@ export default function PatientProfile() {
         <div className="pt-4">
           <Button
             onClick={handleSave}
-            disabled={updateMutation.isPending}
             className="w-full bg-[#8B1F1F] hover:bg-[#721919] text-white"
           >
-            {updateMutation.isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
-              </>
-            )}
+            <Save className="w-4 h-4 mr-2" />
+            Save Changes
           </Button>
         </div>
         </TabsContent>
