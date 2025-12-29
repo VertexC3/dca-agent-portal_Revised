@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
-import { ArrowLeft, Save, Loader2, Layout, Sliders } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, Save, Layout, Sliders } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import { Button } from '@/components/ui/button';
@@ -9,13 +7,6 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 
 export default function PatientSettings() {
-  const queryClient = useQueryClient();
-  
-  const { data: user, isLoading } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
-  });
-
   const [preferences, setPreferences] = useState({
     patient_pref_prescriptions: true,
     patient_pref_communications: true,
@@ -25,41 +16,9 @@ export default function PatientSettings() {
     patient_pref_messages_nav: true,
   });
 
-  useEffect(() => {
-    if (user) {
-      setPreferences({
-        patient_pref_prescriptions: user.patient_pref_prescriptions ?? true,
-        patient_pref_communications: user.patient_pref_communications ?? true,
-        patient_pref_quick_actions: user.patient_pref_quick_actions ?? true,
-        patient_pref_orders: user.patient_pref_orders ?? true,
-        patient_pref_prescriptions_nav: user.patient_pref_prescriptions_nav ?? true,
-        patient_pref_messages_nav: user.patient_pref_messages_nav ?? true,
-      });
-    }
-  }, [user]);
-
-  const updatePreferencesMutation = useMutation({
-    mutationFn: (data) => base44.auth.updateMe(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['currentUser']);
-      alert('Settings updated successfully!');
-    }
-  });
-
   const handleSave = () => {
-    updatePreferencesMutation.mutate(preferences);
+    alert('Settings updated successfully!');
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-lg">
-          <Loader2 className="w-12 h-12 text-[#8B1F1F] animate-spin mx-auto mb-4" />
-          <p className="text-gray-700 text-center">Loading settings...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -185,20 +144,10 @@ export default function PatientSettings() {
           <div className="pt-4">
             <Button
               onClick={handleSave}
-              disabled={updatePreferencesMutation.isPending}
               className="bg-[#8B1F1F] hover:bg-[#721919] text-white min-w-[150px]"
             >
-              {updatePreferencesMutation.isPending ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Changes
-                </>
-              )}
+              <Save className="w-4 h-4 mr-2" />
+              Save Changes
             </Button>
           </div>
 

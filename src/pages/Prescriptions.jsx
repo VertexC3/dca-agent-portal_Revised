@@ -1,14 +1,8 @@
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
-import { Pill, Loader2 } from 'lucide-react';
+import { Pill } from 'lucide-react';
 import PrescriptionCard from '../components/patient/PrescriptionCard';
 
 export default function Prescriptions() {
-  const { data: user } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
-  });
 
   // Full prescription history with different statuses
   const prescriptions = [
