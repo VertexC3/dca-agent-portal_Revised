@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { base44 } from '@/api/base44Client';
-import { Pill, MessageSquare, User, Loader2, Package, Filter, Calendar, FileText, CreditCard, Edit } from 'lucide-react';
+import { Pill, MessageSquare, User, Package, Filter, Calendar, FileText, CreditCard, Edit } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import { format } from 'date-fns';
@@ -15,27 +13,26 @@ import CollapsibleOrderHistory from '../components/patient/CollapsibleOrderHisto
 import RefillRequestDialog from '../components/patient/RefillRequestDialog';
 import SatisfactionSurveyAlert from '../components/patient/SatisfactionSurveyAlert';
 
+// Mock user data
+const mockUser = {
+  full_name: "John Doe",
+  email: "john.doe@example.com",
+  quick_actions: ['profile', 'communication', 'refill'],
+  patient_pref_prescriptions: true,
+  patient_pref_communications: true,
+  patient_pref_quick_actions: true,
+  patient_pref_orders: true,
+  survey_completed: false
+};
+
 export default function PatientDashboard() {
   const [showQuickRefill, setShowQuickRefill] = useState(false);
   const [prescriptionFilter, setPrescriptionFilter] = useState('Active');
   const [showEditActions, setShowEditActions] = useState(false);
   const [showSurveyAlert, setShowSurveyAlert] = useState(true);
-  const queryClient = useQueryClient();
-
-  const { data: user } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me()
-  });
-
-  const { data: featureFlags = [] } = useQuery({
-    queryKey: ['featureFlags'],
-    queryFn: () => base44.entities.FeatureFlag.list(),
-  });
-
-  const isFeatureEnabled = (key) => {
-    const flag = featureFlags.find(f => f.key === key);
-    return flag ? flag.is_enabled : true;
-  };
+  const [quickActions, setQuickActions] = useState(mockUser.quick_actions);
+  
+  const user = mockUser;
 
   // All available quick actions
   const allQuickActions = [
@@ -51,15 +48,7 @@ export default function PatientDashboard() {
   const defaultActions = ['profile', 'communication', 'refill'];
   const selectedActions = user?.quick_actions || defaultActions;
 
-  const [tempSelectedActions, setTempSelectedActions] = useState(selectedActions);
-
-  const updateQuickActionsMutation = useMutation({
-    mutationFn: (actions) => base44.auth.updateMe({ quick_actions: actions }),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['currentUser']);
-      setShowEditActions(false);
-    }
-  });
+  const [tempSelectedActions, setTempSelectedActions] = useState(quickActions);
 
   const handleToggleAction = (actionId) => {
     if (tempSelectedActions.includes(actionId)) {
@@ -70,41 +59,37 @@ export default function PatientDashboard() {
   };
 
   const handleSaveActions = () => {
-    updateQuickActionsMutation.mutate(tempSelectedActions);
+    setQuickActions(tempSelectedActions);
+    setShowEditActions(false);
   };
 
-  const { data: communications = [], isLoading: commsLoading } = useQuery({
-    queryKey: ['patient-communications'],
-    queryFn: async () => {
-      const allComms = await base44.entities.PatientCommunication.list('-timestamp', 100);
-      const filtered = allComms.filter(c => c.patient_email === user?.email);
-      
-      // Add dummy communications if list is empty or has less than 2
-      if (filtered.length < 2) {
-        return [
-          {
-            id: 'dummy1',
-            request_type: 'prescription_refill',
-            channel: 'platform',
-            message_content: 'I would like to request a refill for my Lisinopril prescription.',
-            date: '2025-11-15',
-            patient_email: user?.email
-          },
-          {
-            id: 'dummy2',
-            request_type: 'delivery_status',
-            channel: 'email',
-            message_content: 'Could you please check the status of my recent order?',
-            date: '2025-11-12',
-            patient_email: user?.email
-          },
-          ...filtered
-        ];
-      }
-      return filtered;
+  // Mock communications data
+  const communications = [
+    {
+      id: '1',
+      request_type: 'prescription_refill',
+      channel: 'platform',
+      message_content: 'I would like to request a refill for my Lisinopril prescription.',
+      date: '2025-11-15',
+      timestamp: '2025-11-15T10:30:00Z'
     },
-    enabled: !!user
-  });
+    {
+      id: '2',
+      request_type: 'delivery_status',
+      channel: 'email',
+      message_content: 'Could you please check the status of my recent order?',
+      date: '2025-11-12',
+      timestamp: '2025-11-12T14:20:00Z'
+    },
+    {
+      id: '3',
+      request_type: 'billing_question',
+      channel: 'phone',
+      message_content: 'I have a question about my recent invoice.',
+      date: '2025-11-10',
+      timestamp: '2025-11-10T09:15:00Z'
+    }
+  ];
 
   // Dummy prescriptions with different statuses
   const allPrescriptions = [
@@ -231,7 +216,7 @@ export default function PatientDashboard() {
   return (
     <div className="space-y-6">
       {/* Survey Alert */}
-      {isFeatureEnabled('patient_survey') && showSurveyAlert && !user?.survey_completed && (
+      {showSurveyAlert && !user?.survey_completed && (
         <SatisfactionSurveyAlert 
           user={user} 
           onDismiss={() => setShowSurveyAlert(false)} 
@@ -247,7 +232,7 @@ export default function PatientDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Active Prescriptions Section */}
         <div className="lg:col-span-2 space-y-6">
-          {isFeatureEnabled('patient_prescriptions') && user?.patient_pref_prescriptions !== false && (
+          {user?.patient_pref_prescriptions !== false && (
             <>
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
@@ -277,20 +262,14 @@ export default function PatientDashboard() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Recent Communications */}
-          {isFeatureEnabled('patient_communications') && user?.patient_pref_communications !== false && (
+          {user?.patient_pref_communications !== false && (
             <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
             <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-[#8B1F1F]" />
               Recent Communications
             </h3>
-            {commsLoading ? (
-              <div className="flex justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-              </div>
-            ) : (
-              <>
-                <div className="space-y-3">
-                  {communications.slice(0, 5).map(comm => (
+            <div className="space-y-3">
+              {communications.slice(0, 5).map(comm => (
                     <Link
                       key={comm.id}
                       to={createPageUrl(`PatientCommunicationDetail?id=${comm.id}`)}
@@ -314,19 +293,17 @@ export default function PatientDashboard() {
                     See All →
                   </button>
                 </Link>
-              </>
-            )}
             </div>
           )}
 
           {/* Quick Actions */}
-          {isFeatureEnabled('patient_quick_actions') && user?.patient_pref_quick_actions !== false && (
+          {user?.patient_pref_quick_actions !== false && (
             <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-gray-800">Quick Actions</h3>
               <button
                 onClick={() => {
-                  setTempSelectedActions(selectedActions);
+                  setTempSelectedActions(quickActions);
                   setShowEditActions(true);
                 }}
                 className="text-sm text-[#8B1F1F] hover:text-[#721919] font-semibold flex items-center gap-1"
@@ -336,7 +313,7 @@ export default function PatientDashboard() {
               </button>
             </div>
             <div className="space-y-2">
-              {selectedActions.map(actionId => {
+              {quickActions.map(actionId => {
                 const action = allQuickActions.find(a => a.id === actionId);
                 if (!action) return null;
                 const Icon = action.icon;
@@ -356,7 +333,7 @@ export default function PatientDashboard() {
           )}
 
           {/* Recent Orders */}
-          {isFeatureEnabled('patient_orders') && user?.patient_pref_orders !== false && (
+          {user?.patient_pref_orders !== false && (
             <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-lg">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
@@ -421,17 +398,10 @@ export default function PatientDashboard() {
               </Button>
               <Button
                 onClick={handleSaveActions}
-                disabled={tempSelectedActions.length === 0 || updateQuickActionsMutation.isPending}
+                disabled={tempSelectedActions.length === 0}
                 className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white"
               >
-                {updateQuickActionsMutation.isPending ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  'Save'
-                )}
+                Save
               </Button>
             </div>
           </div>
