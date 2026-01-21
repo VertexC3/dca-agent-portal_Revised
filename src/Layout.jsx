@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from './utils';
-import { Settings, User, X, Pill } from 'lucide-react';
+import { Settings, User, X, Pill, ShoppingCart } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +9,9 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { CartProvider, useCart } from './components/cart/CartContext';
+import CartPopup from './components/cart/CartPopup';
+import { Badge } from '@/components/ui/badge';
 
 // Mock user data
 const mockUser = {
@@ -23,8 +26,10 @@ const mockUser = {
   patient_pref_messages_nav: true
 };
 
-export default function Layout({ children, currentPageName }) {
+function LayoutContent({ children, currentPageName }) {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [showCart, setShowCart] = useState(false);
+  const { cartItems } = useCart();
   const user = mockUser;
 
   React.useEffect(() => {
@@ -72,6 +77,7 @@ export default function Layout({ children, currentPageName }) {
   if (user?.patient_pref_messages_nav !== false) {
     patientNavItems.push({ name: 'Communication', page: 'PatientMessages' });
   }
+  patientNavItems.push({ name: 'Complete Profile', page: 'PatientWelcomeFlow' });
 
   return (
     <div className="min-h-screen relative bg-gray-50" style={{ overflowY: 'scroll' }}>
@@ -104,6 +110,19 @@ export default function Layout({ children, currentPageName }) {
             </nav>
 
             <div className="flex items-center gap-4">
+              {/* Cart Icon */}
+              <button
+                onClick={() => setShowCart(true)}
+                className="relative p-2 rounded-full hover:bg-gray-100 transition-all"
+              >
+                <ShoppingCart className="w-6 h-6 text-gray-700" />
+                {cartItems.length > 0 && (
+                  <Badge className="absolute -top-1 -right-1 bg-[#8B1F1F] text-white px-1.5 py-0.5 text-xs min-w-[20px] h-5 flex items-center justify-center">
+                    {cartItems.length}
+                  </Badge>
+                )}
+              </button>
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-all">
@@ -176,6 +195,17 @@ export default function Layout({ children, currentPageName }) {
           Agent
         </button>
       )}
+
+      {/* Cart Popup */}
+      <CartPopup open={showCart} onClose={() => setShowCart(false)} />
     </div>
+  );
+}
+
+export default function Layout({ children, currentPageName }) {
+  return (
+    <CartProvider>
+      <LayoutContent children={children} currentPageName={currentPageName} />
+    </CartProvider>
   );
 }

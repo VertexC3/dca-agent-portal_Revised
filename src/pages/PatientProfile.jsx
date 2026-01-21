@@ -11,6 +11,7 @@ import OrderHistory from '../components/patient/OrderHistory';
 import CollapsibleOrderHistory from '../components/patient/CollapsibleOrderHistory';
 import PaymentManagement from '../components/patient/PaymentManagement';
 import PrescriptionHistory from '../components/patient/PrescriptionHistory';
+import ProfileCompleteness from '../components/patient/ProfileCompleteness';
 
 // Mock user data
 const mockUser = {
@@ -166,6 +167,9 @@ export default function PatientProfile() {
         </TabsList>
 
         <TabsContent value="profile" className="p-8 space-y-6">
+        {/* Profile Completeness Alert */}
+        <ProfileCompleteness user={user} />
+
         {/* Profile Picture */}
         <div className="flex flex-col items-center pb-6 border-b border-gray-200">
           <div className="relative">
