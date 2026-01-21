@@ -18,6 +18,7 @@ import Prescriptions from './pages/Prescriptions';
 import Roadmap from './pages/Roadmap';
 import Settings from './pages/Settings';
 import StaffMessaging from './pages/StaffMessaging';
+import PatientWelcomeFlow from './pages/PatientWelcomeFlow';
 import __Layout from './Layout.jsx';
 
 
@@ -42,6 +43,7 @@ export const PAGES = {
     "Roadmap": Roadmap,
     "Settings": Settings,
     "StaffMessaging": StaffMessaging,
+    "PatientWelcomeFlow": PatientWelcomeFlow,
 }
 
 export const pagesConfig = {

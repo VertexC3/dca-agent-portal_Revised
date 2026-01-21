@@ -1,0 +1,397 @@
+import React, { useState } from 'react';
+import { ChevronRight, ChevronLeft, Check, User, Heart, Pill, MapPin, Phone, PartyPopper } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { createPageUrl } from '../utils';
+
+export default function PatientWelcomeFlow() {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [formData, setFormData] = useState({
+    full_name: '',
+    phone: '',
+    date_of_birth: '',
+    allergies: '',
+    current_medications: '',
+    known_conditions: '',
+    current_prescriptions: '',
+    addresses: [
+      { name: 'Home', address: '', delivery_days: [], delivery_time: '9:00 AM - 5:00 PM', is_primary: true }
+    ],
+    emergency_contact_name: '',
+    emergency_contact_phone: '',
+  });
+
+  const steps = [
+    {
+      id: 'basic',
+      title: 'Basic Information',
+      icon: User,
+      description: 'Let\'s start with your basic details'
+    },
+    {
+      id: 'medical',
+      title: 'Medical History',
+      icon: Heart,
+      description: 'Help us understand your medical background'
+    },
+    {
+      id: 'prescriptions',
+      title: 'Current Medications',
+      icon: Pill,
+      description: 'Tell us about your current prescriptions'
+    },
+    {
+      id: 'addresses',
+      title: 'Delivery Addresses',
+      icon: MapPin,
+      description: 'Where should we deliver your medications?'
+    },
+    {
+      id: 'emergency',
+      title: 'Emergency Contact',
+      icon: Phone,
+      description: 'Who should we contact in case of emergency?'
+    },
+    {
+      id: 'complete',
+      title: 'Welcome!',
+      icon: PartyPopper,
+      description: 'You\'re all set'
+    }
+  ];
+
+  const progress = ((currentStep + 1) / steps.length) * 100;
+
+  const handleNext = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleComplete = () => {
+    // Save to localStorage
+    const existingUser = JSON.parse(localStorage.getItem('mockUser') || '{}');
+    const updatedUser = { ...existingUser, ...formData };
+    localStorage.setItem('mockUser', JSON.stringify(updatedUser));
+    alert('Profile completed successfully!');
+    window.location.href = createPageUrl('PatientDashboard');
+  };
+
+  const updateAddress = (index, field, value) => {
+    const newAddresses = [...formData.addresses];
+    newAddresses[index] = { ...newAddresses[index], [field]: value };
+    setFormData({ ...formData, addresses: newAddresses });
+  };
+
+  const toggleDeliveryDay = (index, day) => {
+    const newAddresses = [...formData.addresses];
+    const days = newAddresses[index].delivery_days || [];
+    
+    if (days.includes(day)) {
+      newAddresses[index].delivery_days = days.filter(d => d !== day);
+    } else {
+      newAddresses[index].delivery_days = [...days, day];
+    }
+    
+    setFormData({ ...formData, addresses: newAddresses });
+  };
+
+  const addAddress = () => {
+    setFormData({
+      ...formData,
+      addresses: [
+        ...formData.addresses,
+        { name: 'Home', address: '', delivery_days: [], delivery_time: '9:00 AM - 5:00 PM', is_primary: false }
+      ]
+    });
+  };
+
+  const StepIcon = steps[currentStep].icon;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4">
+      <div className="max-w-3xl mx-auto">
+        {/* Progress Bar */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-sm font-semibold text-gray-600">Step {currentStep + 1} of {steps.length}</h2>
+            <span className="text-sm font-semibold text-gray-600">{Math.round(progress)}%</span>
+          </div>
+          <Progress value={progress} className="h-2" />
+        </div>
+
+        {/* Main Card */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
+          {/* Step Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#8B1F1F] text-white mb-4">
+              <StepIcon className="w-8 h-8" />
+            </div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">{steps[currentStep].title}</h1>
+            <p className="text-gray-600">{steps[currentStep].description}</p>
+          </div>
+
+          {/* Step Content */}
+          <div className="space-y-6">
+            {/* Step 0: Basic Information */}
+            {currentStep === 0 && (
+              <>
+                <div>
+                  <Label>Full Name *</Label>
+                  <Input
+                    value={formData.full_name}
+                    onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                    placeholder="John Doe"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label>Phone Number *</Label>
+                  <Input
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="(555) 123-4567"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label>Date of Birth *</Label>
+                  <Input
+                    type="date"
+                    value={formData.date_of_birth}
+                    onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
+                    className="mt-1"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Step 1: Medical History */}
+            {currentStep === 1 && (
+              <>
+                <div>
+                  <Label>Known Allergies</Label>
+                  <Textarea
+                    value={formData.allergies}
+                    onChange={(e) => setFormData({ ...formData, allergies: e.target.value })}
+                    placeholder="Penicillin, Peanuts, etc."
+                    className="mt-1"
+                    rows={3}
+                  />
+                </div>
+                <div>
+                  <Label>Current Medications</Label>
+                  <Textarea
+                    value={formData.current_medications}
+                    onChange={(e) => setFormData({ ...formData, current_medications: e.target.value })}
+                    placeholder="List your current medications..."
+                    className="mt-1"
+                    rows={3}
+                  />
+                </div>
+                <div>
+                  <Label>Known Medical Conditions</Label>
+                  <Textarea
+                    value={formData.known_conditions}
+                    onChange={(e) => setFormData({ ...formData, known_conditions: e.target.value })}
+                    placeholder="Hypertension, Diabetes, etc."
+                    className="mt-1"
+                    rows={3}
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Step 2: Current Prescriptions */}
+            {currentStep === 2 && (
+              <div>
+                <Label>Current Prescriptions</Label>
+                <Textarea
+                  value={formData.current_prescriptions}
+                  onChange={(e) => setFormData({ ...formData, current_prescriptions: e.target.value })}
+                  placeholder="List any prescriptions you're currently taking or need refilled..."
+                  className="mt-1"
+                  rows={6}
+                />
+                <p className="text-sm text-gray-500 mt-2">
+                  Include medication names, dosages, and prescriber names if available.
+                </p>
+              </div>
+            )}
+
+            {/* Step 3: Addresses */}
+            {currentStep === 3 && (
+              <div className="space-y-6">
+                {formData.addresses.map((addr, index) => (
+                  <div key={index} className="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
+                    <Select 
+                      value={addr.name || 'Home'} 
+                      onValueChange={(value) => updateAddress(index, 'name', value)}
+                    >
+                      <SelectTrigger className="font-semibold">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Home">Home</SelectItem>
+                        <SelectItem value="Work">Work</SelectItem>
+                        <SelectItem value="Business">Business</SelectItem>
+                        <SelectItem value="Other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    <div>
+                      <Label className="text-xs text-gray-600">Full Address *</Label>
+                      <Textarea
+                        value={addr.address || ''}
+                        onChange={(e) => updateAddress(index, 'address', e.target.value)}
+                        placeholder="123 Main St, Springfield, IL 62701"
+                        className="mt-1"
+                        rows={2}
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-xs text-gray-600 mb-2 block">Delivery Days</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
+                          <button
+                            key={day}
+                            type="button"
+                            onClick={() => toggleDeliveryDay(index, day)}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                              (addr.delivery_days || []).includes(day)
+                                ? 'bg-[#8B1F1F] text-white shadow-md'
+                                : 'bg-white text-gray-600 border border-gray-300 hover:border-[#8B1F1F]'
+                            }`}
+                          >
+                            {day.slice(0, 3)}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="text-xs text-gray-600">Delivery Time Window</Label>
+                      <Input
+                        value={addr.delivery_time || ''}
+                        onChange={(e) => updateAddress(index, 'delivery_time', e.target.value)}
+                        placeholder="9:00 AM - 5:00 PM"
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+                ))}
+
+                <Button
+                  variant="outline"
+                  onClick={addAddress}
+                  className="w-full"
+                >
+                  Add Another Address
+                </Button>
+              </div>
+            )}
+
+            {/* Step 4: Emergency Contact */}
+            {currentStep === 4 && (
+              <>
+                <div>
+                  <Label>Emergency Contact Name *</Label>
+                  <Input
+                    value={formData.emergency_contact_name}
+                    onChange={(e) => setFormData({ ...formData, emergency_contact_name: e.target.value })}
+                    placeholder="Jane Doe"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label>Emergency Contact Phone *</Label>
+                  <Input
+                    value={formData.emergency_contact_phone}
+                    onChange={(e) => setFormData({ ...formData, emergency_contact_phone: e.target.value })}
+                    placeholder="(555) 987-6543"
+                    className="mt-1"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Step 5: Welcome */}
+            {currentStep === 5 && (
+              <div className="text-center py-8">
+                <div className="mb-6">
+                  <Check className="w-20 h-20 mx-auto text-green-500 mb-4" />
+                  <h2 className="text-2xl font-bold text-gray-800 mb-2">You're All Set!</h2>
+                  <p className="text-gray-600 mb-4">
+                    Your profile has been completed. You can now access all features of the patient portal.
+                  </p>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 max-w-md mx-auto">
+                    <p className="text-sm text-green-800">
+                      ✓ Profile information saved<br />
+                      ✓ Medical history recorded<br />
+                      ✓ Delivery addresses configured<br />
+                      ✓ Emergency contact added
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Navigation Buttons */}
+          <div className="flex gap-3 mt-8 pt-6 border-t border-gray-200">
+            {currentStep > 0 && currentStep < steps.length - 1 && (
+              <Button
+                variant="outline"
+                onClick={handleBack}
+                className="flex items-center gap-2"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Back
+              </Button>
+            )}
+            
+            {currentStep < steps.length - 2 && (
+              <Button
+                onClick={handleNext}
+                className="ml-auto bg-[#8B1F1F] hover:bg-[#721919] text-white flex items-center gap-2"
+              >
+                Continue
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            )}
+
+            {currentStep === steps.length - 2 && (
+              <Button
+                onClick={handleNext}
+                className="ml-auto bg-[#8B1F1F] hover:bg-[#721919] text-white flex items-center gap-2"
+              >
+                Complete Setup
+                <Check className="w-4 h-4" />
+              </Button>
+            )}
+
+            {currentStep === steps.length - 1 && (
+              <Button
+                onClick={handleComplete}
+                className="mx-auto bg-[#8B1F1F] hover:bg-[#721919] text-white px-8"
+              >
+                Go to Dashboard
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
