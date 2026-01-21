@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Pill, Calendar, Package, Truck, MoreVertical, RefreshCw, CreditCard, FileText, Play, History, BookOpen, StopCircle, ChevronDown, Download, Receipt, ExternalLink, CheckCircle } from 'lucide-react';
+import { Pill, Calendar, Package, Truck, MoreVertical, RefreshCw, CreditCard, FileText, Play, History, BookOpen, StopCircle, ChevronDown, Download, Receipt, ExternalLink, CheckCircle, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useCart } from '../cart/CartContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,6 +43,7 @@ export default function PrescriptionCard({ prescription }) {
   const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [showRenewalConfirm, setShowRenewalConfirm] = useState(false);
   const [renewalMessage, setRenewalMessage] = useState(null);
+  const { addToCart } = useCart();
 
   const StatusIcon = statusConfig[prescription.status]?.icon || Package;
 
@@ -49,6 +51,11 @@ export default function PrescriptionCard({ prescription }) {
     if (prescription.status === 'Request Renewal') {
       setShowRenewalConfirm(true);
     }
+  };
+
+  const handleAddToCart = () => {
+    addToCart(prescription);
+    alert(`${prescription.name} added to cart!`);
   };
 
   return (
@@ -61,17 +68,31 @@ export default function PrescriptionCard({ prescription }) {
             </div>
             <div className="flex items-center gap-2">
               {prescription.category === 'Active' && (
-                <Button 
-                  size="sm" 
-                  className="bg-[#8B1F1F] hover:bg-[#721919] text-white h-8 text-xs font-semibold shadow-sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowRefillRequest(true);
-                  }}
-                >
-                  <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
-                  Refill
-                </Button>
+                <>
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    className="h-8 text-xs font-semibold"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToCart();
+                    }}
+                  >
+                    <ShoppingCart className="w-3.5 h-3.5 mr-1.5" />
+                    Add to Cart
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    className="bg-[#8B1F1F] hover:bg-[#721919] text-white h-8 text-xs font-semibold shadow-sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowRefillRequest(true);
+                    }}
+                  >
+                    <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                    Refill Now
+                  </Button>
+                </>
               )}
               <Badge 
                 className={`${statusConfig[prescription.status]?.color} border transition-colors`}
