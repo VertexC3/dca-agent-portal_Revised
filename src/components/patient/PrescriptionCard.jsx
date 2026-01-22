@@ -68,31 +68,17 @@ export default function PrescriptionCard({ prescription }) {
             </div>
             <div className="flex items-center gap-2">
               {prescription.category === 'Active' && (
-                <>
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    className="h-8 text-xs font-semibold"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAddToCart();
-                    }}
-                  >
-                    <ShoppingCart className="w-3.5 h-3.5 mr-1.5" />
-                    Add to Cart
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    className="bg-[#8B1F1F] hover:bg-[#721919] text-white h-8 text-xs font-semibold shadow-sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowRefillRequest(true);
-                    }}
-                  >
-                    <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
-                    Refill Now
-                  </Button>
-                </>
+                <Button 
+                  size="sm" 
+                  className="bg-[#8B1F1F] hover:bg-[#721919] text-white h-8 text-xs font-semibold shadow-sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowRefillRequest(true);
+                  }}
+                >
+                  <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                  Refill Now
+                </Button>
               )}
               <Badge 
                 className={`${statusConfig[prescription.status]?.color} border transition-colors`}
@@ -146,7 +132,7 @@ export default function PrescriptionCard({ prescription }) {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-4">
-            <div className="flex-1 space-y-2 text-sm">
+            <div className="flex-1 grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <p className="text-gray-600">
                 <strong>Prescriber:</strong> 
                 <button 
@@ -158,6 +144,9 @@ export default function PrescriptionCard({ prescription }) {
               </p>
               <p className="text-gray-600">
                 <strong>Dosage:</strong> {prescription.dosage}
+              </p>
+              <p className="text-gray-600">
+                <strong>RX Number:</strong> {prescription.id}
               </p>
               {prescription.quantity && (
                 <p className="text-gray-600">

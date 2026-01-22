@@ -38,7 +38,7 @@ function LayoutContent({ children, currentPageName }) {
 
   // Redirect to PatientDashboard if on a non-patient page
   React.useEffect(() => {
-    const patientPages = ['PatientDashboard', 'PatientProfile', 'PatientMessages', 'PatientCommunications', 'Prescriptions', 'PatientRoadmap', 'PatientSettings'];
+    const patientPages = ['PatientDashboard', 'PatientProfile', 'PatientMessages', 'PatientCommunications', 'Prescriptions', 'PatientRoadmap', 'PatientSettings', 'PatientWelcomeFlow'];
     if (!patientPages.includes(currentPageName)) {
       window.location.href = createPageUrl('PatientDashboard');
     }

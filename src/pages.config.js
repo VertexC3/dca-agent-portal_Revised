@@ -13,12 +13,12 @@ import PatientMessages from './pages/PatientMessages';
 import PatientProfile from './pages/PatientProfile';
 import PatientRoadmap from './pages/PatientRoadmap';
 import PatientSettings from './pages/PatientSettings';
+import PatientWelcomeFlow from './pages/PatientWelcomeFlow';
 import PrescriptionTrends from './pages/PrescriptionTrends';
 import Prescriptions from './pages/Prescriptions';
 import Roadmap from './pages/Roadmap';
 import Settings from './pages/Settings';
 import StaffMessaging from './pages/StaffMessaging';
-import PatientWelcomeFlow from './pages/PatientWelcomeFlow';
 import __Layout from './Layout.jsx';
 
 
@@ -38,12 +38,12 @@ export const PAGES = {
     "PatientProfile": PatientProfile,
     "PatientRoadmap": PatientRoadmap,
     "PatientSettings": PatientSettings,
+    "PatientWelcomeFlow": PatientWelcomeFlow,
     "PrescriptionTrends": PrescriptionTrends,
     "Prescriptions": Prescriptions,
     "Roadmap": Roadmap,
     "Settings": Settings,
     "StaffMessaging": StaffMessaging,
-    "PatientWelcomeFlow": PatientWelcomeFlow,
 }
 
 export const pagesConfig = {

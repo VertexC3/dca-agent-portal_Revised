@@ -450,10 +450,10 @@ DCA Pharmacy Team`
                 {createRequestMutation.isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Submitting...
+                    Adding...
                   </>
                 ) : (
-                  'Submit Request'
+                  'Add to Cart'
                 )}
               </Button>
             </div>
