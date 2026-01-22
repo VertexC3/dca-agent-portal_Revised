@@ -6,7 +6,7 @@ import { useCart } from './CartContext';
 import { Badge } from '@/components/ui/badge';
 
 export default function CartPopup({ open, onClose }) {
-  const { cartItems, removeFromCart, clearCart } = useCart();
+  const { cartItems, removeFromCart, clearCart, updateCartItemComment } = useCart();
 
   const handleCheckout = () => {
     alert('Refill request submitted for ' + cartItems.length + ' prescription(s)');

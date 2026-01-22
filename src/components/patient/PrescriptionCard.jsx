@@ -43,7 +43,10 @@ export default function PrescriptionCard({ prescription }) {
   const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [showRenewalConfirm, setShowRenewalConfirm] = useState(false);
   const [renewalMessage, setRenewalMessage] = useState(null);
-  const { addToCart } = useCart();
+  const [showCancelRefill, setShowCancelRefill] = useState(false);
+  const { addToCart, removeFromCart, isInCart } = useCart();
+  
+  const inCart = isInCart(prescription.id);
 
   const StatusIcon = statusConfig[prescription.status]?.icon || Package;
 
@@ -67,7 +70,7 @@ export default function PrescriptionCard({ prescription }) {
               <span className="text-lg font-semibold">{prescription.name}</span>
             </div>
             <div className="flex items-center gap-2">
-              {prescription.category === 'Active' && (
+              {prescription.category === 'Active' && !inCart && (
                 <Button 
                   size="sm" 
                   className="bg-[#8B1F1F] hover:bg-[#721919] text-white h-8 text-xs font-semibold shadow-sm"
@@ -79,6 +82,14 @@ export default function PrescriptionCard({ prescription }) {
                   <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
                   Refill Now
                 </Button>
+              )}
+              {inCart && (
+                <Badge 
+                  className="bg-orange-100 text-orange-800 border-orange-200 cursor-pointer hover:bg-orange-200 transition-colors"
+                  onClick={() => setShowCancelRefill(true)}
+                >
+                  Refill Requested
+                </Badge>
               )}
               <Badge 
                 className={`${statusConfig[prescription.status]?.color} border transition-colors`}
@@ -463,6 +474,35 @@ export default function PrescriptionCard({ prescription }) {
               </Button>
             </>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Cancel Refill Dialog */}
+      <Dialog open={showCancelRefill} onOpenChange={setShowCancelRefill}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle>Cancel Refill Request?</DialogTitle>
+          </DialogHeader>
+          <p className="text-gray-600 py-4">
+            Are you sure you want to cancel the refill request for {prescription.name}?
+          </p>
+          <div className="flex gap-3 justify-end">
+            <Button 
+              variant="outline"
+              onClick={() => setShowCancelRefill(false)}
+            >
+              No
+            </Button>
+            <Button 
+              className="bg-[#8B1F1F] hover:bg-[#721919]"
+              onClick={() => {
+                removeFromCart(prescription.id);
+                setShowCancelRefill(false);
+              }}
+            >
+              Yes
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </>
