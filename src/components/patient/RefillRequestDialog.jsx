@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2, CheckCircle, Pill, CreditCard, Plus, Trash2, MapPin, Star, DollarSign } from 'lucide-react';
+import { useCart } from '../cart/CartContext';
 
 export default function RefillRequestDialog({ open, onClose, prescription }) {
   const [deliveryMethod, setDeliveryMethod] = useState('pickup');
@@ -20,8 +21,8 @@ export default function RefillRequestDialog({ open, onClose, prescription }) {
   const [saveCard, setSaveCard] = useState(false);
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [newAddress, setNewAddress] = useState({ name: 'Home', address: '', is_primary: false });
-  const [payAtPharmacy, setPayAtPharmacy] = useState(false);
   const queryClient = useQueryClient();
+  const { addToCart } = useCart();
 
   // Calculate estimated cost (base $15 for medications, plus $5 for delivery)
   const estimatedCost = deliveryMethod === 'pickup' ? 15.00 : 20.00;
@@ -134,16 +135,28 @@ DCA Pharmacy Team`
   const handleSubmit = () => {
     if (!user || !prescription) return;
 
-    createRequestMutation.mutate({
-      patient_name: user.full_name,
-      patient_email: user.email,
-      patient_phone: user.phone || '',
-      medication_name: prescription.name,
-      prescription_number: prescription.id.toString(),
-      requested_via: 'manual',
-      status: 'pending',
-      notes: `Delivery: ${deliveryMethod}${deliveryMethod === 'delivery' ? ` to ${selectedAddress}` : ''}${notes ? `. Additional notes: ${notes}` : ''}`
-    });
+    // Validate payment information if not pickup
+    if (deliveryMethod === 'delivery' && !cardNumber) {
+      alert('Please add payment information for delivery orders.');
+      setShowPayment(true);
+      return;
+    }
+
+    // Add to cart
+    addToCart(prescription);
+    
+    // Show success
+    setSubmitted(true);
+    setTimeout(() => {
+      onClose();
+      setSubmitted(false);
+      setNotes('');
+      setDeliveryMethod('pickup');
+      setSelectedAddress('');
+      setCardNumber('');
+      setSaveCard(false);
+      setShowPayment(false);
+    }, 2000);
   };
 
   return (
@@ -156,9 +169,9 @@ DCA Pharmacy Team`
         {submitted ? (
           <div className="py-8 text-center">
             <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-gray-800 mb-2">Request Submitted!</h3>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Added to Cart!</h3>
             <p className="text-gray-600">
-              Your refill request for {prescription?.name} has been sent to the pharmacy.
+              {prescription?.name} has been added to your cart.
             </p>
           </div>
         ) : (
@@ -367,69 +380,47 @@ DCA Pharmacy Team`
 
             {/* Payment Section */}
             <div className="border-t pt-4">
-              {deliveryMethod === 'pickup' && (
-                <div className="mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <Button
+                variant="outline"
+                onClick={() => setShowPayment(!showPayment)}
+                className="w-full mb-3"
+              >
+                <CreditCard className="w-4 h-4 mr-2" />
+                {showPayment ? 'Hide Payment' : 'Add Payment Method'}
+              </Button>
+
+              {showPayment && (
+                <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <Label>Card Number *</Label>
+                    <Input
+                      value={cardNumber}
+                      onChange={(e) => setCardNumber(e.target.value)}
+                      placeholder="1234 5678 9012 3456"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label>Expiry Date *</Label>
+                      <Input placeholder="MM/YY" className="mt-1" />
+                    </div>
+                    <div>
+                      <Label>CVV *</Label>
+                      <Input placeholder="123" className="mt-1" />
+                    </div>
+                  </div>
                   <div className="flex items-center gap-2">
                     <Checkbox
-                      id="pay-at-pharmacy"
-                      checked={payAtPharmacy}
-                      onCheckedChange={(checked) => {
-                        setPayAtPharmacy(checked);
-                        if (checked) setShowPayment(false);
-                      }}
+                      id="save-card"
+                      checked={saveCard}
+                      onCheckedChange={setSaveCard}
                     />
-                    <label htmlFor="pay-at-pharmacy" className="text-sm text-gray-700 cursor-pointer font-medium">
-                      Pay at Pharmacy
+                    <label htmlFor="save-card" className="text-sm text-gray-700 cursor-pointer">
+                      Save card for future purchases
                     </label>
                   </div>
                 </div>
-              )}
-
-              {!payAtPharmacy && (
-                <>
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowPayment(!showPayment)}
-                    className="w-full mb-3"
-                  >
-                    <CreditCard className="w-4 h-4 mr-2" />
-                    {showPayment ? 'Hide Payment' : 'Add Payment Method'}
-                  </Button>
-
-                  {showPayment && (
-                    <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
-                      <div>
-                        <Label>Card Number</Label>
-                        <Input
-                          value={cardNumber}
-                          onChange={(e) => setCardNumber(e.target.value)}
-                          placeholder="1234 5678 9012 3456"
-                          className="mt-1"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <Label>Expiry Date</Label>
-                          <Input placeholder="MM/YY" className="mt-1" />
-                        </div>
-                        <div>
-                          <Label>CVV</Label>
-                          <Input placeholder="123" className="mt-1" />
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Checkbox
-                          id="save-card"
-                          checked={saveCard}
-                          onCheckedChange={setSaveCard}
-                        />
-                        <label htmlFor="save-card" className="text-sm text-gray-700 cursor-pointer">
-                          Save card for future purchases
-                        </label>
-                      </div>
-                    </div>
-                  )}
-                </>
               )}
             </div>
 
