@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useCart } from './CartContext';
 import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 export default function CartPopup({ open, onClose }) {
   const { cartItems, removeFromCart, clearCart, updateCartItemComment } = useCart();
@@ -34,32 +36,44 @@ export default function CartPopup({ open, onClose }) {
           <>
             <div className="space-y-3">
               {cartItems.map((item) => (
-                <div key={item.id} className="flex items-start gap-4 p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-all">
-                  {item.image && (
-                    <img 
-                      src={item.image} 
-                      alt={item.name}
-                      className="w-16 h-16 rounded-lg object-cover"
-                    />
-                  )}
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-800">{item.name}</h3>
-                    <p className="text-sm text-gray-600">{item.dosage}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Badge variant="outline" className="text-xs">
-                        {item.refills} refills remaining
-                      </Badge>
-                      <span className="text-xs text-gray-500">Dr. {item.prescriber}</span>
+                <div key={item.id} className="p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-all space-y-3">
+                  <div className="flex items-start gap-4">
+                    {item.image && (
+                      <img 
+                        src={item.image} 
+                        alt={item.name}
+                        className="w-16 h-16 rounded-lg object-cover"
+                      />
+                    )}
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-800">{item.name}</h3>
+                      <p className="text-sm text-gray-600">{item.dosage}</p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Badge variant="outline" className="text-xs">
+                          {item.refills} refills remaining
+                        </Badge>
+                        <span className="text-xs text-gray-500">Dr. {item.prescriber}</span>
+                      </div>
                     </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeFromCart(item.id)}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => removeFromCart(item.id)}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                  <div>
+                    <Label className="text-xs text-gray-600">Add a comment (optional)</Label>
+                    <Textarea
+                      value={item.comment || ''}
+                      onChange={(e) => updateCartItemComment(item.id, e.target.value)}
+                      placeholder="Any special instructions..."
+                      className="mt-1"
+                      rows={2}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
@@ -76,7 +90,7 @@ export default function CartPopup({ open, onClose }) {
                 onClick={handleCheckout}
                 className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white"
               >
-                Submit Refill Request
+                Submit
               </Button>
             </div>
           </>

@@ -18,7 +18,7 @@ export function CartProvider({ children }) {
       if (exists) {
         return prev;
       }
-      return [...prev, { ...prescription, addedAt: new Date().toISOString() }];
+      return [...prev, { ...prescription, comment: '', addedAt: new Date().toISOString() }];
     });
   };
 
@@ -28,6 +28,18 @@ export function CartProvider({ children }) {
 
   const clearCart = () => {
     setCartItems([]);
+  };
+
+  const updateCartItemComment = (prescriptionId, comment) => {
+    setCartItems(prev => 
+      prev.map(item => 
+        item.id === prescriptionId ? { ...item, comment } : item
+      )
+    );
+  };
+
+  const isInCart = (prescriptionId) => {
+    return cartItems.some(item => item.id === prescriptionId);
   };
 
   return (
