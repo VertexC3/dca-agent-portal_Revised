@@ -133,14 +133,7 @@ DCA Pharmacy Team`
   });
 
   const handleSubmit = () => {
-    if (!user || !prescription) return;
-
-    // Validate payment information if not pickup
-    if (deliveryMethod === 'delivery' && !cardNumber) {
-      alert('Please add payment information for delivery orders.');
-      setShowPayment(true);
-      return;
-    }
+    if (!prescription) return;
 
     // Add to cart
     addToCart(prescription);
@@ -435,17 +428,9 @@ DCA Pharmacy Team`
               </Button>
               <Button
                 onClick={handleSubmit}
-                disabled={createRequestMutation.isPending}
                 className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white"
               >
-                {createRequestMutation.isPending ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Adding...
-                  </>
-                ) : (
-                  'Add to Cart'
-                )}
+                Add to Cart
               </Button>
             </div>
           </div>
