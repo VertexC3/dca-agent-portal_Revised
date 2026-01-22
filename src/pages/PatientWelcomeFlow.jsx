@@ -161,6 +161,17 @@ export default function PatientWelcomeFlow() {
     if (days.includes(day)) {
       newAddresses[index].delivery_days = days.filter(d => d !== day);
     } else {
+      // Check for overlap with other addresses
+      const overlap = newAddresses.find((addr, idx) => 
+        idx !== index && 
+        addr.delivery_days?.includes(day)
+      );
+      
+      if (overlap) {
+        alert(`This day is already assigned to "${overlap.name}". Please choose a different day or remove it from the other address first.`);
+        return;
+      }
+      
       newAddresses[index].delivery_days = [...days, day];
     }
     
@@ -503,12 +514,22 @@ export default function PatientWelcomeFlow() {
             )}
 
             {currentStep === steps.length - 1 && (
-              <Button
-                onClick={handleComplete}
-                className="mx-auto bg-[#8B1F1F] hover:bg-[#721919] text-white px-8"
-              >
-                Go to Dashboard
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  onClick={handleBack}
+                  className="flex items-center gap-2"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Back
+                </Button>
+                <Button
+                  onClick={handleComplete}
+                  className="ml-auto bg-[#8B1F1F] hover:bg-[#721919] text-white px-8"
+                >
+                  Go to Dashboard
+                </Button>
+              </>
             )}
           </div>
         </div>
