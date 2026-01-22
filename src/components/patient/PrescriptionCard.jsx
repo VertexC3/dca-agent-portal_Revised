@@ -86,7 +86,10 @@ export default function PrescriptionCard({ prescription }) {
               {inCart && (
                 <Badge 
                   className="bg-orange-100 text-orange-800 border-orange-200 cursor-pointer hover:bg-orange-200 transition-colors"
-                  onClick={() => setShowCancelRefill(true)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowCancelRefill(true);
+                  }}
                 >
                   Refill Requested
                 </Badge>
