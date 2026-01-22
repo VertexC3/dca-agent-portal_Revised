@@ -132,7 +132,7 @@ export default function PrescriptionCard({ prescription }) {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-4">
-            <div className="flex-1 grid grid-cols-2 gap-x-6 text-sm">
+            <div className="flex-1 grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
               <p className="text-gray-600">
                 <strong>Prescriber:</strong> 
                 <button 
