@@ -1,23 +1,27 @@
 import React, { useState } from 'react';
-import { ChevronRight, ChevronLeft, Check, User, Heart, Pill, MapPin, Phone, PartyPopper } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, User, Heart, Pill, MapPin, Phone, PartyPopper, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { createPageUrl } from '../utils';
+import TagInput from '../components/welcome/TagInput';
+import PrescriptionInput from '../components/welcome/PrescriptionInput';
 
 export default function PatientWelcomeFlow() {
   const [currentStep, setCurrentStep] = useState(0);
+  const [profilePicture, setProfilePicture] = useState(null);
   const [formData, setFormData] = useState({
-    full_name: '',
+    first_name: '',
+    last_name: '',
     phone: '',
+    country_code: '+1',
     date_of_birth: '',
-    allergies: '',
-    current_medications: '',
-    known_conditions: '',
-    current_prescriptions: '',
+    allergies: [],
+    current_medications: [],
+    known_conditions: [],
+    current_prescriptions: [],
     addresses: [
       { name: 'Home', address: '', delivery_days: [], delivery_time: '9:00 AM - 5:00 PM', is_primary: true }
     ],
@@ -81,10 +85,67 @@ export default function PatientWelcomeFlow() {
   const handleComplete = () => {
     // Save to localStorage
     const existingUser = JSON.parse(localStorage.getItem('mockUser') || '{}');
-    const updatedUser = { ...existingUser, ...formData };
+    const updatedUser = { 
+      ...existingUser, 
+      ...formData,
+      full_name: `${formData.first_name} ${formData.last_name}`,
+      profile_picture: profilePicture,
+      // Convert arrays to strings for backward compatibility
+      allergies: formData.allergies.join(', '),
+      current_medications: formData.current_medications.join(', '),
+      known_conditions: formData.known_conditions.join(', ')
+    };
     localStorage.setItem('mockUser', JSON.stringify(updatedUser));
     alert('Profile completed successfully!');
     window.location.href = createPageUrl('PatientDashboard');
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setProfilePicture(event.target.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const formatDateForDisplay = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${month}/${day}/${year}`;
+  };
+
+  const handleDateChange = (displayValue) => {
+    // Remove any non-numeric characters except /
+    const cleaned = displayValue.replace(/[^\d/]/g, '');
+    
+    // Auto-add slashes
+    let formatted = cleaned;
+    if (cleaned.length >= 2 && cleaned.indexOf('/') === -1) {
+      formatted = cleaned.slice(0, 2) + '/' + cleaned.slice(2);
+    }
+    if (cleaned.length >= 5 && cleaned.split('/').length === 2) {
+      const parts = cleaned.split('/');
+      formatted = parts[0] + '/' + parts[1].slice(0, 2) + '/' + parts[1].slice(2);
+    }
+    
+    // Convert to ISO format for storage
+    if (formatted.length === 10) {
+      const [month, day, year] = formatted.split('/');
+      if (month && day && year && month <= 12 && day <= 31) {
+        const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        setFormData({ ...formData, date_of_birth: isoDate });
+        return;
+      }
+    }
+    
+    // For partial dates, just store the formatted value
+    setFormData({ ...formData, date_of_birth: formatted });
   };
 
   const updateAddress = (index, field, value) => {
@@ -134,9 +195,40 @@ export default function PatientWelcomeFlow() {
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
           {/* Step Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#8B1F1F] text-white mb-4">
-              <StepIcon className="w-8 h-8" />
-            </div>
+            {currentStep === 0 ? (
+              <div className="relative inline-block mb-4">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  id="profile-picture-upload"
+                />
+                <label
+                  htmlFor="profile-picture-upload"
+                  className="cursor-pointer group"
+                >
+                  {profilePicture ? (
+                    <img 
+                      src={profilePicture} 
+                      alt="Profile"
+                      className="w-24 h-24 rounded-full object-cover border-4 border-[#8B1F1F]"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-[#8B1F1F] flex items-center justify-center text-white border-4 border-[#8B1F1F]">
+                      <User className="w-12 h-12" />
+                    </div>
+                  )}
+                  <div className="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-lg border-2 border-[#8B1F1F] group-hover:bg-gray-50 transition-all">
+                    <Camera className="w-4 h-4 text-[#8B1F1F]" />
+                  </div>
+                </label>
+              </div>
+            ) : (
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#8B1F1F] text-white mb-4">
+                <StepIcon className="w-8 h-8" />
+              </div>
+            )}
             <h1 className="text-3xl font-bold text-gray-800 mb-2">{steps[currentStep].title}</h1>
             <p className="text-gray-600">{steps[currentStep].description}</p>
           </div>
@@ -146,30 +238,62 @@ export default function PatientWelcomeFlow() {
             {/* Step 0: Basic Information */}
             {currentStep === 0 && (
               <>
-                <div>
-                  <Label>Full Name *</Label>
-                  <Input
-                    value={formData.full_name}
-                    onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                    placeholder="John Doe"
-                    className="mt-1"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>First Name *</Label>
+                    <Input
+                      value={formData.first_name}
+                      onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                      placeholder="John"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label>Last Name *</Label>
+                    <Input
+                      value={formData.last_name}
+                      onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                      placeholder="Doe"
+                      className="mt-1"
+                    />
+                  </div>
                 </div>
                 <div>
                   <Label>Phone Number *</Label>
-                  <Input
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="(555) 123-4567"
-                    className="mt-1"
-                  />
+                  <div className="flex gap-2 mt-1">
+                    <Select value={formData.country_code} onValueChange={(value) => setFormData({ ...formData, country_code: value })}>
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="+1">🇺🇸 +1</SelectItem>
+                        <SelectItem value="+44">🇬🇧 +44</SelectItem>
+                        <SelectItem value="+91">🇮🇳 +91</SelectItem>
+                        <SelectItem value="+86">🇨🇳 +86</SelectItem>
+                        <SelectItem value="+81">🇯🇵 +81</SelectItem>
+                        <SelectItem value="+49">🇩🇪 +49</SelectItem>
+                        <SelectItem value="+33">🇫🇷 +33</SelectItem>
+                        <SelectItem value="+39">🇮🇹 +39</SelectItem>
+                        <SelectItem value="+34">🇪🇸 +34</SelectItem>
+                        <SelectItem value="+61">🇦🇺 +61</SelectItem>
+                        <SelectItem value="+52">🇲🇽 +52</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      placeholder="(555) 123-4567"
+                      className="flex-1"
+                    />
+                  </div>
                 </div>
                 <div>
-                  <Label>Date of Birth *</Label>
+                  <Label>Date of Birth (MM/DD/YYYY) *</Label>
                   <Input
-                    type="date"
-                    value={formData.date_of_birth}
-                    onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
+                    value={formData.date_of_birth.includes('-') ? formatDateForDisplay(formData.date_of_birth) : formData.date_of_birth}
+                    onChange={(e) => handleDateChange(e.target.value)}
+                    placeholder="MM/DD/YYYY"
+                    maxLength={10}
                     className="mt-1"
                   />
                 </div>
@@ -181,33 +305,33 @@ export default function PatientWelcomeFlow() {
               <>
                 <div>
                   <Label>Known Allergies</Label>
-                  <Textarea
-                    value={formData.allergies}
-                    onChange={(e) => setFormData({ ...formData, allergies: e.target.value })}
-                    placeholder="Penicillin, Peanuts, etc."
-                    className="mt-1"
-                    rows={3}
-                  />
+                  <div className="mt-1">
+                    <TagInput
+                      value={formData.allergies}
+                      onChange={(value) => setFormData({ ...formData, allergies: value })}
+                      placeholder="Type allergy and press comma (e.g., Penicillin, Peanuts)"
+                    />
+                  </div>
                 </div>
                 <div>
                   <Label>Current Medications</Label>
-                  <Textarea
-                    value={formData.current_medications}
-                    onChange={(e) => setFormData({ ...formData, current_medications: e.target.value })}
-                    placeholder="List your current medications..."
-                    className="mt-1"
-                    rows={3}
-                  />
+                  <div className="mt-1">
+                    <TagInput
+                      value={formData.current_medications}
+                      onChange={(value) => setFormData({ ...formData, current_medications: value })}
+                      placeholder="Type medication and press comma (e.g., Aspirin, Metformin)"
+                    />
+                  </div>
                 </div>
                 <div>
                   <Label>Known Medical Conditions</Label>
-                  <Textarea
-                    value={formData.known_conditions}
-                    onChange={(e) => setFormData({ ...formData, known_conditions: e.target.value })}
-                    placeholder="Hypertension, Diabetes, etc."
-                    className="mt-1"
-                    rows={3}
-                  />
+                  <div className="mt-1">
+                    <TagInput
+                      value={formData.known_conditions}
+                      onChange={(value) => setFormData({ ...formData, known_conditions: value })}
+                      placeholder="Type condition and press comma (e.g., Hypertension, Diabetes)"
+                    />
+                  </div>
                 </div>
               </>
             )}
@@ -216,16 +340,13 @@ export default function PatientWelcomeFlow() {
             {currentStep === 2 && (
               <div>
                 <Label>Current Prescriptions</Label>
-                <Textarea
-                  value={formData.current_prescriptions}
-                  onChange={(e) => setFormData({ ...formData, current_prescriptions: e.target.value })}
-                  placeholder="List any prescriptions you're currently taking or need refilled..."
-                  className="mt-1"
-                  rows={6}
-                />
-                <p className="text-sm text-gray-500 mt-2">
-                  Include medication names, dosages, and prescriber names if available.
+                <p className="text-sm text-gray-500 mb-3">
+                  Add any prescriptions you're currently taking. We'll automatically recognize common medications.
                 </p>
+                <PrescriptionInput
+                  value={formData.current_prescriptions}
+                  onChange={(value) => setFormData({ ...formData, current_prescriptions: value })}
+                />
               </div>
             )}
 
