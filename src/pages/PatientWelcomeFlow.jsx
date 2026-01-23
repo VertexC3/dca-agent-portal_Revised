@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, ChevronLeft, Check, User, Heart, Pill, MapPin, Phone, PartyPopper, Camera, Calendar as CalendarIcon, Trash2, RefreshCw, Shield } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, User, Heart, Pill, MapPin, Phone, PartyPopper, Camera, Calendar as CalendarIcon, Trash2, RefreshCw, Shield, Stethoscope, Plus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,6 +34,12 @@ export default function PatientWelcomeFlow() {
     allergies: [],
     current_medications: [],
     known_conditions: [],
+    physicians: [
+      { name: '', specialty: '', address: '', phone: '' }
+    ],
+    previous_pharmacy_name: '',
+    previous_pharmacy_address: '',
+    previous_pharmacy_phone: '',
     current_prescriptions: [],
     addresses: [
       { name: 'Home', address_1: '', address_2: '', city: '', state: '', zip: '', delivery_days: [], delivery_from: null, delivery_to: null, delivery_time: '9:00 AM - 5:00 PM', is_primary: true }
@@ -54,6 +60,12 @@ export default function PatientWelcomeFlow() {
       title: 'Medical History',
       icon: Heart,
       description: 'Help us understand your medical background'
+    },
+    {
+      id: 'healthcare',
+      title: 'Healthcare Providers',
+      icon: Stethoscope,
+      description: 'Tell us about your physicians and pharmacy'
     },
     {
       id: 'prescriptions',
@@ -299,6 +311,28 @@ export default function PatientWelcomeFlow() {
     setAddressCoordinates(newCoordinates);
   };
 
+  const updatePhysician = (index, field, value) => {
+    const newPhysicians = [...formData.physicians];
+    newPhysicians[index] = { ...newPhysicians[index], [field]: value };
+    setFormData({ ...formData, physicians: newPhysicians });
+  };
+
+  const addPhysician = () => {
+    setFormData({
+      ...formData,
+      physicians: [...formData.physicians, { name: '', specialty: '', address: '', phone: '' }]
+    });
+  };
+
+  const removePhysician = (index) => {
+    if (formData.physicians.length === 1) {
+      alert('You must have at least one physician.');
+      return;
+    }
+    const newPhysicians = formData.physicians.filter((_, i) => i !== index);
+    setFormData({ ...formData, physicians: newPhysicians });
+  };
+
   const StepIcon = steps[currentStep].icon;
 
   return (
@@ -457,9 +491,9 @@ export default function PatientWelcomeFlow() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                {currentStep === 5 && formData.first_name 
+                {currentStep === 6 && formData.first_name 
                   ? `Welcome, ${formData.first_name}, to DCA Pharmacy!` 
-                  : currentStep === 5 
+                  : currentStep === 6 
                   ? 'Welcome to DCA Pharmacy!' 
                   : steps[currentStep].title}
               </motion.h1>
@@ -469,7 +503,7 @@ export default function PatientWelcomeFlow() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
               >
-                {currentStep === 5 
+                {currentStep === 6 
                   ? 'Your profile has been completed. You can now access all features of the patient portal.' 
                   : steps[currentStep].description}
               </motion.p>
@@ -715,8 +749,123 @@ export default function PatientWelcomeFlow() {
               </>
             )}
 
-              {/* Step 2: Current Prescriptions */}
+              {/* Step 2: Healthcare Providers */}
               {currentStep === 2 && (
+                <div className="space-y-6">
+                  {/* Physicians Section */}
+                  <div>
+                    <Label className="text-lg font-bold text-gray-800 mb-4 block">Current Physicians</Label>
+                    <div className="space-y-4">
+                      {formData.physicians.map((physician, index) => (
+                        <motion.div
+                          key={index}
+                          className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3 relative"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.5 + index * 0.1 }}
+                        >
+                          {index > 0 && (
+                            <button
+                              onClick={() => removePhysician(index)}
+                              className="absolute top-3 right-3 p-1 rounded-lg text-red-500 hover:bg-red-50 transition-all"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          )}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <Label className="text-sm font-semibold text-gray-700">Doctor Name *</Label>
+                              <Input
+                                value={physician.name}
+                                onChange={(e) => updatePhysician(index, 'name', e.target.value)}
+                                placeholder="Dr. John Smith"
+                                className="mt-1 h-10 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-sm font-semibold text-gray-700">Specialty</Label>
+                              <Input
+                                value={physician.specialty}
+                                onChange={(e) => updatePhysician(index, 'specialty', e.target.value)}
+                                placeholder="Cardiology"
+                                className="mt-1 h-10 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <Label className="text-sm font-semibold text-gray-700">Address</Label>
+                            <Input
+                              value={physician.address}
+                              onChange={(e) => updatePhysician(index, 'address', e.target.value)}
+                              placeholder="123 Medical Center Dr, City, State 12345"
+                              className="mt-1 h-10 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-sm font-semibold text-gray-700">Phone Number</Label>
+                            <Input
+                              value={physician.phone}
+                              onChange={(e) => updatePhysician(index, 'phone', e.target.value)}
+                              placeholder="(555) 123-4567"
+                              className="mt-1 h-10 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                            />
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                    <Button
+                      variant="outline"
+                      onClick={addPhysician}
+                      className="w-full mt-3 h-10 border-2 border-dashed border-gray-300 hover:border-[#8B1F1F] hover:bg-[#8B1F1F]/5 text-gray-700 font-semibold"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Another Physician
+                    </Button>
+                  </div>
+
+                  {/* Previous Pharmacy Section */}
+                  <div className="pt-4 border-t border-gray-200">
+                    <Label className="text-lg font-bold text-gray-800 mb-4 block">Previous Pharmacy</Label>
+                    <motion.div
+                      className="space-y-3"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6 }}
+                    >
+                      <div>
+                        <Label className="text-sm font-semibold text-gray-700">Pharmacy Name</Label>
+                        <Input
+                          value={formData.previous_pharmacy_name}
+                          onChange={(e) => setFormData({ ...formData, previous_pharmacy_name: e.target.value })}
+                          placeholder="City Pharmacy"
+                          className="mt-1 h-10 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm font-semibold text-gray-700">Address</Label>
+                        <Input
+                          value={formData.previous_pharmacy_address}
+                          onChange={(e) => setFormData({ ...formData, previous_pharmacy_address: e.target.value })}
+                          placeholder="456 Main St, City, State 12345"
+                          className="mt-1 h-10 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm font-semibold text-gray-700">Phone Number</Label>
+                        <Input
+                          value={formData.previous_pharmacy_phone}
+                          onChange={(e) => setFormData({ ...formData, previous_pharmacy_phone: e.target.value })}
+                          placeholder="(555) 987-6543"
+                          className="mt-1 h-10 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                        />
+                      </div>
+                    </motion.div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Current Prescriptions */}
+              {currentStep === 3 && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -733,8 +882,8 @@ export default function PatientWelcomeFlow() {
                 </motion.div>
               )}
 
-              {/* Step 3: Addresses */}
-              {currentStep === 3 && (
+              {/* Step 4: Addresses */}
+              {currentStep === 4 && (
                 <div className="space-y-6">
                   {formData.addresses.map((addr, index) => (
                     <motion.div 
@@ -1033,8 +1182,8 @@ export default function PatientWelcomeFlow() {
               </div>
             )}
 
-              {/* Step 4: Emergency Contact */}
-              {currentStep === 4 && (
+              {/* Step 5: Emergency Contact */}
+              {currentStep === 5 && (
                 <>
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -1065,8 +1214,8 @@ export default function PatientWelcomeFlow() {
                 </>
               )}
 
-              {/* Step 5: Welcome */}
-              {currentStep === 5 && (
+              {/* Step 6: Welcome */}
+              {currentStep === 6 && (
                 <div className="space-y-5 max-w-2xl mx-auto">
                     {/* Basic Information */}
                     <motion.div 
