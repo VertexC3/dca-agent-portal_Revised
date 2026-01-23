@@ -72,12 +72,6 @@ export default function PatientWelcomeFlow() {
       description: 'Tell us about your physicians and pharmacy'
     },
     {
-      id: 'prescriptions',
-      title: 'Current Medications',
-      icon: Pill,
-      description: 'Tell us about your current prescriptions'
-    },
-    {
       id: 'addresses',
       title: 'Delivery Addresses',
       icon: MapPin,
@@ -534,9 +528,9 @@ export default function PatientWelcomeFlow() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                {currentStep === 7 && formData.first_name 
+                {currentStep === 6 && formData.first_name 
                   ? `Welcome, ${formData.first_name}, to DCA Pharmacy!` 
-                  : currentStep === 7 
+                  : currentStep === 6 
                   ? 'Welcome to DCA Pharmacy!' 
                   : steps[currentStep].title}
               </motion.h1>
@@ -546,7 +540,7 @@ export default function PatientWelcomeFlow() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
               >
-                {currentStep === 7 
+                {currentStep === 6 
                   ? 'Your profile has been completed. You can now access all features of the patient portal.' 
                   : steps[currentStep].description}
               </motion.p>
@@ -801,13 +795,13 @@ export default function PatientWelcomeFlow() {
                     transition={{ delay: 0.6 }}
                   >
                     <Label className="text-base font-semibold text-gray-700">Current Medications</Label>
-                    <div className="mt-2">
-                      <TagInput
-                        value={formData.current_medications}
-                        onChange={(value) => setFormData({ ...formData, current_medications: value })}
-                        placeholder="Type medication and press comma (e.g., Aspirin, Metformin)"
-                      />
-                    </div>
+                    <p className="text-base text-gray-600 mb-4 mt-1">
+                      Add any prescriptions you're currently taking. We'll automatically recognize common medications.
+                    </p>
+                    <PrescriptionInput
+                      value={formData.current_prescriptions}
+                      onChange={(value) => setFormData({ ...formData, current_prescriptions: value })}
+                    />
                   </motion.div>
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -941,26 +935,8 @@ export default function PatientWelcomeFlow() {
                 </div>
               )}
 
-              {/* Step 3: Current Prescriptions */}
+              {/* Step 3: Addresses */}
               {currentStep === 3 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                >
-                  <Label className="text-base font-semibold text-gray-700">Current Prescriptions</Label>
-                  <p className="text-base text-gray-600 mb-4 mt-1">
-                    Add any prescriptions you're currently taking. We'll automatically recognize common medications.
-                  </p>
-                  <PrescriptionInput
-                    value={formData.current_prescriptions}
-                    onChange={(value) => setFormData({ ...formData, current_prescriptions: value })}
-                  />
-                </motion.div>
-              )}
-
-              {/* Step 4: Addresses */}
-              {currentStep === 4 && (
                 <div className="space-y-6">
                   {formData.addresses.map((addr, index) => (
                     <motion.div 
@@ -1248,8 +1224,8 @@ export default function PatientWelcomeFlow() {
                       </div>
                       )}
 
-                      {/* Step 5: Authorized Parties */}
-                      {currentStep === 5 && (
+                      {/* Step 4: Authorized Parties */}
+                      {currentStep === 4 && (
                       <div className="space-y-4">
                       <p className="text-gray-600 text-base">
                       Add individuals who are authorized to pick up prescriptions on your behalf.
@@ -1322,8 +1298,8 @@ export default function PatientWelcomeFlow() {
                       </div>
                       )}
 
-                      {/* Step 6: Emergency Contact */}
-              {currentStep === 6 && (
+                      {/* Step 5: Emergency Contact */}
+              {currentStep === 5 && (
                 <>
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -1354,8 +1330,8 @@ export default function PatientWelcomeFlow() {
                 </>
               )}
 
-              {/* Step 7: Welcome */}
-              {currentStep === 7 && (
+              {/* Step 6: Welcome */}
+              {currentStep === 6 && (
                 <div className="space-y-5 max-w-2xl mx-auto">
                     {/* Basic Information */}
                     <motion.div 
