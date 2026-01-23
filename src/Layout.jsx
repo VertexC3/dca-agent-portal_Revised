@@ -14,7 +14,7 @@ import CartPopup from './components/cart/CartPopup';
 import { Badge } from '@/components/ui/badge';
 
 // Mock user data
-const mockUser = {
+const defaultUser = {
   full_name: "John Doe",
   email: "john.doe@example.com",
   profile_picture: null,
@@ -30,7 +30,24 @@ function LayoutContent({ children, currentPageName }) {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const { cartItems } = useCart();
-  const user = mockUser;
+  
+  // Load user from localStorage or use default
+  const [user, setUser] = useState(() => {
+    const stored = localStorage.getItem('mockUser');
+    return stored ? { ...defaultUser, ...JSON.parse(stored) } : defaultUser;
+  });
+
+  // Listen for localStorage changes (when onboarding completes)
+  React.useEffect(() => {
+    const handleStorageChange = () => {
+      const stored = localStorage.getItem('mockUser');
+      if (stored) {
+        setUser({ ...defaultUser, ...JSON.parse(stored) });
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   React.useEffect(() => {
     document.title = "DCA Pharmacy - Patient Portal";
