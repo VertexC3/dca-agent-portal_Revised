@@ -1220,7 +1220,8 @@ export default function PatientWelcomeFlow() {
                 onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 placeholder="123456"
                 maxLength={6}
-                className="h-20 text-center text-5xl font-bold tracking-widest border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                className="h-32 text-center font-bold tracking-widest border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 w-[80%] mx-auto"
+                style={{ fontSize: '5rem' }}
               />
             </div>
 
