@@ -254,10 +254,10 @@ export default function PatientWelcomeFlow() {
   const StepIcon = steps[currentStep].icon;
 
   return (
-    <div className="min-h-screen relative overflow-hidden py-16 px-4">
+    <div className="fixed inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 overflow-y-auto">
       {/* Animated Background with Parallax */}
       <motion.div 
-        className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50"
+        className="absolute inset-0 -z-10"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
@@ -301,7 +301,7 @@ export default function PatientWelcomeFlow() {
         }}
       />
 
-      <div className="max-w-3xl mx-auto relative z-10">
+      <div className="max-w-3xl mx-auto relative z-10 py-16 px-4">
         {/* Enhanced Progress Bar */}
         <motion.div 
           className="mb-12"
