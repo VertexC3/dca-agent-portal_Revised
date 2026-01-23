@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, ChevronLeft, Check, User, Heart, Pill, MapPin, Phone, PartyPopper, Camera, Calendar as CalendarIcon } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, User, Heart, Pill, MapPin, Phone, PartyPopper, Camera, Calendar as CalendarIcon, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -203,6 +203,20 @@ export default function PatientWelcomeFlow() {
         { name: 'Home', address_1: '', address_2: '', city: '', state: '', zip: '', delivery_days: [], delivery_from: null, delivery_to: null, delivery_time: '9:00 AM - 5:00 PM', is_primary: false }
       ]
     });
+  };
+
+  const removeAddress = (index) => {
+    if (formData.addresses.length === 1) {
+      alert('You must have at least one address.');
+      return;
+    }
+    const newAddresses = formData.addresses.filter((_, i) => i !== index);
+    setFormData({ ...formData, addresses: newAddresses });
+    
+    // Clean up coordinates
+    const newCoordinates = { ...addressCoordinates };
+    delete newCoordinates[index];
+    setAddressCoordinates(newCoordinates);
   };
 
   const StepIcon = steps[currentStep].icon;
@@ -600,13 +614,20 @@ export default function PatientWelcomeFlow() {
                   {formData.addresses.map((addr, index) => (
                     <motion.div 
                       key={index} 
-                      className="p-6 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl border border-gray-200 shadow-sm space-y-4"
+                      className="p-6 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl border border-gray-200 shadow-sm space-y-4 relative"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 + index * 0.1 }}
                     >
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                        <div className="lg:col-span-2 space-y-4">
+                      {index > 0 && (
+                        <button
+                          onClick={() => removeAddress(index)}
+                          className="absolute top-4 right-4 p-2 rounded-lg text-red-500 hover:bg-red-50 transition-all"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      )}
+                      
                       <Select 
                         value={addr.name || 'Home'} 
                         onValueChange={(value) => updateAddress(index, 'name', value)}
@@ -621,8 +642,9 @@ export default function PatientWelcomeFlow() {
                         <SelectItem value="Other">Other</SelectItem>
                       </SelectContent>
                     </Select>
-                    
-                      <div className="grid grid-cols-1 gap-4">
+
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <div className="space-y-4">
                         <div>
                           <Label className="text-base font-semibold text-gray-700">Address 1 *</Label>
                           <Input
@@ -672,6 +694,16 @@ export default function PatientWelcomeFlow() {
                             />
                           </div>
                         </div>
+                      </div>
+                      <div>
+                        {addressCoordinates[index] && (
+                          <AddressMap
+                            lat={addressCoordinates[index].lat}
+                            lon={addressCoordinates[index].lon}
+                            address={`${addr.address_1}, ${addr.city}, ${addr.state} ${addr.zip}`}
+                          />
+                        )}
+                      </div>
                       </div>
 
                       <div>
