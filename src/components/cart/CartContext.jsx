@@ -8,9 +8,18 @@ export function CartProvider({ children }) {
     return saved ? JSON.parse(saved) : [];
   });
 
+  const [submittedItems, setSubmittedItems] = useState(() => {
+    const saved = localStorage.getItem('submittedPrescriptions');
+    return saved ? JSON.parse(saved) : [];
+  });
+
   useEffect(() => {
     localStorage.setItem('prescriptionCart', JSON.stringify(cartItems));
   }, [cartItems]);
+
+  useEffect(() => {
+    localStorage.setItem('submittedPrescriptions', JSON.stringify(submittedItems));
+  }, [submittedItems]);
 
   const addToCart = (prescription) => {
     setCartItems(prev => {
@@ -30,6 +39,16 @@ export function CartProvider({ children }) {
     setCartItems([]);
   };
 
+  const submitCart = () => {
+    const prescriptionIds = cartItems.map(item => item.id);
+    setSubmittedItems(prev => [...new Set([...prev, ...prescriptionIds])]);
+    setCartItems([]);
+  };
+
+  const removeFromSubmitted = (prescriptionId) => {
+    setSubmittedItems(prev => prev.filter(id => id !== prescriptionId));
+  };
+
   const updateCartItemComment = (prescriptionId, comment) => {
     setCartItems(prev => 
       prev.map(item => 
@@ -42,8 +61,12 @@ export function CartProvider({ children }) {
     return cartItems.some(item => item.id === prescriptionId);
   };
 
+  const isSubmitted = (prescriptionId) => {
+    return submittedItems.includes(prescriptionId);
+  };
+
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart, updateCartItemComment, isInCart }}>
+    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart, submitCart, updateCartItemComment, isInCart, isSubmitted, removeFromSubmitted }}>
       {children}
     </CartContext.Provider>
   );

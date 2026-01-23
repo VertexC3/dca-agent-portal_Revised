@@ -44,9 +44,10 @@ export default function PrescriptionCard({ prescription }) {
   const [showRenewalConfirm, setShowRenewalConfirm] = useState(false);
   const [renewalMessage, setRenewalMessage] = useState(null);
   const [showCancelRefill, setShowCancelRefill] = useState(false);
-  const { addToCart, removeFromCart, isInCart } = useCart();
+  const { addToCart, removeFromCart, isInCart, isSubmitted, removeFromSubmitted } = useCart();
   
   const inCart = isInCart(prescription.id);
+  const submitted = isSubmitted(prescription.id);
 
   const StatusIcon = statusConfig[prescription.status]?.icon || Package;
 
@@ -70,7 +71,7 @@ export default function PrescriptionCard({ prescription }) {
               <span className="text-lg font-semibold">{prescription.name}</span>
             </div>
             <div className="flex items-center gap-2">
-              {prescription.category === 'Active' && !inCart && (
+              {prescription.category === 'Active' && !inCart && !submitted && (
                 <Button 
                   size="sm" 
                   className="bg-[#8B1F1F] hover:bg-[#721919] text-white h-8 text-xs font-semibold shadow-sm"
@@ -83,7 +84,7 @@ export default function PrescriptionCard({ prescription }) {
                   Refill Now
                 </Button>
               )}
-              {inCart && (
+              {(inCart || submitted) && (
                 <Badge 
                   className="bg-orange-100 text-orange-800 border-orange-200 cursor-pointer hover:bg-orange-200 transition-colors"
                   onClick={(e) => {
@@ -499,7 +500,11 @@ export default function PrescriptionCard({ prescription }) {
             <Button 
               className="bg-[#8B1F1F] hover:bg-[#721919]"
               onClick={() => {
-                removeFromCart(prescription.id);
+                if (inCart) {
+                  removeFromCart(prescription.id);
+                } else if (submitted) {
+                  removeFromSubmitted(prescription.id);
+                }
                 setShowCancelRefill(false);
               }}
             >

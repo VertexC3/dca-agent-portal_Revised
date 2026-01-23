@@ -8,11 +8,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 
 export default function CartPopup({ open, onClose }) {
-  const { cartItems, removeFromCart, clearCart, updateCartItemComment } = useCart();
+  const { cartItems, removeFromCart, clearCart, submitCart, updateCartItemComment } = useCart();
 
   const handleCheckout = () => {
     alert('Refill request submitted for ' + cartItems.length + ' prescription(s)');
-    clearCart();
+    submitCart();
     onClose();
   };
 
