@@ -649,7 +649,7 @@ export default function PatientWelcomeFlow() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8 }}
                   >
-                    <Label className="text-base font-semibold text-gray-700">Date of Birth (MM/DD/YYYY) *</Label>
+                    <Label className="text-base font-semibold text-gray-700">Date of Birth *</Label>
                     <Input
                       value={formData.date_of_birth.includes('-') ? formatDateForDisplay(formData.date_of_birth) : formData.date_of_birth}
                       onChange={(e) => handleDateChange(e.target.value)}
@@ -1229,7 +1229,7 @@ export default function PatientWelcomeFlow() {
                 onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 placeholder="123456"
                 maxLength={6}
-                className="h-32 text-center font-bold tracking-widest border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 w-[90%] mx-auto"
+                className="h-32 text-center font-bold tracking-widest border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 w-full"
                 style={{ fontSize: '5rem' }}
               />
             </div>
