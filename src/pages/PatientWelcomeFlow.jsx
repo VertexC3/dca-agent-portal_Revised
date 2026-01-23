@@ -164,10 +164,13 @@ export default function PatientWelcomeFlow() {
     // Check if address is complete and geocode it
     const addr = newAddresses[index];
     if (addr.address_1 && addr.city && addr.state && addr.zip) {
-      const coords = await geocodeAddress(addr);
-      if (coords) {
-        setAddressCoordinates(prev => ({ ...prev, [index]: coords }));
-      }
+      // Add a small delay to avoid rate limiting
+      setTimeout(async () => {
+        const coords = await geocodeAddress(addr);
+        if (coords) {
+          setAddressCoordinates(prev => ({ ...prev, [index]: coords }));
+        }
+      }, 500);
     }
   };
 
