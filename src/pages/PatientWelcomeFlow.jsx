@@ -448,21 +448,21 @@ export default function PatientWelcomeFlow() {
                     transition={{ delay: 0.5 }}
                   >
                     <div>
-                      <Label className="text-sm font-semibold text-gray-700">First Name *</Label>
+                      <Label className="text-base font-semibold text-gray-700">First Name *</Label>
                       <Input
                         value={formData.first_name}
                         onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
                         placeholder="John"
-                        className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                        className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                       />
                     </div>
                     <div>
-                      <Label className="text-sm font-semibold text-gray-700">Last Name *</Label>
+                      <Label className="text-base font-semibold text-gray-700">Last Name *</Label>
                       <Input
                         value={formData.last_name}
                         onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
                         placeholder="Doe"
-                        className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                        className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                       />
                     </div>
                   </motion.div>
@@ -471,10 +471,10 @@ export default function PatientWelcomeFlow() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
                   >
-                    <Label className="text-sm font-semibold text-gray-700">Phone Number *</Label>
+                    <Label className="text-base font-semibold text-gray-700">Phone Number *</Label>
                     <div className="flex gap-2 mt-2">
                       <Select value={formData.country_code} onValueChange={(value) => setFormData({ ...formData, country_code: value })}>
-                        <SelectTrigger className="w-32 h-11 border-gray-200">
+                        <SelectTrigger className="w-32 h-12 border-gray-200 text-base">
                           <SelectValue />
                         </SelectTrigger>
                       <SelectContent>
@@ -495,7 +495,7 @@ export default function PatientWelcomeFlow() {
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         placeholder="(555) 123-4567"
-                        className="flex-1 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                        className="flex-1 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                       />
                     </div>
                   </motion.div>
@@ -504,13 +504,13 @@ export default function PatientWelcomeFlow() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.7 }}
                   >
-                    <Label className="text-sm font-semibold text-gray-700">Date of Birth (MM/DD/YYYY) *</Label>
+                    <Label className="text-base font-semibold text-gray-700">Date of Birth (MM/DD/YYYY) *</Label>
                     <Input
                       value={formData.date_of_birth.includes('-') ? formatDateForDisplay(formData.date_of_birth) : formData.date_of_birth}
                       onChange={(e) => handleDateChange(e.target.value)}
                       placeholder="MM/DD/YYYY"
                       maxLength={10}
-                      className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                      className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                     />
                   </motion.div>
               </>
@@ -524,7 +524,7 @@ export default function PatientWelcomeFlow() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
                   >
-                    <Label className="text-sm font-semibold text-gray-700">Known Allergies</Label>
+                    <Label className="text-base font-semibold text-gray-700">Known Allergies</Label>
                     <div className="mt-2">
                       <TagInput
                         value={formData.allergies}
@@ -538,7 +538,7 @@ export default function PatientWelcomeFlow() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
                   >
-                    <Label className="text-sm font-semibold text-gray-700">Current Medications</Label>
+                    <Label className="text-base font-semibold text-gray-700">Current Medications</Label>
                     <div className="mt-2">
                       <TagInput
                         value={formData.current_medications}
@@ -552,7 +552,7 @@ export default function PatientWelcomeFlow() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.7 }}
                   >
-                    <Label className="text-sm font-semibold text-gray-700">Known Medical Conditions</Label>
+                    <Label className="text-base font-semibold text-gray-700">Known Medical Conditions</Label>
                     <div className="mt-2">
                       <TagInput
                         value={formData.known_conditions}
@@ -571,8 +571,8 @@ export default function PatientWelcomeFlow() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
                 >
-                  <Label className="text-sm font-semibold text-gray-700">Current Prescriptions</Label>
-                  <p className="text-sm text-gray-600 mb-4 mt-1">
+                  <Label className="text-base font-semibold text-gray-700">Current Prescriptions</Label>
+                  <p className="text-base text-gray-600 mb-4 mt-1">
                     Add any prescriptions you're currently taking. We'll automatically recognize common medications.
                   </p>
                   <PrescriptionInput
@@ -597,7 +597,7 @@ export default function PatientWelcomeFlow() {
                         value={addr.name || 'Home'} 
                         onValueChange={(value) => updateAddress(index, 'name', value)}
                       >
-                        <SelectTrigger className="font-semibold h-11 border-gray-200">
+                        <SelectTrigger className="font-semibold h-12 border-gray-200 text-base">
                           <SelectValue />
                         </SelectTrigger>
                       <SelectContent>
@@ -610,50 +610,50 @@ export default function PatientWelcomeFlow() {
                     
                       <div className="grid grid-cols-1 gap-4">
                         <div>
-                          <Label className="text-sm font-semibold text-gray-700">Address 1 *</Label>
+                          <Label className="text-base font-semibold text-gray-700">Address 1 *</Label>
                           <Input
                             value={addr.address_1 || ''}
                             onChange={(e) => updateAddress(index, 'address_1', e.target.value)}
                             placeholder="123 Main St"
-                            className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                            className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                           />
                         </div>
                         <div>
-                          <Label className="text-sm font-semibold text-gray-700">Address 2 (Optional)</Label>
+                          <Label className="text-base font-semibold text-gray-700">Address 2 (Optional)</Label>
                           <Input
                             value={addr.address_2 || ''}
                             onChange={(e) => updateAddress(index, 'address_2', e.target.value)}
                             placeholder="Apt 4B"
-                            className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                            className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                           />
                         </div>
                         <div className="grid grid-cols-3 gap-3">
                           <div className="col-span-1">
-                            <Label className="text-sm font-semibold text-gray-700">City *</Label>
+                            <Label className="text-base font-semibold text-gray-700">City *</Label>
                             <Input
                               value={addr.city || ''}
                               onChange={(e) => updateAddress(index, 'city', e.target.value)}
                               placeholder="Springfield"
-                              className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                              className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                             />
                           </div>
                           <div className="col-span-1">
-                            <Label className="text-sm font-semibold text-gray-700">State *</Label>
+                            <Label className="text-base font-semibold text-gray-700">State *</Label>
                             <Input
                               value={addr.state || ''}
                               onChange={(e) => updateAddress(index, 'state', e.target.value)}
                               placeholder="IL"
-                              className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                              className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                               maxLength={2}
                             />
                           </div>
                           <div className="col-span-1">
-                            <Label className="text-sm font-semibold text-gray-700">Zip *</Label>
+                            <Label className="text-base font-semibold text-gray-700">Zip *</Label>
                             <Input
                               value={addr.zip || ''}
                               onChange={(e) => updateAddress(index, 'zip', e.target.value)}
                               placeholder="62701"
-                              className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                              className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                               maxLength={10}
                             />
                           </div>
@@ -661,14 +661,14 @@ export default function PatientWelcomeFlow() {
                       </div>
 
                       <div>
-                        <Label className="text-sm font-semibold text-gray-700 mb-3 block">Delivery Days</Label>
+                        <Label className="text-base font-semibold text-gray-700 mb-3 block">Delivery Days</Label>
                         <div className="flex flex-wrap gap-2">
                           {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
                             <motion.button
                               key={day}
                               type="button"
                               onClick={() => toggleDeliveryDay(index, day)}
-                              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                              className={`px-4 py-2 rounded-xl text-base font-semibold transition-all ${
                                 (addr.delivery_days || []).includes(day)
                                   ? 'bg-gradient-to-r from-[#8B1F1F] to-[#B52A2A] text-white shadow-lg'
                                   : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-[#8B1F1F] hover:shadow-md'
@@ -684,12 +684,12 @@ export default function PatientWelcomeFlow() {
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <Label className="text-sm font-semibold text-gray-700">From</Label>
+                          <Label className="text-base font-semibold text-gray-700">From</Label>
                           <Popover>
                             <PopoverTrigger asChild>
                               <Button
                                 variant="outline"
-                                className="w-full justify-start text-left font-normal mt-2 h-11 border-gray-200 hover:border-[#8B1F1F]"
+                                className="w-full justify-start text-left font-normal mt-2 h-12 border-gray-200 hover:border-[#8B1F1F] text-base"
                               >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {addr.delivery_from ? format(new Date(addr.delivery_from), 'MMM d, yyyy') : 'Select date'}
@@ -708,12 +708,12 @@ export default function PatientWelcomeFlow() {
                           </Popover>
                         </div>
                         <div>
-                          <Label className="text-sm font-semibold text-gray-700">To</Label>
+                          <Label className="text-base font-semibold text-gray-700">To</Label>
                           <Popover>
                             <PopoverTrigger asChild>
                               <Button
                                 variant="outline"
-                                className="w-full justify-start text-left font-normal mt-2 h-11 border-gray-200 hover:border-[#8B1F1F]"
+                                className="w-full justify-start text-left font-normal mt-2 h-12 border-gray-200 hover:border-[#8B1F1F] text-base"
                               >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {addr.delivery_to ? format(new Date(addr.delivery_to), 'MMM d, yyyy') : 'Select date'}
@@ -734,12 +734,12 @@ export default function PatientWelcomeFlow() {
                       </div>
 
                       <div>
-                        <Label className="text-sm font-semibold text-gray-700">Delivery Time Window</Label>
+                        <Label className="text-base font-semibold text-gray-700">Delivery Time Window</Label>
                         <Input
                           value={addr.delivery_time || ''}
                           onChange={(e) => updateAddress(index, 'delivery_time', e.target.value)}
                           placeholder="9:00 AM - 5:00 PM"
-                          className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                          className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                         />
                       </div>
                     </motion.div>
@@ -769,12 +769,12 @@ export default function PatientWelcomeFlow() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
                   >
-                    <Label className="text-sm font-semibold text-gray-700">Emergency Contact Name *</Label>
+                    <Label className="text-base font-semibold text-gray-700">Emergency Contact Name *</Label>
                     <Input
                       value={formData.emergency_contact_name}
                       onChange={(e) => setFormData({ ...formData, emergency_contact_name: e.target.value })}
                       placeholder="Jane Doe"
-                      className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                      className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                     />
                   </motion.div>
                   <motion.div
@@ -782,12 +782,12 @@ export default function PatientWelcomeFlow() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
                   >
-                    <Label className="text-sm font-semibold text-gray-700">Emergency Contact Phone *</Label>
+                    <Label className="text-base font-semibold text-gray-700">Emergency Contact Phone *</Label>
                     <Input
                       value={formData.emergency_contact_phone}
                       onChange={(e) => setFormData({ ...formData, emergency_contact_phone: e.target.value })}
                       placeholder="(555) 987-6543"
-                      className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                      className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                     />
                   </motion.div>
                 </>
