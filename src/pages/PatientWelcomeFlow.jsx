@@ -646,7 +646,7 @@ export default function PatientWelcomeFlow() {
                   {formData.addresses.map((addr, index) => (
                     <motion.div 
                       key={index} 
-                      className="p-6 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl border border-gray-200 shadow-sm space-y-4 relative"
+                      className="p-6 bg-white rounded-2xl border border-gray-200 shadow-sm space-y-4 relative"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 + index * 0.1 }}
