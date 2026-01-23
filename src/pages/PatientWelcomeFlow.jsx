@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, ChevronLeft, Check, User, Heart, Pill, MapPin, Phone, PartyPopper, Camera, Calendar as CalendarIcon, Trash2 } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, User, Heart, Pill, MapPin, Phone, PartyPopper, Camera, Calendar as CalendarIcon, Trash2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -185,6 +185,16 @@ export default function PatientWelcomeFlow() {
 
     // Geocode when zip is completed and other fields are present
     const addr = newAddresses[index];
+    if (addr.address_1 && addr.city && addr.state && addr.zip && addr.zip.length >= 5) {
+      const coords = await geocodeAddress(addr);
+      if (coords) {
+        setAddressCoordinates(prev => ({ ...prev, [index]: coords }));
+      }
+    }
+  };
+
+  const refreshMap = async (index) => {
+    const addr = formData.addresses[index];
     if (addr.address_1 && addr.city && addr.state && addr.zip && addr.zip.length >= 5) {
       const coords = await geocodeAddress(addr);
       if (coords) {
@@ -807,7 +817,7 @@ export default function PatientWelcomeFlow() {
                           </div>
                         </div>
                       </div>
-                      <div className="h-[300px] bg-gray-100 rounded-lg flex items-center justify-center">
+                      <div className="relative h-[300px] bg-gray-100 rounded-lg flex items-center justify-center">
                         {addressCoordinates[index] ? (
                           <AddressMap
                             lat={addressCoordinates[index].lat}
@@ -816,6 +826,15 @@ export default function PatientWelcomeFlow() {
                           />
                         ) : (
                           <p className="text-gray-500 text-sm">Enter address to see map</p>
+                        )}
+                        {addr.address_1 && addr.city && addr.state && addr.zip && addr.zip.length >= 5 && (
+                          <button
+                            onClick={() => refreshMap(index)}
+                            className="absolute top-3 right-3 p-2 bg-white rounded-lg shadow-lg hover:bg-gray-50 transition-all border border-gray-200"
+                            title="Refresh map"
+                          >
+                            <RefreshCw className="w-4 h-4 text-gray-600" />
+                          </button>
                         )}
                       </div>
                       </div>
