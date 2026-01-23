@@ -12,11 +12,14 @@ import { format } from 'date-fns';
 import { createPageUrl } from '../utils';
 import TagInput from '../components/welcome/TagInput';
 import PrescriptionInput from '../components/welcome/PrescriptionInput';
+import AddressMap from '../components/welcome/AddressMap';
+import { geocodeAddress } from '../components/welcome/geocodeAddress';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function PatientWelcomeFlow() {
   const [currentStep, setCurrentStep] = useState(0);
   const [profilePicture, setProfilePicture] = useState(null);
+  const [addressCoordinates, setAddressCoordinates] = useState({});
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -153,10 +156,19 @@ export default function PatientWelcomeFlow() {
     setFormData({ ...formData, date_of_birth: formatted });
   };
 
-  const updateAddress = (index, field, value) => {
+  const updateAddress = async (index, field, value) => {
     const newAddresses = [...formData.addresses];
     newAddresses[index] = { ...newAddresses[index], [field]: value };
     setFormData({ ...formData, addresses: newAddresses });
+
+    // Check if address is complete and geocode it
+    const addr = newAddresses[index];
+    if (addr.address_1 && addr.city && addr.state && addr.zip) {
+      const coords = await geocodeAddress(addr);
+      if (coords) {
+        setAddressCoordinates(prev => ({ ...prev, [index]: coords }));
+      }
+    }
   };
 
   const toggleDeliveryDay = (index, day) => {
@@ -593,6 +605,8 @@ export default function PatientWelcomeFlow() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 + index * 0.1 }}
                     >
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <div className="lg:col-span-2 space-y-4">
                       <Select 
                         value={addr.name || 'Home'} 
                         onValueChange={(value) => updateAddress(index, 'name', value)}
@@ -741,6 +755,17 @@ export default function PatientWelcomeFlow() {
                           placeholder="9:00 AM - 5:00 PM"
                           className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                         />
+                      </div>
+                        </div>
+                        <div className="lg:col-span-1">
+                          {addressCoordinates[index] && (
+                            <AddressMap
+                              lat={addressCoordinates[index].lat}
+                              lon={addressCoordinates[index].lon}
+                              address={`${addr.address_1}, ${addr.city}, ${addr.state} ${addr.zip}`}
+                            />
+                          )}
+                        </div>
                       </div>
                     </motion.div>
                 ))}
