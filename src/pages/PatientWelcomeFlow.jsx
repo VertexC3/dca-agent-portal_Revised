@@ -20,6 +20,7 @@ export default function PatientWelcomeFlow() {
   const [currentStep, setCurrentStep] = useState(0);
   const [profilePicture, setProfilePicture] = useState(null);
   const [addressCoordinates, setAddressCoordinates] = useState({});
+  const [fieldMessages, setFieldMessages] = useState({});
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -161,19 +162,33 @@ export default function PatientWelcomeFlow() {
     newAddresses[index] = { ...newAddresses[index], [field]: value };
     setFormData({ ...formData, addresses: newAddresses });
 
-    // Geocode whenever we have enough address info
+    // Show encouragement messages
+    const messageKey = `${index}-${field}`;
+    if (value) {
+      const messages = {
+        'address_1': '✓ Great! Address 1 completed, now add your city...',
+        'city': '✓ Excellent! City added, now select your state...',
+        'state': '✓ Perfect! State selected, now enter your zip code...',
+        'zip': '✓ Awesome! Zip code added, generating map...'
+      };
+      if (messages[field]) {
+        setFieldMessages(prev => ({ ...prev, [messageKey]: messages[field] }));
+        setTimeout(() => {
+          setFieldMessages(prev => {
+            const newMessages = { ...prev };
+            delete newMessages[messageKey];
+            return newMessages;
+          });
+        }, 3000);
+      }
+    }
+
+    // Geocode when zip is entered
     const addr = newAddresses[index];
-    if (addr.zip || (addr.address_1 && addr.city && addr.state)) {
+    if (field === 'zip' && value.length >= 5) {
       const coords = await geocodeAddress(addr);
       if (coords) {
         setAddressCoordinates(prev => ({ ...prev, [index]: coords }));
-      } else {
-        // Clear coordinates if geocoding fails
-        setAddressCoordinates(prev => {
-          const newCoords = { ...prev };
-          delete newCoords[index];
-          return newCoords;
-        });
       }
     }
   };
@@ -660,6 +675,16 @@ export default function PatientWelcomeFlow() {
                             placeholder="123 Main St"
                             className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                           />
+                          {fieldMessages[`${index}-address_1`] && (
+                            <motion.p
+                              initial={{ opacity: 0, y: -10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0 }}
+                              className="text-sm text-green-600 mt-1 font-medium"
+                            >
+                              {fieldMessages[`${index}-address_1`]}
+                            </motion.p>
+                          )}
                         </div>
                         <div>
                           <Label className="text-base font-semibold text-gray-700">Address 2 (Optional)</Label>
@@ -679,6 +704,16 @@ export default function PatientWelcomeFlow() {
                               placeholder="Springfield"
                               className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                             />
+                            {fieldMessages[`${index}-city`] && (
+                              <motion.p
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0 }}
+                                className="text-sm text-green-600 mt-1 font-medium"
+                              >
+                                {fieldMessages[`${index}-city`]}
+                              </motion.p>
+                            )}
                           </div>
                           <div className="col-span-1">
                             <Label className="text-base font-semibold text-gray-700">State *</Label>
@@ -739,6 +774,16 @@ export default function PatientWelcomeFlow() {
                                 <SelectItem value="WY">WY</SelectItem>
                               </SelectContent>
                             </Select>
+                            {fieldMessages[`${index}-state`] && (
+                              <motion.p
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0 }}
+                                className="text-sm text-green-600 mt-1 font-medium"
+                              >
+                                {fieldMessages[`${index}-state`]}
+                              </motion.p>
+                            )}
                           </div>
                           <div className="col-span-1">
                             <Label className="text-base font-semibold text-gray-700">Zip *</Label>
@@ -749,6 +794,16 @@ export default function PatientWelcomeFlow() {
                               className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                               maxLength={10}
                             />
+                            {fieldMessages[`${index}-zip`] && (
+                              <motion.p
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0 }}
+                                className="text-sm text-green-600 mt-1 font-medium"
+                              >
+                                {fieldMessages[`${index}-zip`]}
+                              </motion.p>
+                            )}
                           </div>
                         </div>
                       </div>
