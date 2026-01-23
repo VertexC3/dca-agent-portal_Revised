@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import { createPageUrl } from '../utils';
 import TagInput from '../components/welcome/TagInput';
 import PrescriptionInput from '../components/welcome/PrescriptionInput';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function PatientWelcomeFlow() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -195,91 +196,219 @@ export default function PatientWelcomeFlow() {
   const StepIcon = steps[currentStep].icon;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4">
-      <div className="max-w-3xl mx-auto">
-        {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-semibold text-gray-600">Step {currentStep + 1} of {steps.length}</h2>
-            <span className="text-sm font-semibold text-gray-600">{Math.round(progress)}%</span>
-          </div>
-          <Progress value={progress} className="h-2" />
-        </div>
+    <div className="min-h-screen relative overflow-hidden py-16 px-4">
+      {/* Animated Background with Parallax */}
+      <motion.div 
+        className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+      />
+      
+      {/* Floating Background Elements */}
+      <motion.div
+        className="absolute top-20 left-10 w-72 h-72 bg-blue-200/30 rounded-full blur-3xl"
+        animate={{
+          y: [0, 30, 0],
+          x: [0, 20, 0],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+      <motion.div
+        className="absolute bottom-20 right-10 w-96 h-96 bg-purple-200/30 rounded-full blur-3xl"
+        animate={{
+          y: [0, -40, 0],
+          x: [0, -30, 0],
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+      <motion.div
+        className="absolute top-1/2 left-1/2 w-64 h-64 bg-pink-200/20 rounded-full blur-3xl"
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.5, 0.3],
+        }}
+        transition={{
+          duration: 6,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
 
-        {/* Main Card */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
-          {/* Step Header */}
-          <div className="text-center mb-8">
-            {currentStep === 0 ? (
-              <div className="relative inline-block mb-4">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  id="profile-picture-upload"
-                />
-                <label
-                  htmlFor="profile-picture-upload"
-                  className="cursor-pointer group"
+      <div className="max-w-3xl mx-auto relative z-10">
+        {/* Enhanced Progress Bar */}
+        <motion.div 
+          className="mb-12"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <motion.h2 
+              className="text-sm font-semibold text-gray-700 tracking-wide"
+              key={currentStep}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+            >
+              Step {currentStep + 1} of {steps.length}
+            </motion.h2>
+            <motion.span 
+              className="text-sm font-bold text-[#8B1F1F]"
+              key={`progress-${currentStep}`}
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+            >
+              {Math.round(progress)}%
+            </motion.span>
+          </div>
+          <div className="relative h-3 bg-white/50 backdrop-blur-sm rounded-full overflow-hidden shadow-inner">
+            <motion.div
+              className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#8B1F1F] to-[#B52A2A] rounded-full shadow-lg"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            />
+          </div>
+        </motion.div>
+
+        {/* Main Card with Enhanced Animation */}
+        <AnimatePresence mode="wait">
+          <motion.div 
+            key={currentStep}
+            initial={{ opacity: 0, y: 40, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -40, scale: 0.95 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-10 border border-white/20"
+          >
+            {/* Step Header with Enhanced Animation */}
+            <motion.div 
+              className="text-center mb-10"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+            >
+              {currentStep === 0 ? (
+                <motion.div 
+                  className="relative inline-block mb-6"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 >
-                  {profilePicture ? (
-                    <img 
-                      src={profilePicture} 
-                      alt="Profile"
-                      className="w-24 h-24 rounded-full object-cover border-4 border-[#8B1F1F]"
-                    />
-                  ) : (
-                    <div className="w-24 h-24 rounded-full bg-[#8B1F1F] flex items-center justify-center text-white border-4 border-[#8B1F1F]">
-                      <User className="w-12 h-12" />
-                    </div>
-                  )}
-                  <div className="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-lg border-2 border-[#8B1F1F] group-hover:bg-gray-50 transition-all">
-                    <Camera className="w-4 h-4 text-[#8B1F1F]" />
-                  </div>
-                </label>
-              </div>
-            ) : (
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#8B1F1F] text-white mb-4">
-                <StepIcon className="w-8 h-8" />
-              </div>
-            )}
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">{steps[currentStep].title}</h1>
-            <p className="text-gray-600">{steps[currentStep].description}</p>
-          </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="profile-picture-upload"
+                  />
+                  <label
+                    htmlFor="profile-picture-upload"
+                    className="cursor-pointer group"
+                  >
+                    {profilePicture ? (
+                      <motion.img 
+                        src={profilePicture} 
+                        alt="Profile"
+                        className="w-28 h-28 rounded-full object-cover border-4 border-[#8B1F1F] shadow-xl"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", stiffness: 200 }}
+                      />
+                    ) : (
+                      <div className="w-28 h-28 rounded-full bg-gradient-to-br from-[#8B1F1F] to-[#B52A2A] flex items-center justify-center text-white border-4 border-white shadow-xl">
+                        <User className="w-14 h-14" />
+                      </div>
+                    )}
+                    <motion.div 
+                      className="absolute bottom-0 right-0 bg-white rounded-full p-2.5 shadow-xl border-2 border-[#8B1F1F] group-hover:bg-gray-50 transition-all"
+                      whileHover={{ scale: 1.1 }}
+                    >
+                      <Camera className="w-5 h-5 text-[#8B1F1F]" />
+                    </motion.div>
+                  </label>
+                </motion.div>
+              ) : (
+                <motion.div 
+                  className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[#8B1F1F] to-[#B52A2A] text-white mb-6 shadow-xl"
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
+                >
+                  <StepIcon className="w-10 h-10" />
+                </motion.div>
+              )}
+              <motion.h1 
+                className="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-3"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                {steps[currentStep].title}
+              </motion.h1>
+              <motion.p 
+                className="text-gray-600 text-lg"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+              >
+                {steps[currentStep].description}
+              </motion.p>
+            </motion.div>
 
-          {/* Step Content */}
-          <div className="space-y-6">
-            {/* Step 0: Basic Information */}
-            {currentStep === 0 && (
-              <>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>First Name *</Label>
-                    <Input
-                      value={formData.first_name}
-                      onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                      placeholder="John"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label>Last Name *</Label>
-                    <Input
-                      value={formData.last_name}
-                      onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                      placeholder="Doe"
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label>Phone Number *</Label>
-                  <div className="flex gap-2 mt-1">
-                    <Select value={formData.country_code} onValueChange={(value) => setFormData({ ...formData, country_code: value })}>
-                      <SelectTrigger className="w-32">
-                        <SelectValue />
-                      </SelectTrigger>
+            {/* Step Content with Stagger Animation */}
+            <motion.div 
+              className="space-y-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
+              {/* Step 0: Basic Information */}
+              {currentStep === 0 && (
+                <>
+                  <motion.div 
+                    className="grid grid-cols-2 gap-4"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <div>
+                      <Label className="text-sm font-semibold text-gray-700">First Name *</Label>
+                      <Input
+                        value={formData.first_name}
+                        onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                        placeholder="John"
+                        className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-sm font-semibold text-gray-700">Last Name *</Label>
+                      <Input
+                        value={formData.last_name}
+                        onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                        placeholder="Doe"
+                        className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                      />
+                    </div>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                  >
+                    <Label className="text-sm font-semibold text-gray-700">Phone Number *</Label>
+                    <div className="flex gap-2 mt-2">
+                      <Select value={formData.country_code} onValueChange={(value) => setFormData({ ...formData, country_code: value })}>
+                        <SelectTrigger className="w-32 h-11 border-gray-200">
+                          <SelectValue />
+                        </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="+1">🇺🇸 +1</SelectItem>
                         <SelectItem value="+44">🇬🇧 +44</SelectItem>
@@ -294,89 +423,115 @@ export default function PatientWelcomeFlow() {
                         <SelectItem value="+52">🇲🇽 +52</SelectItem>
                       </SelectContent>
                     </Select>
+                      <Input
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        placeholder="(555) 123-4567"
+                        className="flex-1 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                      />
+                    </div>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7 }}
+                  >
+                    <Label className="text-sm font-semibold text-gray-700">Date of Birth (MM/DD/YYYY) *</Label>
                     <Input
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="(555) 123-4567"
-                      className="flex-1"
+                      value={formData.date_of_birth.includes('-') ? formatDateForDisplay(formData.date_of_birth) : formData.date_of_birth}
+                      onChange={(e) => handleDateChange(e.target.value)}
+                      placeholder="MM/DD/YYYY"
+                      maxLength={10}
+                      className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
                     />
-                  </div>
-                </div>
-                <div>
-                  <Label>Date of Birth (MM/DD/YYYY) *</Label>
-                  <Input
-                    value={formData.date_of_birth.includes('-') ? formatDateForDisplay(formData.date_of_birth) : formData.date_of_birth}
-                    onChange={(e) => handleDateChange(e.target.value)}
-                    placeholder="MM/DD/YYYY"
-                    maxLength={10}
-                    className="mt-1"
+                  </motion.div>
+              </>
+            )}
+
+              {/* Step 1: Medical History */}
+              {currentStep === 1 && (
+                <>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <Label className="text-sm font-semibold text-gray-700">Known Allergies</Label>
+                    <div className="mt-2">
+                      <TagInput
+                        value={formData.allergies}
+                        onChange={(value) => setFormData({ ...formData, allergies: value })}
+                        placeholder="Type allergy and press comma (e.g., Penicillin, Peanuts)"
+                      />
+                    </div>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                  >
+                    <Label className="text-sm font-semibold text-gray-700">Current Medications</Label>
+                    <div className="mt-2">
+                      <TagInput
+                        value={formData.current_medications}
+                        onChange={(value) => setFormData({ ...formData, current_medications: value })}
+                        placeholder="Type medication and press comma (e.g., Aspirin, Metformin)"
+                      />
+                    </div>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7 }}
+                  >
+                    <Label className="text-sm font-semibold text-gray-700">Known Medical Conditions</Label>
+                    <div className="mt-2">
+                      <TagInput
+                        value={formData.known_conditions}
+                        onChange={(value) => setFormData({ ...formData, known_conditions: value })}
+                        placeholder="Type condition and press comma (e.g., Hypertension, Diabetes)"
+                      />
+                    </div>
+                  </motion.div>
+              </>
+            )}
+
+              {/* Step 2: Current Prescriptions */}
+              {currentStep === 2 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <Label className="text-sm font-semibold text-gray-700">Current Prescriptions</Label>
+                  <p className="text-sm text-gray-600 mb-4 mt-1">
+                    Add any prescriptions you're currently taking. We'll automatically recognize common medications.
+                  </p>
+                  <PrescriptionInput
+                    value={formData.current_prescriptions}
+                    onChange={(value) => setFormData({ ...formData, current_prescriptions: value })}
                   />
-                </div>
-              </>
-            )}
+                </motion.div>
+              )}
 
-            {/* Step 1: Medical History */}
-            {currentStep === 1 && (
-              <>
-                <div>
-                  <Label>Known Allergies</Label>
-                  <div className="mt-1">
-                    <TagInput
-                      value={formData.allergies}
-                      onChange={(value) => setFormData({ ...formData, allergies: value })}
-                      placeholder="Type allergy and press comma (e.g., Penicillin, Peanuts)"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label>Current Medications</Label>
-                  <div className="mt-1">
-                    <TagInput
-                      value={formData.current_medications}
-                      onChange={(value) => setFormData({ ...formData, current_medications: value })}
-                      placeholder="Type medication and press comma (e.g., Aspirin, Metformin)"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label>Known Medical Conditions</Label>
-                  <div className="mt-1">
-                    <TagInput
-                      value={formData.known_conditions}
-                      onChange={(value) => setFormData({ ...formData, known_conditions: value })}
-                      placeholder="Type condition and press comma (e.g., Hypertension, Diabetes)"
-                    />
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* Step 2: Current Prescriptions */}
-            {currentStep === 2 && (
-              <div>
-                <Label>Current Prescriptions</Label>
-                <p className="text-sm text-gray-500 mb-3">
-                  Add any prescriptions you're currently taking. We'll automatically recognize common medications.
-                </p>
-                <PrescriptionInput
-                  value={formData.current_prescriptions}
-                  onChange={(value) => setFormData({ ...formData, current_prescriptions: value })}
-                />
-              </div>
-            )}
-
-            {/* Step 3: Addresses */}
-            {currentStep === 3 && (
-              <div className="space-y-6">
-                {formData.addresses.map((addr, index) => (
-                  <div key={index} className="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
-                    <Select 
-                      value={addr.name || 'Home'} 
-                      onValueChange={(value) => updateAddress(index, 'name', value)}
+              {/* Step 3: Addresses */}
+              {currentStep === 3 && (
+                <div className="space-y-6">
+                  {formData.addresses.map((addr, index) => (
+                    <motion.div 
+                      key={index} 
+                      className="p-6 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-2xl border border-gray-200 shadow-sm space-y-4"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 + index * 0.1 }}
                     >
-                      <SelectTrigger className="font-semibold">
-                        <SelectValue />
-                      </SelectTrigger>
+                      <Select 
+                        value={addr.name || 'Home'} 
+                        onValueChange={(value) => updateAddress(index, 'name', value)}
+                      >
+                        <SelectTrigger className="font-semibold h-11 border-gray-200">
+                          <SelectValue />
+                        </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Home">Home</SelectItem>
                         <SelectItem value="Work">Work</SelectItem>
@@ -385,319 +540,399 @@ export default function PatientWelcomeFlow() {
                       </SelectContent>
                     </Select>
                     
-                    <div className="grid grid-cols-1 gap-3">
+                      <div className="grid grid-cols-1 gap-4">
+                        <div>
+                          <Label className="text-sm font-semibold text-gray-700">Address 1 *</Label>
+                          <Input
+                            value={addr.address_1 || ''}
+                            onChange={(e) => updateAddress(index, 'address_1', e.target.value)}
+                            placeholder="123 Main St"
+                            className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-sm font-semibold text-gray-700">Address 2 (Optional)</Label>
+                          <Input
+                            value={addr.address_2 || ''}
+                            onChange={(e) => updateAddress(index, 'address_2', e.target.value)}
+                            placeholder="Apt 4B"
+                            className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                          />
+                        </div>
+                        <div className="grid grid-cols-3 gap-3">
+                          <div className="col-span-1">
+                            <Label className="text-sm font-semibold text-gray-700">City *</Label>
+                            <Input
+                              value={addr.city || ''}
+                              onChange={(e) => updateAddress(index, 'city', e.target.value)}
+                              placeholder="Springfield"
+                              className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <Label className="text-sm font-semibold text-gray-700">State *</Label>
+                            <Input
+                              value={addr.state || ''}
+                              onChange={(e) => updateAddress(index, 'state', e.target.value)}
+                              placeholder="IL"
+                              className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                              maxLength={2}
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <Label className="text-sm font-semibold text-gray-700">Zip *</Label>
+                            <Input
+                              value={addr.zip || ''}
+                              onChange={(e) => updateAddress(index, 'zip', e.target.value)}
+                              placeholder="62701"
+                              className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                              maxLength={10}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
                       <div>
-                        <Label className="text-xs text-gray-600">Address 1 *</Label>
+                        <Label className="text-sm font-semibold text-gray-700 mb-3 block">Delivery Days</Label>
+                        <div className="flex flex-wrap gap-2">
+                          {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
+                            <motion.button
+                              key={day}
+                              type="button"
+                              onClick={() => toggleDeliveryDay(index, day)}
+                              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                                (addr.delivery_days || []).includes(day)
+                                  ? 'bg-gradient-to-r from-[#8B1F1F] to-[#B52A2A] text-white shadow-lg'
+                                  : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-[#8B1F1F] hover:shadow-md'
+                              }`}
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              {day.slice(0, 3)}
+                            </motion.button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label className="text-sm font-semibold text-gray-700">From</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className="w-full justify-start text-left font-normal mt-2 h-11 border-gray-200 hover:border-[#8B1F1F]"
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {addr.delivery_from ? format(new Date(addr.delivery_from), 'MMM d, yyyy') : 'Select date'}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={addr.delivery_from ? new Date(addr.delivery_from) : undefined}
+                                onSelect={(date) => updateAddress(index, 'delivery_from', date?.toISOString())}
+                                captionLayout="dropdown-buttons"
+                                fromYear={2020}
+                                toYear={2030}
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-semibold text-gray-700">To</Label>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className="w-full justify-start text-left font-normal mt-2 h-11 border-gray-200 hover:border-[#8B1F1F]"
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {addr.delivery_to ? format(new Date(addr.delivery_to), 'MMM d, yyyy') : 'Select date'}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={addr.delivery_to ? new Date(addr.delivery_to) : undefined}
+                                onSelect={(date) => updateAddress(index, 'delivery_to', date?.toISOString())}
+                                captionLayout="dropdown-buttons"
+                                fromYear={2020}
+                                toYear={2030}
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label className="text-sm font-semibold text-gray-700">Delivery Time Window</Label>
                         <Input
-                          value={addr.address_1 || ''}
-                          onChange={(e) => updateAddress(index, 'address_1', e.target.value)}
-                          placeholder="123 Main St"
-                          className="mt-1"
+                          value={addr.delivery_time || ''}
+                          onChange={(e) => updateAddress(index, 'delivery_time', e.target.value)}
+                          placeholder="9:00 AM - 5:00 PM"
+                          className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
                         />
                       </div>
-                      <div>
-                        <Label className="text-xs text-gray-600">Address 2 (Optional)</Label>
-                        <Input
-                          value={addr.address_2 || ''}
-                          onChange={(e) => updateAddress(index, 'address_2', e.target.value)}
-                          placeholder="Apt 4B"
-                          className="mt-1"
-                        />
-                      </div>
-                      <div className="grid grid-cols-3 gap-3">
-                        <div className="col-span-1">
-                          <Label className="text-xs text-gray-600">City *</Label>
-                          <Input
-                            value={addr.city || ''}
-                            onChange={(e) => updateAddress(index, 'city', e.target.value)}
-                            placeholder="Springfield"
-                            className="mt-1"
-                          />
-                        </div>
-                        <div className="col-span-1">
-                          <Label className="text-xs text-gray-600">State *</Label>
-                          <Input
-                            value={addr.state || ''}
-                            onChange={(e) => updateAddress(index, 'state', e.target.value)}
-                            placeholder="IL"
-                            className="mt-1"
-                            maxLength={2}
-                          />
-                        </div>
-                        <div className="col-span-1">
-                          <Label className="text-xs text-gray-600">Zip *</Label>
-                          <Input
-                            value={addr.zip || ''}
-                            onChange={(e) => updateAddress(index, 'zip', e.target.value)}
-                            placeholder="62701"
-                            className="mt-1"
-                            maxLength={10}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label className="text-xs text-gray-600 mb-2 block">Delivery Days</Label>
-                      <div className="flex flex-wrap gap-2">
-                        {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
-                          <button
-                            key={day}
-                            type="button"
-                            onClick={() => toggleDeliveryDay(index, day)}
-                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                              (addr.delivery_days || []).includes(day)
-                                ? 'bg-[#8B1F1F] text-white shadow-md'
-                                : 'bg-white text-gray-600 border border-gray-300 hover:border-[#8B1F1F]'
-                            }`}
-                          >
-                            {day.slice(0, 3)}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-xs text-gray-600">From</Label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="w-full justify-start text-left font-normal mt-1"
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {addr.delivery_from ? format(new Date(addr.delivery_from), 'MMM d, yyyy') : 'Select date'}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={addr.delivery_from ? new Date(addr.delivery_from) : undefined}
-                              onSelect={(date) => updateAddress(index, 'delivery_from', date?.toISOString())}
-                              captionLayout="dropdown-buttons"
-                              fromYear={2020}
-                              toYear={2030}
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-                      <div>
-                        <Label className="text-xs text-gray-600">To</Label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="w-full justify-start text-left font-normal mt-1"
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {addr.delivery_to ? format(new Date(addr.delivery_to), 'MMM d, yyyy') : 'Select date'}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={addr.delivery_to ? new Date(addr.delivery_to) : undefined}
-                              onSelect={(date) => updateAddress(index, 'delivery_to', date?.toISOString())}
-                              captionLayout="dropdown-buttons"
-                              fromYear={2020}
-                              toYear={2030}
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label className="text-xs text-gray-600">Delivery Time Window</Label>
-                      <Input
-                        value={addr.delivery_time || ''}
-                        onChange={(e) => updateAddress(index, 'delivery_time', e.target.value)}
-                        placeholder="9:00 AM - 5:00 PM"
-                        className="mt-1"
-                      />
-                    </div>
-                  </div>
+                    </motion.div>
                 ))}
 
-                <Button
-                  variant="outline"
-                  onClick={addAddress}
-                  className="w-full"
-                >
-                  Add Another Address
-                </Button>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.8 }}
+                  >
+                    <Button
+                      variant="outline"
+                      onClick={addAddress}
+                      className="w-full h-12 border-2 border-dashed border-gray-300 hover:border-[#8B1F1F] hover:bg-[#8B1F1F]/5 text-gray-700 font-semibold"
+                    >
+                      Add Another Address
+                    </Button>
+                  </motion.div>
               </div>
             )}
 
-            {/* Step 4: Emergency Contact */}
-            {currentStep === 4 && (
-              <>
-                <div>
-                  <Label>Emergency Contact Name *</Label>
-                  <Input
-                    value={formData.emergency_contact_name}
-                    onChange={(e) => setFormData({ ...formData, emergency_contact_name: e.target.value })}
-                    placeholder="Jane Doe"
-                    className="mt-1"
-                  />
+              {/* Step 4: Emergency Contact */}
+              {currentStep === 4 && (
+                <>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <Label className="text-sm font-semibold text-gray-700">Emergency Contact Name *</Label>
+                    <Input
+                      value={formData.emergency_contact_name}
+                      onChange={(e) => setFormData({ ...formData, emergency_contact_name: e.target.value })}
+                      placeholder="Jane Doe"
+                      className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                    />
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                  >
+                    <Label className="text-sm font-semibold text-gray-700">Emergency Contact Phone *</Label>
+                    <Input
+                      value={formData.emergency_contact_phone}
+                      onChange={(e) => setFormData({ ...formData, emergency_contact_phone: e.target.value })}
+                      placeholder="(555) 987-6543"
+                      className="mt-2 h-11 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                    />
+                  </motion.div>
+                </>
+              )}
+
+              {/* Step 5: Welcome */}
+              {currentStep === 5 && (
+                <div className="py-8">
+                  <motion.div 
+                    className="text-center mb-10"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1, rotate: 360 }}
+                      transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+                    >
+                      <Check className="w-24 h-24 mx-auto text-green-500 mb-6" />
+                    </motion.div>
+                    <motion.h2 
+                      className="text-3xl font-bold text-gray-800 mb-3"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                    >
+                      You're All Set!
+                    </motion.h2>
+                    <motion.p 
+                      className="text-gray-600 text-lg mb-8"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.5 }}
+                    >
+                      Your profile has been completed. You can now access all features of the patient portal.
+                    </motion.p>
+                  </motion.div>
+
+                  {/* Profile Overview */}
+                  <div className="space-y-5 max-w-2xl mx-auto">
+                    {/* Basic Information */}
+                    <motion.div 
+                      className="bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-200 rounded-2xl p-6 shadow-sm"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.6 }}
+                    >
+                      <h3 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
+                        <User className="w-6 h-6" />
+                        Basic Information
+                      </h3>
+                      <div className="space-y-2 text-base">
+                        <p className="text-blue-800"><strong>Name:</strong> {formData.first_name} {formData.last_name}</p>
+                        <p className="text-blue-800"><strong>Phone:</strong> {formData.country_code} {formData.phone}</p>
+                        <p className="text-blue-800"><strong>Date of Birth:</strong> {formData.date_of_birth.includes('-') ? formatDateForDisplay(formData.date_of_birth) : formData.date_of_birth}</p>
+                      </div>
+                    </motion.div>
+
+                    {/* Medical History */}
+                    <motion.div 
+                      className="bg-gradient-to-br from-purple-50 to-purple-100/50 border border-purple-200 rounded-2xl p-6 shadow-sm"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.7 }}
+                    >
+                      <h3 className="text-xl font-bold text-purple-900 mb-4 flex items-center gap-2">
+                        <Heart className="w-6 h-6" />
+                        Medical History
+                      </h3>
+                      <div className="space-y-2 text-base">
+                        <p className="text-purple-800"><strong>Allergies:</strong> {formData.allergies.length > 0 ? formData.allergies.join(', ') : 'None'}</p>
+                        <p className="text-purple-800"><strong>Current Medications:</strong> {formData.current_medications.length > 0 ? formData.current_medications.join(', ') : 'None'}</p>
+                        <p className="text-purple-800"><strong>Medical Conditions:</strong> {formData.known_conditions.length > 0 ? formData.known_conditions.join(', ') : 'None'}</p>
+                      </div>
+                    </motion.div>
+
+                    {/* Prescriptions */}
+                    <motion.div 
+                      className="bg-gradient-to-br from-green-50 to-green-100/50 border border-green-200 rounded-2xl p-6 shadow-sm"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.8 }}
+                    >
+                      <h3 className="text-xl font-bold text-green-900 mb-4 flex items-center gap-2">
+                        <Pill className="w-6 h-6" />
+                        Current Prescriptions
+                      </h3>
+                      <div className="space-y-2 text-base">
+                        {formData.current_prescriptions.length > 0 ? (
+                          formData.current_prescriptions.map((rx, idx) => (
+                            <p key={idx} className="text-green-800">• {rx.name} - {rx.dosage}</p>
+                          ))
+                        ) : (
+                          <p className="text-green-800">None added</p>
+                        )}
+                      </div>
+                    </motion.div>
+
+                    {/* Delivery Addresses */}
+                    <motion.div 
+                      className="bg-gradient-to-br from-orange-50 to-orange-100/50 border border-orange-200 rounded-2xl p-6 shadow-sm"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.9 }}
+                    >
+                      <h3 className="text-xl font-bold text-orange-900 mb-4 flex items-center gap-2">
+                        <MapPin className="w-6 h-6" />
+                        Delivery Addresses
+                      </h3>
+                      <div className="space-y-4 text-base">
+                        {formData.addresses.map((addr, idx) => (
+                          <div key={idx} className="text-orange-800">
+                            <p><strong>{addr.name}:</strong> {addr.address_1}{addr.address_2 ? `, ${addr.address_2}` : ''}, {addr.city}, {addr.state} {addr.zip}</p>
+                            <p className="text-sm">Delivery Days: {addr.delivery_days.length > 0 ? addr.delivery_days.join(', ') : 'Not set'}</p>
+                            {addr.delivery_from && addr.delivery_to && (
+                              <p className="text-sm">Delivery Period: {format(new Date(addr.delivery_from), 'MMM d, yyyy')} - {format(new Date(addr.delivery_to), 'MMM d, yyyy')}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+
+                    {/* Emergency Contact */}
+                    <motion.div 
+                      className="bg-gradient-to-br from-red-50 to-red-100/50 border border-red-200 rounded-2xl p-6 shadow-sm"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 1.0 }}
+                    >
+                      <h3 className="text-xl font-bold text-red-900 mb-4 flex items-center gap-2">
+                        <Phone className="w-6 h-6" />
+                        Emergency Contact
+                      </h3>
+                      <div className="space-y-2 text-base">
+                        <p className="text-red-800"><strong>Name:</strong> {formData.emergency_contact_name}</p>
+                        <p className="text-red-800"><strong>Phone:</strong> {formData.emergency_contact_phone}</p>
+                      </div>
+                    </motion.div>
+                  </div>
                 </div>
-                <div>
-                  <Label>Emergency Contact Phone *</Label>
-                  <Input
-                    value={formData.emergency_contact_phone}
-                    onChange={(e) => setFormData({ ...formData, emergency_contact_phone: e.target.value })}
-                    placeholder="(555) 987-6543"
-                    className="mt-1"
-                  />
-                </div>
-              </>
-            )}
+              )}
+            </motion.div>
 
-            {/* Step 5: Welcome */}
-            {currentStep === 5 && (
-              <div className="py-8">
-                <div className="text-center mb-8">
-                  <Check className="w-20 h-20 mx-auto text-green-500 mb-4" />
-                  <h2 className="text-2xl font-bold text-gray-800 mb-2">You're All Set!</h2>
-                  <p className="text-gray-600 mb-6">
-                    Your profile has been completed. You can now access all features of the patient portal.
-                  </p>
-                </div>
+            {/* Enhanced Navigation Buttons */}
+            <motion.div 
+              className="flex gap-4 mt-10 pt-8 border-t border-gray-200"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              {currentStep > 0 && currentStep < steps.length - 1 && (
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    variant="outline"
+                    onClick={handleBack}
+                    className="flex items-center gap-2 h-12 px-6 border-2 border-gray-300 hover:border-[#8B1F1F] hover:bg-[#8B1F1F]/5 font-semibold"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                    Back
+                  </Button>
+                </motion.div>
+              )}
+              
+              {currentStep < steps.length - 2 && (
+                <motion.div className="ml-auto" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    onClick={handleNext}
+                    className="bg-gradient-to-r from-[#8B1F1F] to-[#B52A2A] hover:from-[#721919] hover:to-[#8B1F1F] text-white flex items-center gap-2 h-12 px-8 shadow-lg font-semibold"
+                  >
+                    Continue
+                    <ChevronRight className="w-5 h-5" />
+                  </Button>
+                </motion.div>
+              )}
 
-                {/* Profile Overview */}
-                <div className="space-y-4 max-w-2xl mx-auto">
-                  {/* Basic Information */}
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
-                    <h3 className="text-lg font-bold text-blue-900 mb-3 flex items-center gap-2">
-                      <User className="w-5 h-5" />
-                      Basic Information
-                    </h3>
-                    <div className="space-y-1.5 text-base">
-                      <p className="text-blue-800"><strong>Name:</strong> {formData.first_name} {formData.last_name}</p>
-                      <p className="text-blue-800"><strong>Phone:</strong> {formData.country_code} {formData.phone}</p>
-                      <p className="text-blue-800"><strong>Date of Birth:</strong> {formData.date_of_birth.includes('-') ? formatDateForDisplay(formData.date_of_birth) : formData.date_of_birth}</p>
-                    </div>
-                  </div>
+              {currentStep === steps.length - 2 && (
+                <motion.div className="ml-auto" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    onClick={handleNext}
+                    className="bg-gradient-to-r from-[#8B1F1F] to-[#B52A2A] hover:from-[#721919] hover:to-[#8B1F1F] text-white flex items-center gap-2 h-12 px-8 shadow-lg font-semibold"
+                  >
+                    Complete Setup
+                    <Check className="w-5 h-5" />
+                  </Button>
+                </motion.div>
+              )}
 
-                  {/* Medical History */}
-                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-5">
-                    <h3 className="text-lg font-bold text-purple-900 mb-3 flex items-center gap-2">
-                      <Heart className="w-5 h-5" />
-                      Medical History
-                    </h3>
-                    <div className="space-y-1.5 text-base">
-                      <p className="text-purple-800"><strong>Allergies:</strong> {formData.allergies.length > 0 ? formData.allergies.join(', ') : 'None'}</p>
-                      <p className="text-purple-800"><strong>Current Medications:</strong> {formData.current_medications.length > 0 ? formData.current_medications.join(', ') : 'None'}</p>
-                      <p className="text-purple-800"><strong>Medical Conditions:</strong> {formData.known_conditions.length > 0 ? formData.known_conditions.join(', ') : 'None'}</p>
-                    </div>
-                  </div>
-
-                  {/* Prescriptions */}
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-5">
-                    <h3 className="text-lg font-bold text-green-900 mb-3 flex items-center gap-2">
-                      <Pill className="w-5 h-5" />
-                      Current Prescriptions
-                    </h3>
-                    <div className="space-y-1.5 text-base">
-                      {formData.current_prescriptions.length > 0 ? (
-                        formData.current_prescriptions.map((rx, idx) => (
-                          <p key={idx} className="text-green-800">• {rx.name} - {rx.dosage}</p>
-                        ))
-                      ) : (
-                        <p className="text-green-800">None added</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Delivery Addresses */}
-                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-5">
-                    <h3 className="text-lg font-bold text-orange-900 mb-3 flex items-center gap-2">
-                      <MapPin className="w-5 h-5" />
-                      Delivery Addresses
-                    </h3>
-                    <div className="space-y-3 text-base">
-                      {formData.addresses.map((addr, idx) => (
-                        <div key={idx} className="text-orange-800">
-                          <p><strong>{addr.name}:</strong> {addr.address_1}{addr.address_2 ? `, ${addr.address_2}` : ''}, {addr.city}, {addr.state} {addr.zip}</p>
-                          <p className="text-sm">Delivery Days: {addr.delivery_days.length > 0 ? addr.delivery_days.join(', ') : 'Not set'}</p>
-                          {addr.delivery_from && addr.delivery_to && (
-                            <p className="text-sm">Delivery Period: {format(new Date(addr.delivery_from), 'MMM d, yyyy')} - {format(new Date(addr.delivery_to), 'MMM d, yyyy')}</p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Emergency Contact */}
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-5">
-                    <h3 className="text-lg font-bold text-red-900 mb-3 flex items-center gap-2">
-                      <Phone className="w-5 h-5" />
-                      Emergency Contact
-                    </h3>
-                    <div className="space-y-1.5 text-base">
-                      <p className="text-red-800"><strong>Name:</strong> {formData.emergency_contact_name}</p>
-                      <p className="text-red-800"><strong>Phone:</strong> {formData.emergency_contact_phone}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Navigation Buttons */}
-          <div className="flex gap-3 mt-8 pt-6 border-t border-gray-200">
-            {currentStep > 0 && currentStep < steps.length - 1 && (
-              <Button
-                variant="outline"
-                onClick={handleBack}
-                className="flex items-center gap-2"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                Back
-              </Button>
-            )}
-            
-            {currentStep < steps.length - 2 && (
-              <Button
-                onClick={handleNext}
-                className="ml-auto bg-[#8B1F1F] hover:bg-[#721919] text-white flex items-center gap-2"
-              >
-                Continue
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            )}
-
-            {currentStep === steps.length - 2 && (
-              <Button
-                onClick={handleNext}
-                className="ml-auto bg-[#8B1F1F] hover:bg-[#721919] text-white flex items-center gap-2"
-              >
-                Complete Setup
-                <Check className="w-4 h-4" />
-              </Button>
-            )}
-
-            {currentStep === steps.length - 1 && (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={handleBack}
-                  className="flex items-center gap-2"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  Back
-                </Button>
-                <Button
-                  onClick={handleComplete}
-                  className="ml-auto bg-[#8B1F1F] hover:bg-[#721919] text-white px-8"
-                >
-                  Go to Dashboard
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
+              {currentStep === steps.length - 1 && (
+                <>
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Button
+                      variant="outline"
+                      onClick={handleBack}
+                      className="flex items-center gap-2 h-12 px-6 border-2 border-gray-300 hover:border-[#8B1F1F] hover:bg-[#8B1F1F]/5 font-semibold"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                      Back
+                    </Button>
+                  </motion.div>
+                  <motion.div className="ml-auto" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      onClick={handleComplete}
+                      className="bg-gradient-to-r from-[#8B1F1F] to-[#B52A2A] hover:from-[#721919] hover:to-[#8B1F1F] text-white h-12 px-10 shadow-xl font-bold text-lg"
+                    >
+                      Go to Dashboard
+                    </Button>
+                  </motion.div>
+                </>
+              )}
+            </motion.div>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
