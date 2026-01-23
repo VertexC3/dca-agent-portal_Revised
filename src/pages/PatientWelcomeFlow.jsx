@@ -619,9 +619,18 @@ export default function PatientWelcomeFlow() {
                         className="flex-1 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                       />
                       {phoneValidated ? (
-                        <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-lg border-2 border-green-500">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (window.confirm('Are you sure you want to disconnect this phone number? You will need to validate it again.')) {
+                              setPhoneValidated(false);
+                            }
+                          }}
+                          className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-lg border-2 border-green-500 hover:bg-green-200 transition-all cursor-pointer"
+                          title="Click to disconnect"
+                        >
                           <Check className="w-6 h-6 text-green-600" />
-                        </div>
+                        </button>
                       ) : (
                         <Button
                           type="button"
