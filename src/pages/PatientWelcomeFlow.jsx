@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, ChevronLeft, Check, User, Heart, Pill, MapPin, Phone, PartyPopper, Camera, Calendar as CalendarIcon, Trash2, RefreshCw } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, User, Heart, Pill, MapPin, Phone, PartyPopper, Camera, Calendar as CalendarIcon, Trash2, RefreshCw, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,7 +21,11 @@ export default function PatientWelcomeFlow() {
   const [profilePicture, setProfilePicture] = useState(null);
   const [addressCoordinates, setAddressCoordinates] = useState({});
   const [fieldMessages, setFieldMessages] = useState({});
+  const [phoneValidated, setPhoneValidated] = useState(false);
+  const [showMfaDialog, setShowMfaDialog] = useState(false);
+  const [mfaCode, setMfaCode] = useState('');
   const [formData, setFormData] = useState({
+    email: '',
     first_name: '',
     last_name: '',
     phone: '',
@@ -91,6 +95,21 @@ export default function PatientWelcomeFlow() {
     }
   };
 
+  const handleValidatePhone = () => {
+    setShowMfaDialog(true);
+    setMfaCode('');
+  };
+
+  const handleMfaSubmit = () => {
+    if (mfaCode === '123456') {
+      setPhoneValidated(true);
+      setShowMfaDialog(false);
+      setMfaCode('');
+    } else {
+      alert('Invalid code. Please try again.');
+    }
+  };
+
   const handleComplete = () => {
     // Save to localStorage
     const existingUser = JSON.parse(localStorage.getItem('mockUser') || '{}');
@@ -99,6 +118,7 @@ export default function PatientWelcomeFlow() {
       ...formData,
       full_name: `${formData.first_name} ${formData.last_name}`,
       profile_picture: profilePicture,
+      phone_validated: phoneValidated,
       // Convert arrays to strings for backward compatibility
       allergies: formData.allergies.join(', '),
       current_medications: formData.current_medications.join(', '),
@@ -499,11 +519,25 @@ export default function PatientWelcomeFlow() {
               {/* Step 0: Basic Information */}
               {currentStep === 0 && (
                 <>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <Label className="text-base font-semibold text-gray-700">Email *</Label>
+                    <Input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      placeholder="john.doe@example.com"
+                      className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
+                    />
+                  </motion.div>
                   <motion.div 
                     className="grid grid-cols-2 gap-4"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
+                    transition={{ delay: 0.6 }}
                   >
                     <div>
                       <Label className="text-base font-semibold text-gray-700">First Name *</Label>
@@ -527,7 +561,7 @@ export default function PatientWelcomeFlow() {
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6 }}
+                    transition={{ delay: 0.7 }}
                   >
                     <Label className="text-base font-semibold text-gray-700">Phone Number *</Label>
                     <div className="flex gap-2 mt-2">
@@ -555,12 +589,27 @@ export default function PatientWelcomeFlow() {
                         placeholder="(555) 123-4567"
                         className="flex-1 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                       />
+                      {phoneValidated ? (
+                        <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-lg border-2 border-green-500">
+                          <Check className="w-6 h-6 text-green-600" />
+                        </div>
+                      ) : (
+                        <Button
+                          type="button"
+                          onClick={handleValidatePhone}
+                          disabled={!formData.phone}
+                          className="h-12 bg-[#8B1F1F] hover:bg-[#721919] text-white"
+                        >
+                          <Shield className="w-4 h-4 mr-1" />
+                          Validate
+                        </Button>
+                      )}
                     </div>
                   </motion.div>
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.7 }}
+                    transition={{ delay: 0.8 }}
                   >
                     <Label className="text-base font-semibold text-gray-700">Date of Birth (MM/DD/YYYY) *</Label>
                     <Input
@@ -1020,8 +1069,9 @@ export default function PatientWelcomeFlow() {
                         Basic Information
                       </h3>
                       <div className="space-y-2 text-base">
+                        <p className="text-blue-800"><strong>Email:</strong> {formData.email}</p>
                         <p className="text-blue-800"><strong>Name:</strong> {formData.first_name} {formData.last_name}</p>
-                        <p className="text-blue-800"><strong>Phone:</strong> {formData.country_code} {formData.phone}</p>
+                        <p className="text-blue-800"><strong>Phone:</strong> {formData.country_code} {formData.phone} {phoneValidated && '✓ Verified'}</p>
                         <p className="text-blue-800"><strong>Date of Birth:</strong> {formData.date_of_birth.includes('-') ? formatDateForDisplay(formData.date_of_birth) : formData.date_of_birth}</p>
                       </div>
                     </motion.div>
