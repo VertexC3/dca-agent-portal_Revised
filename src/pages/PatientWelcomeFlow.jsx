@@ -1183,6 +1183,57 @@ export default function PatientWelcomeFlow() {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {/* MFA Dialog */}
+      {showMfaDialog && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full"
+          >
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-[#8B1F1F]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-8 h-8 text-[#8B1F1F]" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">Verify Your Phone</h3>
+              <p className="text-gray-600">
+                A 6-digit code has been sent to<br />
+                <span className="font-semibold">{formData.country_code} {formData.phone}</span>
+              </p>
+            </div>
+            
+            <div className="mb-6">
+              <Label className="text-base font-semibold text-gray-700 mb-2 block">Enter 6-Digit Code</Label>
+              <Input
+                type="text"
+                value={mfaCode}
+                onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="123456"
+                maxLength={6}
+                className="h-14 text-center text-2xl font-bold tracking-widest border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowMfaDialog(false)}
+                className="flex-1 h-12 border-2 border-gray-300 hover:border-[#8B1F1F] hover:bg-[#8B1F1F]/5"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleMfaSubmit}
+                disabled={mfaCode.length !== 6}
+                className="flex-1 h-12 bg-gradient-to-r from-[#8B1F1F] to-[#B52A2A] hover:from-[#721919] hover:to-[#8B1F1F] text-white"
+              >
+                Verify
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
