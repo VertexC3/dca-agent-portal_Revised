@@ -788,17 +788,6 @@ export default function PatientWelcomeFlow() {
                           className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                         />
                       </div>
-                        </div>
-                        <div className="lg:col-span-1">
-                          {addressCoordinates[index] && (
-                            <AddressMap
-                              lat={addressCoordinates[index].lat}
-                              lon={addressCoordinates[index].lon}
-                              address={`${addr.address_1}, ${addr.city}, ${addr.state} ${addr.zip}`}
-                            />
-                          )}
-                        </div>
-                      </div>
                     </motion.div>
                 ))}
 
