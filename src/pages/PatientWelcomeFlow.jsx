@@ -461,20 +461,86 @@ export default function PatientWelcomeFlow() {
 
             {/* Step 5: Welcome */}
             {currentStep === 5 && (
-              <div className="text-center py-8">
-                <div className="mb-6">
+              <div className="py-8">
+                <div className="text-center mb-8">
                   <Check className="w-20 h-20 mx-auto text-green-500 mb-4" />
                   <h2 className="text-2xl font-bold text-gray-800 mb-2">You're All Set!</h2>
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-gray-600 mb-6">
                     Your profile has been completed. You can now access all features of the patient portal.
                   </p>
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4 max-w-md mx-auto">
-                    <p className="text-sm text-green-800">
-                      ✓ Profile information saved<br />
-                      ✓ Medical history recorded<br />
-                      ✓ Delivery addresses configured<br />
-                      ✓ Emergency contact added
-                    </p>
+                </div>
+
+                {/* Profile Overview */}
+                <div className="space-y-4 max-w-2xl mx-auto">
+                  {/* Basic Information */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
+                    <h3 className="text-lg font-bold text-blue-900 mb-3 flex items-center gap-2">
+                      <User className="w-5 h-5" />
+                      Basic Information
+                    </h3>
+                    <div className="space-y-1.5 text-base">
+                      <p className="text-blue-800"><strong>Name:</strong> {formData.first_name} {formData.last_name}</p>
+                      <p className="text-blue-800"><strong>Phone:</strong> {formData.country_code} {formData.phone}</p>
+                      <p className="text-blue-800"><strong>Date of Birth:</strong> {formData.date_of_birth.includes('-') ? formatDateForDisplay(formData.date_of_birth) : formData.date_of_birth}</p>
+                    </div>
+                  </div>
+
+                  {/* Medical History */}
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-5">
+                    <h3 className="text-lg font-bold text-purple-900 mb-3 flex items-center gap-2">
+                      <Heart className="w-5 h-5" />
+                      Medical History
+                    </h3>
+                    <div className="space-y-1.5 text-base">
+                      <p className="text-purple-800"><strong>Allergies:</strong> {formData.allergies.length > 0 ? formData.allergies.join(', ') : 'None'}</p>
+                      <p className="text-purple-800"><strong>Current Medications:</strong> {formData.current_medications.length > 0 ? formData.current_medications.join(', ') : 'None'}</p>
+                      <p className="text-purple-800"><strong>Medical Conditions:</strong> {formData.known_conditions.length > 0 ? formData.known_conditions.join(', ') : 'None'}</p>
+                    </div>
+                  </div>
+
+                  {/* Prescriptions */}
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-5">
+                    <h3 className="text-lg font-bold text-green-900 mb-3 flex items-center gap-2">
+                      <Pill className="w-5 h-5" />
+                      Current Prescriptions
+                    </h3>
+                    <div className="space-y-1.5 text-base">
+                      {formData.current_prescriptions.length > 0 ? (
+                        formData.current_prescriptions.map((rx, idx) => (
+                          <p key={idx} className="text-green-800">• {rx.name} - {rx.dosage}</p>
+                        ))
+                      ) : (
+                        <p className="text-green-800">None added</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Delivery Addresses */}
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-5">
+                    <h3 className="text-lg font-bold text-orange-900 mb-3 flex items-center gap-2">
+                      <MapPin className="w-5 h-5" />
+                      Delivery Addresses
+                    </h3>
+                    <div className="space-y-3 text-base">
+                      {formData.addresses.map((addr, idx) => (
+                        <div key={idx} className="text-orange-800">
+                          <p><strong>{addr.name}:</strong> {addr.address}</p>
+                          <p className="text-sm">Delivery Days: {addr.delivery_days.length > 0 ? addr.delivery_days.join(', ') : 'Not set'}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Emergency Contact */}
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-5">
+                    <h3 className="text-lg font-bold text-red-900 mb-3 flex items-center gap-2">
+                      <Phone className="w-5 h-5" />
+                      Emergency Contact
+                    </h3>
+                    <div className="space-y-1.5 text-base">
+                      <p className="text-red-800"><strong>Name:</strong> {formData.emergency_contact_name}</p>
+                      <p className="text-red-800"><strong>Phone:</strong> {formData.emergency_contact_phone}</p>
+                    </div>
                   </div>
                 </div>
               </div>
