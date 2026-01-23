@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Mail, Phone, MapPin, Calendar, Save, Plus, Trash2, Package, Star, CreditCard, Pill } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Calendar as CalendarIcon, Save, Plus, Trash2, Package, Star, CreditCard, Pill } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,6 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
 import OrderHistory from '../components/patient/OrderHistory';
 import CollapsibleOrderHistory from '../components/patient/CollapsibleOrderHistory';
 import PaymentManagement from '../components/patient/PaymentManagement';
@@ -22,8 +25,14 @@ const mockUser = {
   addresses: [
     {
       name: 'Home',
-      address: '123 Main St, Springfield, IL 62701',
+      address_1: '123 Main St',
+      address_2: '',
+      city: 'Springfield',
+      state: 'IL',
+      zip: '62701',
       delivery_days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      delivery_from: null,
+      delivery_to: null,
       delivery_time: '9:00 AM - 5:00 PM',
       is_primary: true
     }
@@ -75,8 +84,14 @@ export default function PatientProfile() {
         ...profileData.addresses,
         {
           name: 'Home',
-          address: '',
+          address_1: '',
+          address_2: '',
+          city: '',
+          state: '',
+          zip: '',
           delivery_days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+          delivery_from: null,
+          delivery_to: null,
           delivery_time: '9:00 AM - 5:00 PM',
           is_primary: false
         }
@@ -294,15 +309,56 @@ export default function PatientProfile() {
                   </label>
                 </div>
                 
-                <div>
-                  <Label className="text-xs text-gray-600">Full Address</Label>
-                  <Textarea
-                    value={addr.address || ''}
-                    onChange={(e) => updateAddress(index, 'address', e.target.value)}
-                    placeholder="123 Main St, Springfield, IL 62701"
-                    className="mt-1"
-                    rows={2}
-                  />
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <Label className="text-xs text-gray-600">Address 1</Label>
+                    <Input
+                      value={addr.address_1 || ''}
+                      onChange={(e) => updateAddress(index, 'address_1', e.target.value)}
+                      placeholder="123 Main St"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-600">Address 2 (Optional)</Label>
+                    <Input
+                      value={addr.address_2 || ''}
+                      onChange={(e) => updateAddress(index, 'address_2', e.target.value)}
+                      placeholder="Apt 4B"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="col-span-1">
+                      <Label className="text-xs text-gray-600">City</Label>
+                      <Input
+                        value={addr.city || ''}
+                        onChange={(e) => updateAddress(index, 'city', e.target.value)}
+                        placeholder="Springfield"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div className="col-span-1">
+                      <Label className="text-xs text-gray-600">State</Label>
+                      <Input
+                        value={addr.state || ''}
+                        onChange={(e) => updateAddress(index, 'state', e.target.value)}
+                        placeholder="IL"
+                        className="mt-1"
+                        maxLength={2}
+                      />
+                    </div>
+                    <div className="col-span-1">
+                      <Label className="text-xs text-gray-600">Zip</Label>
+                      <Input
+                        value={addr.zip || ''}
+                        onChange={(e) => updateAddress(index, 'zip', e.target.value)}
+                        placeholder="62701"
+                        className="mt-1"
+                        maxLength={10}
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div>
@@ -322,6 +378,57 @@ export default function PatientProfile() {
                         {day.slice(0, 3)}
                       </button>
                     ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs text-gray-600">From</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-left font-normal mt-1"
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {addr.delivery_from ? format(new Date(addr.delivery_from), 'MMM d, yyyy') : 'Select date'}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={addr.delivery_from ? new Date(addr.delivery_from) : undefined}
+                          onSelect={(date) => updateAddress(index, 'delivery_from', date?.toISOString())}
+                          captionLayout="dropdown-buttons"
+                          fromYear={2020}
+                          toYear={2030}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-600">To</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-left font-normal mt-1"
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {addr.delivery_to ? format(new Date(addr.delivery_to), 'MMM d, yyyy') : 'Select date'}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={addr.delivery_to ? new Date(addr.delivery_to) : undefined}
+                          onSelect={(date) => updateAddress(index, 'delivery_to', date?.toISOString())}
+                          captionLayout="dropdown-buttons"
+                          fromYear={2020}
+                          toYear={2030}
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 </div>
 
