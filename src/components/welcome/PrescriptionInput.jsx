@@ -178,31 +178,28 @@ export default function PrescriptionInput({ value = [], onChange }) {
       {value.length > 0 && (
         <div className="space-y-3">
           {value.map((prescription, index) => (
-            <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-200 flex items-start gap-3">
-              <Pill className="w-5 h-5 text-[#8B1F1F] flex-shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="font-semibold text-gray-800">{prescription.name}</p>
-                    {prescription.genericName && prescription.brandName && (
-                      <p className="text-xs text-gray-600">
-                        Generic: {prescription.genericName} | Brand: {prescription.brandName}
-                      </p>
-                    )}
-                    <p className="text-sm text-gray-600 mt-1">Dosage: {prescription.dosage}</p>
-                    {prescription.category && (
-                      <Badge className="mt-2 bg-blue-100 text-blue-800 border-blue-200">
-                        {prescription.category}
-                      </Badge>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => handleRemove(index)}
-                    className="text-red-600 hover:text-red-700 p-1"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
+            <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="font-semibold text-gray-800">{prescription.name}</p>
+                  {prescription.genericName && prescription.brandName && (
+                    <p className="text-xs text-gray-600">
+                      Generic: {prescription.genericName} | Brand: {prescription.brandName}
+                    </p>
+                  )}
+                  <p className="text-sm text-gray-600 mt-1">Dosage: {prescription.dosage}</p>
+                  {prescription.category && (
+                    <Badge className="mt-2 bg-blue-100 text-blue-800 border-blue-200">
+                      {prescription.category}
+                    </Badge>
+                  )}
                 </div>
+                <button
+                  onClick={() => handleRemove(index)}
+                  className="text-red-600 hover:text-red-700 p-1"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
             </div>
           ))}
