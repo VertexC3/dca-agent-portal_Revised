@@ -760,7 +760,7 @@ export default function PatientWelcomeFlow() {
                           <Input
                             value={addr.address_1 || ''}
                             onChange={(e) => updateAddress(index, 'address_1', e.target.value)}
-                            placeholder="123 Main St"
+                            placeholder="233 Bedford Way"
                             className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                           />
                           {fieldMessages[`${index}-address_1`] && (
@@ -789,7 +789,7 @@ export default function PatientWelcomeFlow() {
                             <Input
                               value={addr.city || ''}
                               onChange={(e) => updateAddress(index, 'city', e.target.value)}
-                              placeholder="Springfield"
+                              placeholder="Franklin"
                               className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                             />
                             {fieldMessages[`${index}-city`] && (
@@ -878,7 +878,7 @@ export default function PatientWelcomeFlow() {
                             <Input
                               value={addr.zip || ''}
                               onChange={(e) => updateAddress(index, 'zip', e.target.value)}
-                              placeholder="62701"
+                              placeholder="37064"
                               className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                               maxLength={10}
                             />
