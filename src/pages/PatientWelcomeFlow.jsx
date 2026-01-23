@@ -457,7 +457,11 @@ export default function PatientWelcomeFlow() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                {steps[currentStep].title}
+                {currentStep === 5 && formData.first_name 
+                  ? `Welcome, ${formData.first_name}, to DCA Pharmacy!` 
+                  : currentStep === 5 
+                  ? 'Welcome to DCA Pharmacy!' 
+                  : steps[currentStep].title}
               </motion.h1>
               <motion.p 
                 className="text-gray-600 text-lg"
@@ -465,7 +469,9 @@ export default function PatientWelcomeFlow() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
               >
-                {steps[currentStep].description}
+                {currentStep === 5 
+                  ? 'Your profile has been completed. You can now access all features of the patient portal.' 
+                  : steps[currentStep].description}
               </motion.p>
             </motion.div>
 
@@ -1061,40 +1067,7 @@ export default function PatientWelcomeFlow() {
 
               {/* Step 5: Welcome */}
               {currentStep === 5 && (
-                <div className="py-8">
-                  <motion.div 
-                    className="text-center mb-10"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.6 }}
-                  >
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1, rotate: 360 }}
-                      transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-                    >
-                      <Check className="w-24 h-24 mx-auto text-green-500 mb-6" />
-                    </motion.div>
-                    <motion.h2 
-                      className="text-3xl font-bold text-gray-800 mb-3"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 }}
-                    >
-                      {formData.first_name ? `Welcome, ${formData.first_name}, to DCA Pharmacy!` : 'Welcome to DCA Pharmacy!'}
-                    </motion.h2>
-                    <motion.p 
-                      className="text-gray-600 text-lg mb-8"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.5 }}
-                    >
-                      Your profile has been completed. You can now access all features of the patient portal.
-                    </motion.p>
-                  </motion.div>
-
-                  {/* Profile Overview */}
-                  <div className="space-y-5 max-w-2xl mx-auto">
+                <div className="space-y-5 max-w-2xl mx-auto">
                     {/* Basic Information */}
                     <motion.div 
                       className="bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-200 rounded-2xl p-6 shadow-sm"
@@ -1195,7 +1168,6 @@ export default function PatientWelcomeFlow() {
                       </div>
                     </motion.div>
                   </div>
-                </div>
               )}
             </motion.div>
           </motion.div>
