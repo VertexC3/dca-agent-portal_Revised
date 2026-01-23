@@ -45,8 +45,21 @@ function LayoutContent({ children, currentPageName }) {
         setUser({ ...defaultUser, ...JSON.parse(stored) });
       }
     };
+    
+    const handleProfileUpdate = () => {
+      const stored = localStorage.getItem('mockUser');
+      if (stored) {
+        setUser({ ...defaultUser, ...JSON.parse(stored) });
+      }
+    };
+    
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('userProfileUpdated', handleProfileUpdate);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('userProfileUpdated', handleProfileUpdate);
+    };
   }, []);
 
   React.useEffect(() => {

@@ -135,7 +135,16 @@ export default function PatientWelcomeFlow() {
     
     const reader = new FileReader();
     reader.onload = (event) => {
-      setProfilePicture(event.target.result);
+      const imageData = event.target.result;
+      setProfilePicture(imageData);
+      
+      // Save to localStorage immediately
+      const existingUser = JSON.parse(localStorage.getItem('mockUser') || '{}');
+      const updatedUser = { ...existingUser, profile_picture: imageData };
+      localStorage.setItem('mockUser', JSON.stringify(updatedUser));
+      
+      // Trigger a custom event to notify Layout
+      window.dispatchEvent(new Event('userProfileUpdated'));
     };
     reader.readAsDataURL(file);
   };
