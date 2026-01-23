@@ -363,12 +363,80 @@ export default function PatientWelcomeFlow() {
               </motion.p>
             </motion.div>
 
+            {/* Enhanced Navigation Buttons */}
+            <motion.div 
+              className="flex gap-4 mb-8 pb-6 border-b border-gray-200"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              {currentStep > 0 && currentStep < steps.length - 1 && (
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    variant="outline"
+                    onClick={handleBack}
+                    className="flex items-center gap-2 h-12 px-6 border-2 border-gray-300 hover:border-[#8B1F1F] hover:bg-[#8B1F1F]/5 font-semibold"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                    Back
+                  </Button>
+                </motion.div>
+              )}
+              
+              {currentStep < steps.length - 2 && (
+                <motion.div className="ml-auto" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    onClick={handleNext}
+                    className="bg-gradient-to-r from-[#8B1F1F] to-[#B52A2A] hover:from-[#721919] hover:to-[#8B1F1F] text-white flex items-center gap-2 h-12 px-8 shadow-lg font-semibold"
+                  >
+                    Continue
+                    <ChevronRight className="w-5 h-5" />
+                  </Button>
+                </motion.div>
+              )}
+
+              {currentStep === steps.length - 2 && (
+                <motion.div className="ml-auto" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    onClick={handleNext}
+                    className="bg-gradient-to-r from-[#8B1F1F] to-[#B52A2A] hover:from-[#721919] hover:to-[#8B1F1F] text-white flex items-center gap-2 h-12 px-8 shadow-lg font-semibold"
+                  >
+                    Complete Setup
+                    <Check className="w-5 h-5" />
+                  </Button>
+                </motion.div>
+              )}
+
+              {currentStep === steps.length - 1 && (
+                <>
+                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                    <Button
+                      variant="outline"
+                      onClick={handleBack}
+                      className="flex items-center gap-2 h-12 px-6 border-2 border-gray-300 hover:border-[#8B1F1F] hover:bg-[#8B1F1F]/5 font-semibold"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                      Back
+                    </Button>
+                  </motion.div>
+                  <motion.div className="ml-auto" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      onClick={handleComplete}
+                      className="bg-gradient-to-r from-[#8B1F1F] to-[#B52A2A] hover:from-[#721919] hover:to-[#8B1F1F] text-white h-12 px-10 shadow-xl font-bold text-lg"
+                    >
+                      Go to Dashboard
+                    </Button>
+                  </motion.div>
+                </>
+              )}
+            </motion.div>
+
             {/* Step Content with Stagger Animation */}
             <motion.div 
               className="space-y-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
             >
               {/* Step 0: Basic Information */}
               {currentStep === 0 && (
@@ -861,74 +929,6 @@ export default function PatientWelcomeFlow() {
                     </motion.div>
                   </div>
                 </div>
-              )}
-            </motion.div>
-
-            {/* Enhanced Navigation Buttons */}
-            <motion.div 
-              className="flex gap-4 mt-10 pt-8 border-t border-gray-200"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-              {currentStep > 0 && currentStep < steps.length - 1 && (
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    variant="outline"
-                    onClick={handleBack}
-                    className="flex items-center gap-2 h-12 px-6 border-2 border-gray-300 hover:border-[#8B1F1F] hover:bg-[#8B1F1F]/5 font-semibold"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                    Back
-                  </Button>
-                </motion.div>
-              )}
-              
-              {currentStep < steps.length - 2 && (
-                <motion.div className="ml-auto" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    onClick={handleNext}
-                    className="bg-gradient-to-r from-[#8B1F1F] to-[#B52A2A] hover:from-[#721919] hover:to-[#8B1F1F] text-white flex items-center gap-2 h-12 px-8 shadow-lg font-semibold"
-                  >
-                    Continue
-                    <ChevronRight className="w-5 h-5" />
-                  </Button>
-                </motion.div>
-              )}
-
-              {currentStep === steps.length - 2 && (
-                <motion.div className="ml-auto" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    onClick={handleNext}
-                    className="bg-gradient-to-r from-[#8B1F1F] to-[#B52A2A] hover:from-[#721919] hover:to-[#8B1F1F] text-white flex items-center gap-2 h-12 px-8 shadow-lg font-semibold"
-                  >
-                    Complete Setup
-                    <Check className="w-5 h-5" />
-                  </Button>
-                </motion.div>
-              )}
-
-              {currentStep === steps.length - 1 && (
-                <>
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button
-                      variant="outline"
-                      onClick={handleBack}
-                      className="flex items-center gap-2 h-12 px-6 border-2 border-gray-300 hover:border-[#8B1F1F] hover:bg-[#8B1F1F]/5 font-semibold"
-                    >
-                      <ChevronLeft className="w-5 h-5" />
-                      Back
-                    </Button>
-                  </motion.div>
-                  <motion.div className="ml-auto" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button
-                      onClick={handleComplete}
-                      className="bg-gradient-to-r from-[#8B1F1F] to-[#B52A2A] hover:from-[#721919] hover:to-[#8B1F1F] text-white h-12 px-10 shadow-xl font-bold text-lg"
-                    >
-                      Go to Dashboard
-                    </Button>
-                  </motion.div>
-                </>
               )}
             </motion.div>
           </motion.div>
