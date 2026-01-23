@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, ChevronLeft, Check, User, Heart, Pill, MapPin, Phone, PartyPopper, Camera, Calendar as CalendarIcon, Trash2, RefreshCw, Shield, Stethoscope, Plus, X } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, User, Heart, Pill, MapPin, Phone, PartyPopper, Camera, Calendar as CalendarIcon, Trash2, RefreshCw, Shield, Stethoscope, Plus, X, Upload, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,6 +19,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function PatientWelcomeFlow() {
   const [currentStep, setCurrentStep] = useState(0);
   const [profilePicture, setProfilePicture] = useState(null);
+  const [driversLicense, setDriversLicense] = useState(null);
   const [addressCoordinates, setAddressCoordinates] = useState({});
   const [fieldMessages, setFieldMessages] = useState({});
   const [phoneValidated, setPhoneValidated] = useState(false);
@@ -42,7 +43,10 @@ export default function PatientWelcomeFlow() {
     previous_pharmacy_phone: '',
     current_prescriptions: [],
     addresses: [
-      { name: 'Home', address_1: '', address_2: '', city: '', state: '', zip: '', delivery_days: [], delivery_from: null, delivery_to: null, delivery_time: '9:00 AM - 5:00 PM', is_primary: true }
+      { name: 'Home', address_1: '', address_2: '', city: '', state: '', zip: '', delivery_days: [], delivery_from: null, delivery_to: null, delivery_time: '9:00 AM - 5:00 PM', note: '', is_primary: true }
+    ],
+    authorized_parties: [
+      { first_name: '', last_name: '', phone: '', email: '' }
     ],
     emergency_contact_name: '',
     emergency_contact_phone: '',
@@ -78,6 +82,12 @@ export default function PatientWelcomeFlow() {
       title: 'Delivery Addresses',
       icon: MapPin,
       description: 'Where should we deliver your medications?'
+    },
+    {
+      id: 'authorized',
+      title: 'Authorized Parties',
+      icon: Users,
+      description: 'Who can pick up prescriptions on your behalf?'
     },
     {
       id: 'emergency',
@@ -292,7 +302,7 @@ export default function PatientWelcomeFlow() {
       ...formData,
       addresses: [
         ...formData.addresses,
-        { name: 'Home', address_1: '', address_2: '', city: '', state: '', zip: '', delivery_days: [], delivery_from: null, delivery_to: null, delivery_time: '9:00 AM - 5:00 PM', is_primary: false }
+        { name: 'Home', address_1: '', address_2: '', city: '', state: '', zip: '', delivery_days: [], delivery_from: null, delivery_to: null, delivery_time: '9:00 AM - 5:00 PM', note: '', is_primary: false }
       ]
     });
   };
@@ -331,6 +341,39 @@ export default function PatientWelcomeFlow() {
     }
     const newPhysicians = formData.physicians.filter((_, i) => i !== index);
     setFormData({ ...formData, physicians: newPhysicians });
+  };
+
+  const updateAuthorizedParty = (index, field, value) => {
+    const newParties = [...formData.authorized_parties];
+    newParties[index] = { ...newParties[index], [field]: value };
+    setFormData({ ...formData, authorized_parties: newParties });
+  };
+
+  const addAuthorizedParty = () => {
+    setFormData({
+      ...formData,
+      authorized_parties: [...formData.authorized_parties, { first_name: '', last_name: '', phone: '', email: '' }]
+    });
+  };
+
+  const removeAuthorizedParty = (index) => {
+    if (formData.authorized_parties.length === 1) {
+      alert('You must have at least one authorized party.');
+      return;
+    }
+    const newParties = formData.authorized_parties.filter((_, i) => i !== index);
+    setFormData({ ...formData, authorized_parties: newParties });
+  };
+
+  const handleDriversLicenseUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setDriversLicense(event.target.result);
+    };
+    reader.readAsDataURL(file);
   };
 
   const StepIcon = steps[currentStep].icon;
@@ -491,9 +534,9 @@ export default function PatientWelcomeFlow() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                {currentStep === 6 && formData.first_name 
+                {currentStep === 7 && formData.first_name 
                   ? `Welcome, ${formData.first_name}, to DCA Pharmacy!` 
-                  : currentStep === 6 
+                  : currentStep === 7 
                   ? 'Welcome to DCA Pharmacy!' 
                   : steps[currentStep].title}
               </motion.h1>
@@ -503,7 +546,7 @@ export default function PatientWelcomeFlow() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
               >
-                {currentStep === 6 
+                {currentStep === 7 
                   ? 'Your profile has been completed. You can now access all features of the patient portal.' 
                   : steps[currentStep].description}
               </motion.p>
@@ -696,12 +739,46 @@ export default function PatientWelcomeFlow() {
                       placeholder="MM/DD/YYYY"
                       maxLength={10}
                       className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
-                    />
-                  </motion.div>
-              </>
-            )}
+                      />
+                      </motion.div>
+                      <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.9 }}
+                      >
+                      <Label className="text-base font-semibold text-gray-700">Driver's License</Label>
+                      <div className="mt-2">
+                      <input
+                        type="file"
+                        accept="image/*,.pdf"
+                        onChange={handleDriversLicenseUpload}
+                        className="hidden"
+                        id="drivers-license-upload"
+                      />
+                      <label
+                        htmlFor="drivers-license-upload"
+                        className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg hover:border-[#8B1F1F] hover:bg-gray-50 transition-all cursor-pointer"
+                      >
+                        {driversLicense ? (
+                          <div className="flex flex-col items-center gap-2">
+                            <Check className="w-8 h-8 text-green-600" />
+                            <p className="text-sm font-semibold text-green-600">License Uploaded</p>
+                            <p className="text-xs text-gray-500">Click to change</p>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center gap-2">
+                            <Upload className="w-8 h-8 text-gray-400" />
+                            <p className="text-sm font-semibold text-gray-600">Upload Driver's License</p>
+                            <p className="text-xs text-gray-500">Click to browse files</p>
+                          </div>
+                        )}
+                      </label>
+                      </div>
+                      </motion.div>
+                      </>
+                      )}
 
-              {/* Step 1: Medical History */}
+                      {/* Step 1: Medical History */}
               {currentStep === 1 && (
                 <>
                   <motion.div
@@ -1141,27 +1218,112 @@ export default function PatientWelcomeFlow() {
                           className="mt-2 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                         />
                       </div>
-                    </motion.div>
-                ))}
 
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.8 }}
-                  >
-                    <Button
+                      <div>
+                        <Label className="text-base font-semibold text-gray-700">Leave a Note (Optional)</Label>
+                        <Textarea
+                          value={addr.note || ''}
+                          onChange={(e) => updateAddress(index, 'note', e.target.value)}
+                          placeholder="E.g., Leave at front door, Ring doorbell, etc."
+                          className="mt-2 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
+                          rows={3}
+                        />
+                      </div>
+                      </motion.div>
+                      ))}
+
+                      <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.8 }}
+                      >
+                      <Button
                       variant="outline"
                       onClick={addAddress}
                       className="w-full h-12 border-2 border-dashed border-gray-300 hover:border-[#8B1F1F] hover:bg-[#8B1F1F]/5 text-gray-700 font-semibold"
-                    >
+                      >
                       Add Another Address
-                    </Button>
-                  </motion.div>
-              </div>
-            )}
+                      </Button>
+                      </motion.div>
+                      </div>
+                      )}
 
-              {/* Step 5: Emergency Contact */}
-              {currentStep === 5 && (
+                      {/* Step 5: Authorized Parties */}
+                      {currentStep === 5 && (
+                      <div className="space-y-4">
+                      <p className="text-gray-600 text-base">
+                      Add individuals who are authorized to pick up prescriptions on your behalf.
+                      </p>
+                      {formData.authorized_parties.map((party, index) => (
+                      <motion.div
+                      key={index}
+                      className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3 relative"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 + index * 0.1 }}
+                      >
+                      {index > 0 && (
+                        <button
+                          onClick={() => removeAuthorizedParty(index)}
+                          className="absolute top-3 right-3 p-1 rounded-lg text-red-500 hover:bg-red-50 transition-all"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label className="text-sm font-semibold text-gray-700">First Name *</Label>
+                          <Input
+                            value={party.first_name}
+                            onChange={(e) => updateAuthorizedParty(index, 'first_name', e.target.value)}
+                            placeholder="John"
+                            className="mt-1 h-10 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-sm font-semibold text-gray-700">Last Name *</Label>
+                          <Input
+                            value={party.last_name}
+                            onChange={(e) => updateAuthorizedParty(index, 'last_name', e.target.value)}
+                            placeholder="Doe"
+                            className="mt-1 h-10 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label className="text-sm font-semibold text-gray-700">Phone Number *</Label>
+                        <Input
+                          value={party.phone}
+                          onChange={(e) => updateAuthorizedParty(index, 'phone', e.target.value)}
+                          placeholder="(555) 123-4567"
+                          className="mt-1 h-10 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm font-semibold text-gray-700">Email *</Label>
+                        <Input
+                          type="email"
+                          value={party.email}
+                          onChange={(e) => updateAuthorizedParty(index, 'email', e.target.value)}
+                          placeholder="john.doe@example.com"
+                          className="mt-1 h-10 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20"
+                        />
+                      </div>
+                      </motion.div>
+                      ))}
+                      <Button
+                      variant="outline"
+                      onClick={addAuthorizedParty}
+                      className="w-full h-10 border-2 border-dashed border-gray-300 hover:border-[#8B1F1F] hover:bg-[#8B1F1F]/5 text-gray-700 font-semibold"
+                      >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Another Authorized Party
+                      </Button>
+                      </div>
+                      )}
+
+                      {/* Step 6: Emergency Contact */}
+              {currentStep === 6 && (
                 <>
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -1192,8 +1354,8 @@ export default function PatientWelcomeFlow() {
                 </>
               )}
 
-              {/* Step 6: Welcome */}
-              {currentStep === 6 && (
+              {/* Step 7: Welcome */}
+              {currentStep === 7 && (
                 <div className="space-y-5 max-w-2xl mx-auto">
                     {/* Basic Information */}
                     <motion.div 
