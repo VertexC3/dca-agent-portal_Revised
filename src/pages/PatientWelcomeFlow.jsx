@@ -162,14 +162,14 @@ export default function PatientWelcomeFlow() {
     newAddresses[index] = { ...newAddresses[index], [field]: value };
     setFormData({ ...formData, addresses: newAddresses });
 
-    // Show encouragement messages
+    // Show encouragement messages only when field is completed
     const messageKey = `${index}-${field}`;
-    if (value) {
+    if (value && value.trim().length > 0) {
       const messages = {
-        'address_1': '✓ Great! Address 1 completed, now add your city...',
-        'city': '✓ Excellent! City added, now select your state...',
-        'state': '✓ Perfect! State selected, now enter your zip code...',
-        'zip': '✓ Awesome! Zip code added, generating map...'
+        'address_1': value.trim().length >= 3 ? '✓ Great! Address 1 completed, now add your city...' : null,
+        'city': value.trim().length >= 2 ? '✓ Excellent! City added, now select your state...' : null,
+        'state': value.length === 2 ? '✓ Perfect! State selected, now enter your zip code...' : null,
+        'zip': value.length >= 5 ? '✓ Awesome! Zip code added, generating map...' : null
       };
       if (messages[field]) {
         setFieldMessages(prev => ({ ...prev, [messageKey]: messages[field] }));
@@ -183,9 +183,9 @@ export default function PatientWelcomeFlow() {
       }
     }
 
-    // Geocode when zip is entered
+    // Geocode when zip is completed and other fields are present
     const addr = newAddresses[index];
-    if (field === 'zip' && value.length >= 5) {
+    if (addr.address_1 && addr.city && addr.state && addr.zip && addr.zip.length >= 5) {
       const coords = await geocodeAddress(addr);
       if (coords) {
         setAddressCoordinates(prev => ({ ...prev, [index]: coords }));
