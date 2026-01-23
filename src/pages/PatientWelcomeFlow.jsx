@@ -1081,7 +1081,7 @@ export default function PatientWelcomeFlow() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
                     >
-                      You're All Set!
+                      {formData.first_name ? `Welcome, ${formData.first_name}, to DCA Pharmacy!` : 'Welcome to DCA Pharmacy!'}
                     </motion.h2>
                     <motion.p 
                       className="text-gray-600 text-lg mb-8"
