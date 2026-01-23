@@ -1081,28 +1081,6 @@ export default function PatientWelcomeFlow() {
                       </div>
                       </div>
 
-                      <div>
-                        <Label className="text-base font-semibold text-gray-700 mb-3 block">Delivery Days</Label>
-                        <div className="flex flex-wrap gap-2">
-                          {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
-                            <motion.button
-                              key={day}
-                              type="button"
-                              onClick={() => toggleDeliveryDay(index, day)}
-                              className={`px-4 py-2 rounded-xl text-base font-semibold transition-all ${
-                                (addr.delivery_days || []).includes(day)
-                                  ? 'bg-gradient-to-r from-[#8B1F1F] to-[#B52A2A] text-white shadow-lg'
-                                  : 'bg-white text-gray-600 border-2 border-gray-200 hover:border-[#8B1F1F] hover:shadow-md'
-                              }`}
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                            >
-                              {day.slice(0, 3)}
-                            </motion.button>
-                          ))}
-                        </div>
-                      </div>
-
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <Label className="text-base font-semibold text-gray-700">From</Label>
