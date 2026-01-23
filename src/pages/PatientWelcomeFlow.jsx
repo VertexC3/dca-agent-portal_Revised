@@ -177,6 +177,25 @@ export default function PatientWelcomeFlow() {
     setFormData({ ...formData, date_of_birth: formatted });
   };
 
+  const handlePhoneChange = (value) => {
+    // Remove all non-numeric characters
+    const cleaned = value.replace(/\D/g, '');
+    
+    // Format as (XXX) XXX-XXXX
+    let formatted = cleaned;
+    if (cleaned.length > 0) {
+      if (cleaned.length <= 3) {
+        formatted = `(${cleaned}`;
+      } else if (cleaned.length <= 6) {
+        formatted = `(${cleaned.slice(0, 3)}) ${cleaned.slice(3)}`;
+      } else {
+        formatted = `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`;
+      }
+    }
+    
+    setFormData({ ...formData, phone: formatted });
+  };
+
   const updateAddress = async (index, field, value) => {
     const newAddresses = [...formData.addresses];
     newAddresses[index] = { ...newAddresses[index], [field]: value };
@@ -585,8 +604,9 @@ export default function PatientWelcomeFlow() {
                     </Select>
                       <Input
                         value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        onChange={(e) => handlePhoneChange(e.target.value)}
                         placeholder="(555) 123-4567"
+                        maxLength={14}
                         className="flex-1 h-12 border-gray-200 focus:border-[#8B1F1F] focus:ring-[#8B1F1F]/20 text-base"
                       />
                       {phoneValidated ? (
