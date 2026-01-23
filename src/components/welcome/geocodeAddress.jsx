@@ -1,5 +1,7 @@
+import { base44 } from '@/api/base44Client';
+
 /**
- * Geocodes an address using OpenStreetMap's Nominatim API
+ * Geocodes an address using Base44's AI integration
  * @param {Object} address - Address object with address_1, city, state, zip
  * @returns {Promise<{lat: number, lon: number} | null>}
  */
@@ -11,21 +13,22 @@ export async function geocodeAddress(address) {
   const query = `${address.address_1}, ${address.city}, ${address.state} ${address.zip}`;
   
   try {
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`,
-      {
-        headers: {
-          'User-Agent': 'DCA-Pharmacy-PatientPortal/1.0'
+    const result = await base44.integrations.Core.InvokeLLM({
+      prompt: `Geocode this address and return ONLY the latitude and longitude: "${query}". Return in JSON format with 'lat' and 'lon' keys as numbers. If you cannot geocode the address, return an empty object {}.`,
+      add_context_from_internet: true,
+      response_json_schema: {
+        type: "object",
+        properties: {
+          lat: { type: "number" },
+          lon: { type: "number" }
         }
       }
-    );
-
-    const data = await response.json();
+    });
     
-    if (data && data.length > 0) {
+    if (result && typeof result.lat === 'number' && typeof result.lon === 'number') {
       return {
-        lat: parseFloat(data[0].lat),
-        lon: parseFloat(data[0].lon)
+        lat: result.lat,
+        lon: result.lon
       };
     }
     
