@@ -46,10 +46,10 @@ export default function OrderDetailDialog({ order, open, onClose }) {
 
         <div className="space-y-6">
           {/* Order Identifiers */}
-          <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="p-4 bg-white rounded-lg border border-gray-200">
             <div className="flex items-center gap-2 mb-3">
-              <FileText className="w-5 h-5 text-blue-600" />
-              <h3 className="text-lg font-bold text-blue-900">Order Identifiers</h3>
+              <FileText className="w-5 h-5 text-[#1a1f5c]" />
+              <h3 className="text-lg font-bold text-gray-900">Order Identifiers</h3>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -79,10 +79,10 @@ export default function OrderDetailDialog({ order, open, onClose }) {
           </div>
 
           {/* Patient Identifier (De-identified) */}
-          <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+          <div className="p-4 bg-white rounded-lg border border-gray-200">
             <div className="flex items-center gap-2 mb-3">
-              <User className="w-5 h-5 text-purple-600" />
-              <h3 className="text-lg font-bold text-purple-900">Patient Information (De-identified)</h3>
+              <User className="w-5 h-5 text-[#1a1f5c]" />
+              <h3 className="text-lg font-bold text-gray-900">Patient Information (De-identified)</h3>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -94,16 +94,16 @@ export default function OrderDetailDialog({ order, open, onClose }) {
                 <p className="text-base text-gray-900 font-mono">{order.patient_code || `PT-${order.id?.padStart(6, '0')}`}</p>
               </div>
             </div>
-            <p className="text-xs text-purple-700 mt-3 italic">
+            <p className="text-xs text-gray-600 mt-3 italic">
               * Patient identity information is de-identified per HIPAA and BAA requirements
             </p>
           </div>
 
           {/* Medication Details */}
-          <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+          <div className="p-4 bg-white rounded-lg border border-gray-200">
             <div className="flex items-center gap-2 mb-3">
-              <Pill className="w-5 h-5 text-green-600" />
-              <h3 className="text-lg font-bold text-green-900">Medication Details</h3>
+              <Pill className="w-5 h-5 text-[#1a1f5c]" />
+              <h3 className="text-lg font-bold text-gray-900">Medication Details</h3>
             </div>
             <div className="space-y-3">
               <div>
@@ -122,10 +122,10 @@ export default function OrderDetailDialog({ order, open, onClose }) {
           </div>
 
           {/* Pricing Details */}
-          <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+          <div className="p-4 bg-white rounded-lg border border-gray-200">
             <div className="flex items-center gap-2 mb-3">
-              <DollarSign className="w-5 h-5 text-amber-600" />
-              <h3 className="text-lg font-bold text-amber-900">Pricing Details</h3>
+              <DollarSign className="w-5 h-5 text-[#1a1f5c]" />
+              <h3 className="text-lg font-bold text-gray-900">Pricing Details</h3>
             </div>
             <div className="space-y-3">
               <div className="flex justify-between">
@@ -136,7 +136,7 @@ export default function OrderDetailDialog({ order, open, onClose }) {
                 <p className="text-sm text-gray-700">Quantity</p>
                 <p className="text-base font-semibold text-gray-900">× {order.quantity_dispensed || 1}</p>
               </div>
-              <div className="flex justify-between border-t border-amber-300 pt-2">
+              <div className="flex justify-between border-t border-gray-300 pt-2">
                 <p className="text-sm text-gray-700">Extended Line Amount</p>
                 <p className="text-base font-semibold text-gray-900">${extendedAmount.toFixed(2)}</p>
               </div>
