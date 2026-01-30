@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-import { Package, TrendingUp, Truck, FileText } from 'lucide-react';
+import { Package, TrendingUp, Truck, FileText, Search, X, Filter } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { createPageUrl } from '../utils';
 import { useNavigate } from 'react-router-dom';
 import OrderDetailDialog from '../components/facility/OrderDetailDialog';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Mock data
 const mockOrders = [
@@ -121,11 +125,57 @@ export default function FacilityDashboard() {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [selectedOrderStage, setSelectedOrderStage] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [searchExpanded, setSearchExpanded] = useState(false);
+  const [filters, setFilters] = useState({
+    dateFrom: '',
+    dateTo: '',
+    type: 'all',
+    amountFrom: '',
+    amountTo: '',
+    patient: '',
+    physician: ''
+  });
   const navigate = useNavigate();
 
-  const newOrders = mockOrders.filter(o => o.order_stage === 'new');
-  const inProcessOrders = mockOrders.filter(o => o.order_stage === 'in_process');
-  const shippedOrders = mockOrders.filter(o => o.order_stage === 'shipped');
+  // Filter orders based on search criteria
+  const filteredOrders = mockOrders.filter(order => {
+    // Date filter
+    if (filters.dateFrom && new Date(order.order_date) < new Date(filters.dateFrom)) return false;
+    if (filters.dateTo && new Date(order.order_date) > new Date(filters.dateTo)) return false;
+    
+    // Type filter
+    if (filters.type !== 'all' && order.order_stage !== filters.type) return false;
+    
+    // Amount filter
+    if (filters.amountFrom && order.total_amount < parseFloat(filters.amountFrom)) return false;
+    if (filters.amountTo && order.total_amount > parseFloat(filters.amountTo)) return false;
+    
+    // Patient filter
+    if (filters.patient && !order.patient_name.toLowerCase().includes(filters.patient.toLowerCase())) return false;
+    
+    // Physician filter (would need physician data on orders - for demo purposes)
+    // if (filters.physician && !order.physician_name?.toLowerCase().includes(filters.physician.toLowerCase())) return false;
+    
+    return true;
+  });
+
+  const newOrders = filteredOrders.filter(o => o.order_stage === 'new');
+  const inProcessOrders = filteredOrders.filter(o => o.order_stage === 'in_process');
+  const shippedOrders = filteredOrders.filter(o => o.order_stage === 'shipped');
+
+  const clearFilters = () => {
+    setFilters({
+      dateFrom: '',
+      dateTo: '',
+      type: 'all',
+      amountFrom: '',
+      amountTo: '',
+      patient: '',
+      physician: ''
+    });
+  };
+
+  const hasActiveFilters = Object.values(filters).some(v => v && v !== 'all');
 
   const handlePayNow = (orderId) => {
     navigate(createPageUrl('FacilityPayment') + `?orderId=${orderId}`);
@@ -179,9 +229,155 @@ export default function FacilityDashboard() {
       />
 
       <div className="relative z-10 space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Facility Dashboard</h1>
-          <p className="text-gray-600 mt-1">Overview of orders and invoices</p>
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Facility Dashboard</h1>
+            <p className="text-gray-600 mt-1">Overview of orders and invoices</p>
+          </div>
+          
+          {/* Global Search */}
+          <div className="relative">
+            <AnimatePresence>
+              {!searchExpanded ? (
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  onClick={() => setSearchExpanded(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-300 hover:border-[#1a1f5c] rounded-lg shadow-sm transition-all"
+                >
+                  <Search className="w-5 h-5 text-gray-600" />
+                  <span className="text-sm font-semibold text-gray-700">Search & Filter</span>
+                  {hasActiveFilters && (
+                    <Badge className="bg-[#1a1f5c] text-white">Active</Badge>
+                  )}
+                </motion.button>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="absolute right-0 top-0 w-[600px] bg-white border-2 border-[#1a1f5c] rounded-lg shadow-2xl p-6 z-50"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <Filter className="w-5 h-5 text-[#1a1f5c]" />
+                      <h3 className="text-lg font-bold text-gray-900">Advanced Search & Filters</h3>
+                    </div>
+                    <button
+                      onClick={() => setSearchExpanded(false)}
+                      className="p-1 hover:bg-gray-100 rounded transition-all"
+                    >
+                      <X className="w-5 h-5 text-gray-600" />
+                    </button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {/* Date Range */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-sm font-semibold text-gray-700">Date From</Label>
+                        <Input
+                          type="date"
+                          value={filters.dateFrom}
+                          onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm font-semibold text-gray-700">Date To</Label>
+                        <Input
+                          type="date"
+                          value={filters.dateTo}
+                          onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Order Type */}
+                    <div>
+                      <Label className="text-sm font-semibold text-gray-700">Order Type</Label>
+                      <Select value={filters.type} onValueChange={(value) => setFilters({ ...filters, type: value })}>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Orders</SelectItem>
+                          <SelectItem value="new">New Orders</SelectItem>
+                          <SelectItem value="in_process">In Process</SelectItem>
+                          <SelectItem value="shipped">Shipped</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Amount Range */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-sm font-semibold text-gray-700">Amount From ($)</Label>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          value={filters.amountFrom}
+                          onChange={(e) => setFilters({ ...filters, amountFrom: e.target.value })}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-sm font-semibold text-gray-700">Amount To ($)</Label>
+                        <Input
+                          type="number"
+                          placeholder="10000"
+                          value={filters.amountTo}
+                          onChange={(e) => setFilters({ ...filters, amountTo: e.target.value })}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Patient Search */}
+                    <div>
+                      <Label className="text-sm font-semibold text-gray-700">Patient Name</Label>
+                      <Input
+                        placeholder="Search by patient name..."
+                        value={filters.patient}
+                        onChange={(e) => setFilters({ ...filters, patient: e.target.value })}
+                        className="mt-1"
+                      />
+                    </div>
+
+                    {/* Physician Search */}
+                    <div>
+                      <Label className="text-sm font-semibold text-gray-700">Physician Name</Label>
+                      <Input
+                        placeholder="Search by physician name..."
+                        value={filters.physician}
+                        onChange={(e) => setFilters({ ...filters, physician: e.target.value })}
+                        className="mt-1"
+                      />
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-3 pt-2">
+                      <Button
+                        onClick={clearFilters}
+                        variant="outline"
+                        className="flex-1"
+                      >
+                        Clear All
+                      </Button>
+                      <Button
+                        onClick={() => setSearchExpanded(false)}
+                        className="flex-1 bg-[#1a1f5c] hover:bg-[#151a4d] text-white"
+                      >
+                        Apply Filters
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
       {/* Summary Cards */}
