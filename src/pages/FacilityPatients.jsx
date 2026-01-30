@@ -94,33 +94,22 @@ export default function FacilityPatients() {
       />
 
       <div className="relative z-10 space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Patients</h1>
-          <p className="text-gray-600 mt-1">Manage patient information</p>
-        </div>
-
-      {/* Search */}
-      <div className="max-w-md">
-        <Input
-          placeholder="Search patients by name or email..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="h-12"
-        />
-      </div>
-
-      {/* Summary Card */}
-      <Card className="border-2 border-purple-200 bg-purple-50">
-        <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <Users className="w-12 h-12 text-purple-600" />
-            <div>
-              <p className="text-3xl font-bold text-purple-900">{mockPatients.length}</p>
-              <p className="text-sm text-purple-700">Total Active Patients</p>
-            </div>
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Patients</h1>
+            <p className="text-gray-600 mt-1">Manage patient information</p>
           </div>
-        </CardContent>
-      </Card>
+          
+          {/* Search */}
+          <div className="w-96">
+            <Input
+              placeholder="Search patients by name or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="h-12"
+            />
+          </div>
+        </div>
 
       {/* Patients List */}
       <div className="grid grid-cols-1 gap-4">
