@@ -257,7 +257,7 @@ export default function FacilityDashboard() {
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  className="absolute right-0 top-0 w-[600px] bg-white border-2 border-[#1a1f5c] rounded-lg shadow-2xl p-6 z-50"
+                  className="absolute right-0 top-0 w-[750px] bg-white border-2 border-[#1a1f5c] rounded-lg shadow-2xl p-6 z-50"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
