@@ -71,6 +71,8 @@ import StaffMessaging from './pages/StaffMessaging';
 import FacilityDashboard from './pages/FacilityDashboard';
 import FacilityPayment from './pages/FacilityPayment';
 import FacilityPatients from './pages/FacilityPatients';
+import FacilityUserProfile from './pages/FacilityUserProfile';
+import FacilityProfile from './pages/FacilityProfile';
 import __Layout from './Layout.jsx';
 
 
@@ -99,6 +101,8 @@ export const PAGES = {
     "FacilityDashboard": FacilityDashboard,
     "FacilityPayment": FacilityPayment,
     "FacilityPatients": FacilityPatients,
+    "FacilityUserProfile": FacilityUserProfile,
+    "FacilityProfile": FacilityProfile,
 }
 
 export const pagesConfig = {
