@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
+import { motion } from 'framer-motion';
 
 // Mock patient data
 const mockPatients = [
@@ -65,11 +66,38 @@ export default function FacilityPatients() {
   );
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Patients</h1>
-        <p className="text-gray-600 mt-1">Manage patient information</p>
-      </div>
+    <div className="relative min-h-screen">
+      {/* Parallax Background Elements */}
+      <motion.div
+        className="absolute top-10 right-32 w-80 h-80 bg-purple-200/20 rounded-full blur-3xl pointer-events-none"
+        animate={{
+          y: [0, 35, 0],
+          x: [0, 15, 0],
+        }}
+        transition={{
+          duration: 9,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+      <motion.div
+        className="absolute bottom-10 left-32 w-72 h-72 bg-pink-200/20 rounded-full blur-3xl pointer-events-none"
+        animate={{
+          y: [0, -30, 0],
+          x: [0, -20, 0],
+        }}
+        transition={{
+          duration: 14,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+
+      <div className="relative z-10 space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Patients</h1>
+          <p className="text-gray-600 mt-1">Manage patient information</p>
+        </div>
 
       {/* Search */}
       <div className="max-w-md">
@@ -227,6 +255,7 @@ export default function FacilityPatients() {
           )}
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 }

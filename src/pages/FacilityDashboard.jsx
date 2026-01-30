@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { createPageUrl } from '../utils';
 import { useNavigate } from 'react-router-dom';
 import OrderDetailDialog from '../components/facility/OrderDetailDialog';
+import { motion } from 'framer-motion';
 
 // Mock data
 const mockOrders = [
@@ -150,11 +151,38 @@ export default function FacilityDashboard() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Facility Dashboard</h1>
-        <p className="text-gray-600 mt-1">Overview of orders and invoices</p>
-      </div>
+    <div className="relative min-h-screen">
+      {/* Parallax Background Elements */}
+      <motion.div
+        className="absolute top-20 right-10 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl pointer-events-none"
+        animate={{
+          y: [0, 30, 0],
+          x: [0, 20, 0],
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+      <motion.div
+        className="absolute bottom-20 left-10 w-80 h-80 bg-purple-200/20 rounded-full blur-3xl pointer-events-none"
+        animate={{
+          y: [0, -40, 0],
+          x: [0, -30, 0],
+        }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+
+      <div className="relative z-10 space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Facility Dashboard</h1>
+          <p className="text-gray-600 mt-1">Overview of orders and invoices</p>
+        </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -422,12 +450,13 @@ export default function FacilityDashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* Order Detail Dialog */}
-      <OrderDetailDialog 
-        order={selectedOrder} 
-        open={!!selectedOrder} 
-        onClose={() => setSelectedOrder(null)} 
-      />
+        {/* Order Detail Dialog */}
+        <OrderDetailDialog 
+          order={selectedOrder} 
+          open={!!selectedOrder} 
+          onClose={() => setSelectedOrder(null)} 
+        />
+      </div>
     </div>
   );
 }

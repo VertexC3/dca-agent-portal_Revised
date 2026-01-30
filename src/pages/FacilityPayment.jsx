@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { format } from 'date-fns';
+import { motion } from 'framer-motion';
 
 // Mock data (same as dashboard)
 const mockOrders = [
@@ -104,8 +105,35 @@ export default function FacilityPayment() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="relative min-h-screen">
+      {/* Parallax Background Elements */}
+      <motion.div
+        className="absolute top-32 left-20 w-72 h-72 bg-green-200/20 rounded-full blur-3xl pointer-events-none"
+        animate={{
+          y: [0, 40, 0],
+          x: [0, 25, 0],
+        }}
+        transition={{
+          duration: 11,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+      <motion.div
+        className="absolute bottom-32 right-20 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl pointer-events-none"
+        animate={{
+          y: [0, -35, 0],
+          x: [0, -25, 0],
+        }}
+        transition={{
+          duration: 13,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+
+      <div className="relative z-10 space-y-6">
+        <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Payment Center</h1>
           <p className="text-gray-600 mt-1">Select orders to pay</p>
@@ -212,6 +240,7 @@ export default function FacilityPayment() {
             </Card>
           );
         })}
+        </div>
       </div>
     </div>
   );
