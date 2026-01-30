@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Package, TrendingUp, Truck, FileText, Search, X, Filter } from 'lucide-react';
+import { Package, TrendingUp, Truck, FileText, Search, X, Filter, Download, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
 import { createPageUrl } from '../utils';
 import { useNavigate } from 'react-router-dom';
@@ -177,6 +178,22 @@ export default function FacilityDashboard() {
 
   const hasActiveFilters = Object.values(filters).some(v => v && v !== 'all');
 
+  const handleExportPDF = () => {
+    alert('Exporting to PDF... (Feature in development)');
+    // Implementation would generate PDF with filteredOrders data
+  };
+
+  const handleExportExcel = () => {
+    alert('Exporting to Excel... (Feature in development)');
+    // Implementation would generate Excel with filteredOrders data
+  };
+
+  const handleRefresh = () => {
+    clearFilters();
+    alert('Dashboard refreshed!');
+    // In production, this would refetch data from the server
+  };
+
   const handlePayNow = (orderId) => {
     navigate(createPageUrl('FacilityPayment') + `?orderId=${orderId}`);
   };
@@ -235,8 +252,38 @@ export default function FacilityDashboard() {
             <p className="text-gray-600 mt-1">Overview of orders and invoices</p>
           </div>
           
-          {/* Global Search */}
-          <div className="relative">
+          <div className="flex items-center gap-3">
+            {/* Export Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex items-center gap-2 border-2 border-gray-300 hover:border-[#1a1f5c]">
+                  <Download className="w-4 h-4" />
+                  Export
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuItem onClick={handleExportPDF} className="cursor-pointer">
+                  <FileText className="w-4 h-4 mr-2" />
+                  Export to PDF
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportExcel} className="cursor-pointer">
+                  <FileText className="w-4 h-4 mr-2" />
+                  Export to Excel
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Refresh Button */}
+            <Button
+              variant="outline"
+              onClick={handleRefresh}
+              className="border-2 border-gray-300 hover:border-[#1a1f5c]"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </Button>
+
+            {/* Global Search */}
+            <div className="relative">
             <AnimatePresence>
               {!searchExpanded ? (
                 <motion.button
@@ -377,6 +424,7 @@ export default function FacilityDashboard() {
                 </motion.div>
               )}
             </AnimatePresence>
+            </div>
           </div>
         </div>
 
