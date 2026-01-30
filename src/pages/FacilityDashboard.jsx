@@ -9,11 +9,65 @@ import { useNavigate } from 'react-router-dom';
 
 // Mock data
 const mockOrders = [
-  { id: '1', order_number: 'ORD-001', order_stage: 'new', payment_status: 'unpaid', total_amount: 250, invoice_id: 'INV-001' },
-  { id: '2', order_number: 'ORD-002', order_stage: 'new', payment_status: 'unpaid', total_amount: 180, invoice_id: 'INV-001' },
-  { id: '3', order_number: 'ORD-003', order_stage: 'in_process', payment_status: 'unpaid', total_amount: 320, invoice_id: 'INV-002' },
-  { id: '4', order_number: 'ORD-004', order_stage: 'in_process', payment_status: 'paid', total_amount: 150, invoice_id: 'INV-002' },
-  { id: '5', order_number: 'ORD-005', order_stage: 'shipped', payment_status: 'paid', total_amount: 400, invoice_id: 'INV-003' },
+  { 
+    id: '1', 
+    order_number: 'ORD-001', 
+    patient_name: 'John Smith',
+    medication_name: 'Semaglutide',
+    order_stage: 'new', 
+    payment_status: 'unpaid', 
+    total_amount: 250, 
+    invoice_id: 'INV-001',
+    order_date: '2026-01-28'
+  },
+  { 
+    id: '2', 
+    order_number: 'ORD-002', 
+    patient_name: 'Sarah Johnson',
+    medication_name: 'Tirzepatide',
+    order_stage: 'new', 
+    payment_status: 'unpaid', 
+    total_amount: 180, 
+    invoice_id: 'INV-001',
+    order_date: '2026-01-28'
+  },
+  { 
+    id: '3', 
+    order_number: 'ORD-003', 
+    patient_name: 'Mike Davis',
+    medication_name: 'Semaglutide',
+    order_stage: 'in_process', 
+    payment_status: 'unpaid', 
+    total_amount: 320, 
+    invoice_id: 'INV-002',
+    order_date: '2026-01-27'
+  },
+  { 
+    id: '4', 
+    order_number: 'ORD-004', 
+    patient_name: 'Emily Brown',
+    medication_name: 'Tirzepatide',
+    order_stage: 'in_process', 
+    payment_status: 'paid', 
+    total_amount: 150, 
+    invoice_id: 'INV-002',
+    order_date: '2026-01-27'
+  },
+  { 
+    id: '5', 
+    order_number: 'ORD-005', 
+    patient_name: 'Robert Wilson',
+    medication_name: 'Semaglutide',
+    order_stage: 'shipped', 
+    payment_status: 'paid', 
+    total_amount: 400, 
+    invoice_id: 'INV-003',
+    order_date: '2026-01-25',
+    tracking_number: '773890123456',
+    carrier: 'FedEx',
+    shipped_date: '2026-01-26',
+    estimated_delivery: '2026-01-30'
+  },
 ];
 
 const mockInvoices = [
@@ -63,6 +117,7 @@ const mockInvoices = [
 
 export default function FacilityDashboard() {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [selectedOrderStage, setSelectedOrderStage] = useState(null);
   const navigate = useNavigate();
 
   const newOrders = mockOrders.filter(o => o.order_stage === 'new');
@@ -101,7 +156,10 @@ export default function FacilityDashboard() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="border-2 border-blue-200 bg-blue-50">
+        <Card 
+          className="border-2 border-blue-200 bg-blue-50 cursor-pointer hover:shadow-lg transition-all"
+          onClick={() => setSelectedOrderStage('new')}
+        >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-blue-900">New Orders</CardTitle>
             <Package className="w-5 h-5 text-blue-600" />
@@ -114,7 +172,10 @@ export default function FacilityDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-orange-200 bg-orange-50">
+        <Card 
+          className="border-2 border-orange-200 bg-orange-50 cursor-pointer hover:shadow-lg transition-all"
+          onClick={() => setSelectedOrderStage('in_process')}
+        >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-orange-900">In Process</CardTitle>
             <TrendingUp className="w-5 h-5 text-orange-600" />
@@ -127,7 +188,10 @@ export default function FacilityDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-green-200 bg-green-50">
+        <Card 
+          className="border-2 border-green-200 bg-green-50 cursor-pointer hover:shadow-lg transition-all"
+          onClick={() => setSelectedOrderStage('shipped')}
+        >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-green-900">Shipped</CardTitle>
             <Truck className="w-5 h-5 text-green-600" />
@@ -181,6 +245,89 @@ export default function FacilityDashboard() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Orders by Stage Dialog */}
+      <Dialog open={!!selectedOrderStage} onOpenChange={() => setSelectedOrderStage(null)}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {selectedOrderStage === 'new' && <><Package className="w-5 h-5 text-blue-600" /> New Orders</>}
+              {selectedOrderStage === 'in_process' && <><TrendingUp className="w-5 h-5 text-orange-600" /> In Process Orders</>}
+              {selectedOrderStage === 'shipped' && <><Truck className="w-5 h-5 text-green-600" /> Shipped Orders</>}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            {mockOrders
+              .filter(order => order.order_stage === selectedOrderStage)
+              .map(order => (
+                <div key={order.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <p className="text-lg font-bold text-gray-900">{order.order_number}</p>
+                        <Badge className={`${getPaymentStatusBadge(order.payment_status)}`}>
+                          {order.payment_status.replace('_', ' ').toUpperCase()}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-gray-700">
+                        <span className="font-semibold">Patient:</span> {order.patient_name}
+                      </p>
+                      <p className="text-sm text-gray-700">
+                        <span className="font-semibold">Medication:</span> {order.medication_name}
+                      </p>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Order Date: {format(new Date(order.order_date), 'MMM d, yyyy')}
+                      </p>
+                      
+                      {/* FedEx Tracking Info for Shipped Orders */}
+                      {order.order_stage === 'shipped' && order.tracking_number && (
+                        <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Truck className="w-4 h-4 text-green-600" />
+                            <p className="text-sm font-semibold text-green-900">FedEx Shipment</p>
+                          </div>
+                          <div className="space-y-1 text-sm">
+                            <p className="text-gray-700">
+                              <span className="font-semibold">Tracking:</span>{' '}
+                              <a 
+                                href={`https://www.fedex.com/fedextrack/?trknbr=${order.tracking_number}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:underline"
+                              >
+                                {order.tracking_number}
+                              </a>
+                            </p>
+                            <p className="text-gray-700">
+                              <span className="font-semibold">Shipped:</span> {format(new Date(order.shipped_date), 'MMM d, yyyy')}
+                            </p>
+                            <p className="text-gray-700">
+                              <span className="font-semibold">Est. Delivery:</span> {format(new Date(order.estimated_delivery), 'MMM d, yyyy')}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-right ml-4">
+                      <p className="text-xl font-bold text-gray-900">${order.total_amount.toFixed(2)}</p>
+                      {order.payment_status === 'unpaid' && (
+                        <button
+                          onClick={() => {
+                            setSelectedOrderStage(null);
+                            handlePayNow(order.id);
+                          }}
+                          className="mt-2 px-4 py-2 bg-[#1a1f5c] hover:bg-[#151a4d] text-white text-sm font-semibold rounded-lg transition-all"
+                        >
+                          Pay Now
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Invoice Detail Dialog */}
       <Dialog open={!!selectedInvoice} onOpenChange={() => setSelectedInvoice(null)}>
