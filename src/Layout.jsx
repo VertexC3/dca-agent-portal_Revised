@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from './utils';
-import { Settings, User, X, Pill, ShoppingCart } from 'lucide-react';
+import { Settings, User, X, Pill, ShoppingCart, Clock } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CartProvider, useCart } from './components/cart/CartContext';
 import CartPopup from './components/cart/CartPopup';
+import PickupWindowPopup from './components/pickup/PickupWindowPopup';
 import { Badge } from '@/components/ui/badge';
 
 // Mock user data
@@ -29,6 +30,7 @@ const defaultUser = {
 function LayoutContent({ children, currentPageName }) {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [showCart, setShowCart] = useState(false);
+  const [showPickupWindow, setShowPickupWindow] = useState(false);
   const { cartItems } = useCart();
   
   // Load user from localStorage or use default
@@ -140,6 +142,18 @@ function LayoutContent({ children, currentPageName }) {
             </nav>
 
             <div className="flex items-center gap-4">
+              {/* Pickup Window Icon */}
+              <button
+                onClick={() => setShowPickupWindow(true)}
+                className="relative p-2 rounded-full hover:bg-gray-100 transition-all"
+                title="Pickup Window"
+              >
+                <Clock className="w-6 h-6 text-gray-700" />
+                <Badge className="absolute -top-1 -right-1 bg-green-500 text-white px-1.5 py-0.5 text-xs min-w-[20px] h-5 flex items-center justify-center">
+                  1
+                </Badge>
+              </button>
+
               {/* Cart Icon */}
               <button
                 onClick={() => setShowCart(true)}
@@ -228,9 +242,12 @@ function LayoutContent({ children, currentPageName }) {
 
       {/* Cart Popup */}
       <CartPopup open={showCart} onClose={() => setShowCart(false)} />
-    </div>
-  );
-}
+
+      {/* Pickup Window Popup */}
+      <PickupWindowPopup open={showPickupWindow} onClose={() => setShowPickupWindow(false)} />
+      </div>
+      );
+      }
 
 export default function Layout({ children, currentPageName }) {
   return (
