@@ -29,20 +29,15 @@ const defaultUser = {
 };
 
 function LayoutContent({ children, currentPageName }) {
+  // Check if this is a facility page FIRST (before any hooks)
+  const facilityPages = ['FacilityDashboard', 'FacilityPayment', 'FacilityPatients', 'FacilityUserProfile', 'FacilityProfile'];
+  const isFacilityPage = facilityPages.includes(currentPageName);
+  
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const [showPickupWindow, setShowPickupWindow] = useState(false);
   const [showPlatformSwitcher, setShowPlatformSwitcher] = useState(false);
   const { cartItems } = useCart();
-  
-  // Check if this is a facility page
-  const facilityPages = ['FacilityDashboard', 'FacilityPayment', 'FacilityPatients', 'FacilityUserProfile', 'FacilityProfile'];
-  const isFacilityPage = facilityPages.includes(currentPageName);
-  
-  // If it's a facility page, use FacilityLayout
-  if (isFacilityPage) {
-    return <FacilityLayout children={children} currentPageName={currentPageName} />;
-  }
   
   // Load user from localStorage or use default
   const [user, setUser] = useState(() => {
@@ -115,6 +110,11 @@ function LayoutContent({ children, currentPageName }) {
     patientNavItems.push({ name: 'Communication', page: 'PatientMessages' });
   }
   patientNavItems.push({ name: 'Complete Profile', page: 'PatientWelcomeFlow' });
+
+  // If it's a facility page, use FacilityLayout (AFTER all hooks are called)
+  if (isFacilityPage) {
+    return <FacilityLayout children={children} currentPageName={currentPageName} />;
+  }
 
   return (
     <div className="min-h-screen relative bg-gray-50" style={{ overflowY: 'scroll' }}>
