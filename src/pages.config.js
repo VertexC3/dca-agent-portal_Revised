@@ -54,6 +54,11 @@ import CommunicationDetail from './pages/CommunicationDetail';
 import Communications from './pages/Communications';
 import DailyView from './pages/DailyView';
 import Dashboard from './pages/Dashboard';
+import FacilityDashboard from './pages/FacilityDashboard';
+import FacilityPatients from './pages/FacilityPatients';
+import FacilityPayment from './pages/FacilityPayment';
+import FacilityProfile from './pages/FacilityProfile';
+import FacilityUserProfile from './pages/FacilityUserProfile';
 import Home from './pages/Home';
 import PatientCommunications from './pages/PatientCommunications';
 import PatientDashboard from './pages/PatientDashboard';
@@ -68,11 +73,6 @@ import Prescriptions from './pages/Prescriptions';
 import Roadmap from './pages/Roadmap';
 import Settings from './pages/Settings';
 import StaffMessaging from './pages/StaffMessaging';
-import FacilityDashboard from './pages/FacilityDashboard';
-import FacilityPayment from './pages/FacilityPayment';
-import FacilityPatients from './pages/FacilityPatients';
-import FacilityUserProfile from './pages/FacilityUserProfile';
-import FacilityProfile from './pages/FacilityProfile';
 import __Layout from './Layout.jsx';
 
 
@@ -84,6 +84,11 @@ export const PAGES = {
     "Communications": Communications,
     "DailyView": DailyView,
     "Dashboard": Dashboard,
+    "FacilityDashboard": FacilityDashboard,
+    "FacilityPatients": FacilityPatients,
+    "FacilityPayment": FacilityPayment,
+    "FacilityProfile": FacilityProfile,
+    "FacilityUserProfile": FacilityUserProfile,
     "Home": Home,
     "PatientCommunications": PatientCommunications,
     "PatientDashboard": PatientDashboard,
@@ -98,11 +103,6 @@ export const PAGES = {
     "Roadmap": Roadmap,
     "Settings": Settings,
     "StaffMessaging": StaffMessaging,
-    "FacilityDashboard": FacilityDashboard,
-    "FacilityPayment": FacilityPayment,
-    "FacilityPatients": FacilityPatients,
-    "FacilityUserProfile": FacilityUserProfile,
-    "FacilityProfile": FacilityProfile,
 }
 
 export const pagesConfig = {

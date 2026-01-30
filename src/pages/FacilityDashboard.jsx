@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { createPageUrl } from '../utils';
 import { useNavigate } from 'react-router-dom';
+import OrderDetailDialog from '../components/facility/OrderDetailDialog';
 
 // Mock data
 const mockOrders = [
@@ -118,6 +119,7 @@ const mockInvoices = [
 export default function FacilityDashboard() {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [selectedOrderStage, setSelectedOrderStage] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const navigate = useNavigate();
 
   const newOrders = mockOrders.filter(o => o.order_stage === 'new');
@@ -260,7 +262,11 @@ export default function FacilityDashboard() {
             {mockOrders
               .filter(order => order.order_stage === selectedOrderStage)
               .map(order => (
-                <div key={order.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div 
+                  key={order.id} 
+                  className="p-4 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all"
+                  onClick={() => setSelectedOrder(order)}
+                >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
@@ -362,7 +368,14 @@ export default function FacilityDashboard() {
                   {mockOrders
                     .filter(order => order.invoice_id === selectedInvoice.id)
                     .map(order => (
-                      <div key={order.id} className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                      <div 
+                        key={order.id} 
+                        className="p-3 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedOrder(order);
+                        }}
+                      >
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="font-semibold text-gray-900">{order.order_number}</p>
@@ -408,6 +421,13 @@ export default function FacilityDashboard() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Order Detail Dialog */}
+      <OrderDetailDialog 
+        order={selectedOrder} 
+        open={!!selectedOrder} 
+        onClose={() => setSelectedOrder(null)} 
+      />
     </div>
   );
 }
