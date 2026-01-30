@@ -29,10 +29,6 @@ const defaultUser = {
 };
 
 function LayoutContent({ children, currentPageName }) {
-  // Check if this is a facility page FIRST (before any hooks)
-  const facilityPages = ['FacilityDashboard', 'FacilityPayment', 'FacilityPatients', 'FacilityUserProfile', 'FacilityProfile'];
-  const isFacilityPage = facilityPages.includes(currentPageName);
-  
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const [showPickupWindow, setShowPickupWindow] = useState(false);
@@ -110,11 +106,6 @@ function LayoutContent({ children, currentPageName }) {
     patientNavItems.push({ name: 'Communication', page: 'PatientMessages' });
   }
   patientNavItems.push({ name: 'Complete Profile', page: 'PatientWelcomeFlow' });
-
-  // If it's a facility page, use FacilityLayout (AFTER all hooks are called)
-  if (isFacilityPage) {
-    return <FacilityLayout children={children} currentPageName={currentPageName} />;
-  }
 
   return (
     <div className="min-h-screen relative bg-gray-50" style={{ overflowY: 'scroll' }}>
@@ -292,6 +283,16 @@ function LayoutContent({ children, currentPageName }) {
       }
 
 export default function Layout({ children, currentPageName }) {
+  // Check if this is a facility page BEFORE wrapping in CartProvider
+  const facilityPages = ['FacilityDashboard', 'FacilityPayment', 'FacilityPatients', 'FacilityUserProfile', 'FacilityProfile'];
+  const isFacilityPage = facilityPages.includes(currentPageName);
+  
+  // If it's a facility page, use FacilityLayout directly (no CartProvider needed)
+  if (isFacilityPage) {
+    return <FacilityLayout children={children} currentPageName={currentPageName} />;
+  }
+  
+  // Otherwise, use patient layout with CartProvider
   return (
     <CartProvider>
       <LayoutContent children={children} currentPageName={currentPageName} />
