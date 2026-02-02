@@ -73,6 +73,8 @@ import Prescriptions from './pages/Prescriptions';
 import Roadmap from './pages/Roadmap';
 import Settings from './pages/Settings';
 import StaffMessaging from './pages/StaffMessaging';
+import FacilitySearchResults from './pages/FacilitySearchResults';
+import FacilityInvoices from './pages/FacilityInvoices';
 import __Layout from './Layout.jsx';
 
 
@@ -103,6 +105,8 @@ export const PAGES = {
     "Roadmap": Roadmap,
     "Settings": Settings,
     "StaffMessaging": StaffMessaging,
+    "FacilitySearchResults": FacilitySearchResults,
+    "FacilityInvoices": FacilityInvoices,
 }
 
 export const pagesConfig = {

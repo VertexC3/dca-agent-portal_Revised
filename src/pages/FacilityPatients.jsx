@@ -60,10 +60,19 @@ export default function FacilityPatients() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDetail, setSelectedDetail] = useState(null);
 
-  const filteredPatients = mockPatients.filter(patient =>
-    patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const clearFilters = () => {
+    setFilters({ status: 'all', physician: 'all', medication: 'all' });
+    setSearchTerm('');
+  };
+
+  const hasActiveFilters = Object.values(filters).some(v => v && v !== 'all') || searchTerm;
+
+  const filteredPatients = mockPatients.filter(patient => {
+    if (searchTerm && !patient.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        !patient.email.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    if (filters.physician !== 'all' && patient.physician !== filters.physician) return false;
+    return true;
+  });
 
   return (
     <div className="relative min-h-screen">
@@ -100,14 +109,100 @@ export default function FacilityPatients() {
             <p className="text-gray-600 mt-1">Manage patient information</p>
           </div>
           
-          {/* Search */}
-          <div className="w-96">
-            <Input
-              placeholder="Search patients by name or email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-12"
-            />
+          {/* Patient-Specific Search */}
+          <div className="relative">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setSearchExpanded(!searchExpanded)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all ${
+                  searchExpanded ? 'bg-[#1a1f5c] text-white border-[#1a1f5c]' : 'border-gray-300 hover:border-[#1a1f5c]'
+                }`}
+              >
+                <Search className="w-5 h-5" />
+              </button>
+
+              <Input
+                placeholder="Search patients by name or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="h-11 w-96 border-2 border-gray-300"
+              />
+            </div>
+
+            <AnimatePresence>
+              {searchExpanded && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  className="absolute top-14 right-0 bg-white border-2 border-gray-200 rounded-lg shadow-xl p-6 z-50 w-[600px]"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <Filter className="w-5 h-5 text-[#1a1f5c]" />
+                      <h3 className="font-semibold text-lg">Filter Patients</h3>
+                    </div>
+                    <button onClick={() => setSearchExpanded(false)} className="p-1 hover:bg-gray-100 rounded-full">
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <Label className="text-sm font-medium mb-2">Status</Label>
+                      <Select value={filters.status} onValueChange={(v) => setFilters({...filters, status: v})}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Statuses</SelectItem>
+                          <SelectItem value="active">Active</SelectItem>
+                          <SelectItem value="inactive">Inactive</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium mb-2">Physician</Label>
+                      <Select value={filters.physician} onValueChange={(v) => setFilters({...filters, physician: v})}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Physicians</SelectItem>
+                          <SelectItem value="Dr. Sarah Johnson">Dr. Sarah Johnson</SelectItem>
+                          <SelectItem value="Dr. Michael Chen">Dr. Michael Chen</SelectItem>
+                          <SelectItem value="Dr. Emily Rodriguez">Dr. Emily Rodriguez</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="col-span-2">
+                      <Label className="text-sm font-medium mb-2">Medication</Label>
+                      <Select value={filters.medication} onValueChange={(v) => setFilters({...filters, medication: v})}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Medications</SelectItem>
+                          <SelectItem value="Semaglutide">Semaglutide</SelectItem>
+                          <SelectItem value="Tirzepatide">Tirzepatide</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between pt-4 border-t">
+                    <Button variant="outline" onClick={clearFilters} disabled={!hasActiveFilters}>
+                      Clear All
+                    </Button>
+                    <Button onClick={() => setSearchExpanded(false)} className="bg-[#1a1f5c]">
+                      Apply Filters
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
@@ -245,6 +340,7 @@ export default function FacilityPatients() {
         </DialogContent>
       </Dialog>
       </div>
-    </div>
-  );
-}
+      </div>
+      </div>
+      );
+      }

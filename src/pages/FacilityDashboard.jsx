@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Package, TrendingUp, Truck, FileText, Search, X, Filter, Download, RefreshCw } from 'lucide-react';
+import { Package, TrendingUp, Truck, FileText, Download, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
@@ -137,6 +137,16 @@ export default function FacilityDashboard() {
     physician: ''
   });
   const navigate = useNavigate();
+
+  const handleExportInvoicePDF = (invoice) => {
+    alert(`Exporting invoice ${invoice.invoice_number} to PDF...`);
+    setExportingInvoice(null);
+  };
+
+  const handleExportInvoiceExcel = (invoice) => {
+    alert(`Exporting invoice ${invoice.invoice_number} to Excel...`);
+    setExportingInvoice(null);
+  };
 
   // Filter orders based on search criteria
   const filteredOrders = mockOrders.filter(order => {
@@ -281,9 +291,6 @@ export default function FacilityDashboard() {
             >
               <RefreshCw className="w-4 h-4" />
             </Button>
-
-            {/* Global Search */}
-            <div className="relative">
             <AnimatePresence>
               {!searchExpanded ? (
                 <motion.button
@@ -422,9 +429,6 @@ export default function FacilityDashboard() {
                     </div>
                   </div>
                 </motion.div>
-              )}
-            </AnimatePresence>
-            </div>
           </div>
         </div>
 
