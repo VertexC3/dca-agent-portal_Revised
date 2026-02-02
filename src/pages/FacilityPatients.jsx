@@ -84,15 +84,7 @@ export default function FacilityPatients() {
   });
 
   return (
-    <div className="relative min-h-screen">
-      {/* Parallax Background */}
-      <div className="fixed inset-0 z-0 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 opacity-40" />
-      <div className="fixed inset-0 z-0" style={{
-        backgroundImage: 'radial-gradient(circle at 30% 40%, rgba(167, 139, 250, 0.1) 0%, transparent 50%), radial-gradient(circle at 70% 70%, rgba(236, 72, 153, 0.1) 0%, transparent 50%)',
-        transform: 'translateZ(0)',
-      }} />
-
-      <div className="relative z-10 space-y-6">
+    <div className="space-y-6">
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Patients</h1>
@@ -115,7 +107,8 @@ export default function FacilityPatients() {
                 placeholder="Search patients by name or email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="h-11 w-96 border-2 border-gray-300"
+                onClick={() => setSearchExpanded(true)}
+                className="h-11 w-96 border-2 border-gray-300 cursor-pointer"
               />
             </div>
 
@@ -329,7 +322,6 @@ export default function FacilityPatients() {
             )}
           </DialogContent>
         </Dialog>
-      </div>
     </div>
   );
 }

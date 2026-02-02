@@ -85,15 +85,7 @@ export default function FacilityInvoices() {
   const totalPaid = filteredInvoices.reduce((sum, inv) => sum + inv.total_paid, 0);
 
   return (
-    <div className="relative min-h-screen">
-      {/* Parallax Background */}
-      <div className="fixed inset-0 z-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 opacity-40" />
-      <div className="fixed inset-0 z-0" style={{
-        backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255, 192, 203, 0.1) 0%, transparent 50%)',
-        transform: 'translateZ(0)',
-      }} />
-
-      <div className="relative z-10 space-y-6">
+    <div className="space-y-6">
         {/* Header with Search */}
         <div className="flex items-center justify-between gap-4">
           <div>
@@ -117,7 +109,8 @@ export default function FacilityInvoices() {
                 placeholder="Search invoices..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="h-11 w-80 border-2 border-gray-300"
+                onClick={() => setSearchExpanded(true)}
+                className="h-11 w-80 border-2 border-gray-300 cursor-pointer"
               />
             </div>
 
@@ -207,49 +200,49 @@ export default function FacilityInvoices() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="border-2 border-blue-200 bg-blue-50">
+          <Card className="border-2 border-gray-200">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <FileText className="w-10 h-10 text-blue-600" />
+                <FileText className="w-10 h-10 text-gray-600" />
                 <div>
-                  <p className="text-2xl font-bold text-blue-900">{filteredInvoices.length}</p>
-                  <p className="text-sm text-blue-700">Total Invoices</p>
+                  <p className="text-2xl font-bold text-gray-900">{filteredInvoices.length}</p>
+                  <p className="text-sm text-gray-600">Total Invoices</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-green-200 bg-green-50">
+          <Card className="border-2 border-gray-200">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <DollarSign className="w-10 h-10 text-green-600" />
+                <DollarSign className="w-10 h-10 text-gray-600" />
                 <div>
-                  <p className="text-2xl font-bold text-green-900">${totalRevenue.toFixed(2)}</p>
-                  <p className="text-sm text-green-700">Total Revenue</p>
+                  <p className="text-2xl font-bold text-gray-900">${totalRevenue.toFixed(2)}</p>
+                  <p className="text-sm text-gray-600">Total Revenue</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-yellow-200 bg-yellow-50">
+          <Card className="border-2 border-gray-200">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <Clock className="w-10 h-10 text-yellow-600" />
+                <Clock className="w-10 h-10 text-gray-600" />
                 <div>
-                  <p className="text-2xl font-bold text-yellow-900">{openInvoices}</p>
-                  <p className="text-sm text-yellow-700">Open Invoices</p>
+                  <p className="text-2xl font-bold text-gray-900">{openInvoices}</p>
+                  <p className="text-sm text-gray-600">Open Invoices</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-purple-200 bg-purple-50">
+          <Card className="border-2 border-gray-200">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <CheckCircle className="w-10 h-10 text-purple-600" />
+                <CheckCircle className="w-10 h-10 text-gray-600" />
                 <div>
-                  <p className="text-2xl font-bold text-purple-900">${totalPaid.toFixed(2)}</p>
-                  <p className="text-sm text-purple-700">Total Paid</p>
+                  <p className="text-2xl font-bold text-gray-900">${totalPaid.toFixed(2)}</p>
+                  <p className="text-sm text-gray-600">Total Paid</p>
                 </div>
               </div>
             </CardContent>

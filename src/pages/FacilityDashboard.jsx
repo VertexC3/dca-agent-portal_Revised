@@ -82,16 +82,7 @@ export default function FacilityDashboard() {
   };
 
   return (
-    <div className="relative min-h-screen">
-      {/* Parallax Background */}
-      <div className="fixed inset-0 z-0 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 opacity-40" />
-      <div className="fixed inset-0 z-0" style={{
-        backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%)',
-        transform: 'translateZ(0)',
-      }} />
-
-      <div className="relative z-10 space-y-8">
-      <div className="space-y-6">
+    <div className="space-y-6">
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Facility Dashboard</h1>
@@ -132,36 +123,36 @@ export default function FacilityDashboard() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="border-2 border-blue-200 bg-blue-50 cursor-pointer" onClick={() => setSelectedOrderStage('new')}>
+        <Card className="border-2 border-gray-200 cursor-pointer hover:border-gray-400 transition-all" onClick={() => setSelectedOrderStage('new')}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-blue-900">New Orders</CardTitle>
-            <Package className="w-5 h-5 text-blue-600" />
+            <CardTitle className="text-sm font-medium text-gray-900">New Orders</CardTitle>
+            <Package className="w-5 h-5 text-gray-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-blue-900">{newOrders.length}</div>
-            <p className="text-xs text-blue-700 mt-1">${newOrders.reduce((sum, o) => sum + o.total_amount, 0).toFixed(2)} total</p>
+            <div className="text-3xl font-bold text-gray-900">{newOrders.length}</div>
+            <p className="text-xs text-gray-600 mt-1">${newOrders.reduce((sum, o) => sum + o.total_amount, 0).toFixed(2)} total</p>
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-orange-200 bg-orange-50 cursor-pointer" onClick={() => setSelectedOrderStage('in_process')}>
+        <Card className="border-2 border-gray-200 cursor-pointer hover:border-gray-400 transition-all" onClick={() => setSelectedOrderStage('in_process')}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-orange-900">In Process</CardTitle>
-            <TrendingUp className="w-5 h-5 text-orange-600" />
+            <CardTitle className="text-sm font-medium text-gray-900">In Process</CardTitle>
+            <TrendingUp className="w-5 h-5 text-gray-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-orange-900">{inProcessOrders.length}</div>
-            <p className="text-xs text-orange-700 mt-1">${inProcessOrders.reduce((sum, o) => sum + o.total_amount, 0).toFixed(2)} total</p>
+            <div className="text-3xl font-bold text-gray-900">{inProcessOrders.length}</div>
+            <p className="text-xs text-gray-600 mt-1">${inProcessOrders.reduce((sum, o) => sum + o.total_amount, 0).toFixed(2)} total</p>
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-green-200 bg-green-50 cursor-pointer" onClick={() => setSelectedOrderStage('shipped')}>
+        <Card className="border-2 border-gray-200 cursor-pointer hover:border-gray-400 transition-all" onClick={() => setSelectedOrderStage('shipped')}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-green-900">Shipped</CardTitle>
-            <Truck className="w-5 h-5 text-green-600" />
+            <CardTitle className="text-sm font-medium text-gray-900">Shipped</CardTitle>
+            <Truck className="w-5 h-5 text-gray-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-green-900">{shippedOrders.length}</div>
-            <p className="text-xs text-green-700 mt-1">${shippedOrders.reduce((sum, o) => sum + o.total_amount, 0).toFixed(2)} total</p>
+            <div className="text-3xl font-bold text-gray-900">{shippedOrders.length}</div>
+            <p className="text-xs text-gray-600 mt-1">${shippedOrders.reduce((sum, o) => sum + o.total_amount, 0).toFixed(2)} total</p>
           </CardContent>
         </Card>
       </div>
@@ -335,8 +326,6 @@ export default function FacilityDashboard() {
 
         {/* Order Detail Dialog */}
         <OrderDetailDialog order={selectedOrder} open={!!selectedOrder} onClose={() => setSelectedOrder(null)} />
-      </div>
-      </div>
     </div>
   );
 }
