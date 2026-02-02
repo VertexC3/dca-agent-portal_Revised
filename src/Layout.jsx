@@ -284,7 +284,7 @@ function LayoutContent({ children, currentPageName }) {
 
 export default function Layout({ children, currentPageName }) {
   // Check if this is a facility page BEFORE wrapping in CartProvider
-  const facilityPages = ['FacilityDashboard', 'FacilityPayment', 'FacilityPatients', 'FacilityUserProfile', 'FacilityProfile'];
+  const facilityPages = ['FacilityDashboard', 'FacilityInvoices', 'FacilityPatients', 'FacilityUserProfile', 'FacilityProfile', 'FacilitySearchResults'];
   const isFacilityPage = facilityPages.includes(currentPageName);
   
   // If it's a facility page, use FacilityLayout directly (no CartProvider needed)
