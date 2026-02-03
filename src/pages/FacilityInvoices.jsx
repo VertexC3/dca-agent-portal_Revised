@@ -208,49 +208,49 @@ export default function FacilityInvoices() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="border-2 border-gray-200">
+          <Card className="border-2 border-gray-200 overflow-hidden">
             <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <FileText className="w-10 h-10 text-gray-600" />
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">{filteredInvoices.length}</p>
-                  <p className="text-sm text-gray-600">Total Invoices</p>
+              <div className="flex items-center gap-4 min-w-0">
+                <FileText className="w-10 h-10 text-gray-600 flex-shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-2xl font-bold text-gray-900 truncate">{filteredInvoices.length}</p>
+                  <p className="text-sm text-gray-600 truncate">Total Invoices</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-gray-200">
+          <Card className="border-2 border-gray-200 overflow-hidden">
             <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <DollarSign className="w-10 h-10 text-gray-600" />
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">${formatCurrency(totalRevenue)}</p>
-                  <p className="text-sm text-gray-600">Total Revenue</p>
+              <div className="flex items-center gap-4 min-w-0">
+                <DollarSign className="w-10 h-10 text-gray-600 flex-shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-2xl font-bold text-gray-900 truncate">${formatCurrency(totalRevenue)}</p>
+                  <p className="text-sm text-gray-600 truncate">Total Revenue</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-gray-200">
+          <Card className="border-2 border-gray-200 overflow-hidden">
             <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <Clock className="w-10 h-10 text-gray-600" />
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">{openInvoices}</p>
-                  <p className="text-sm text-gray-600">Open Invoices</p>
+              <div className="flex items-center gap-4 min-w-0">
+                <Clock className="w-10 h-10 text-gray-600 flex-shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-2xl font-bold text-gray-900 truncate">{openInvoices}</p>
+                  <p className="text-sm text-gray-600 truncate">Open Invoices</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-gray-200">
+          <Card className="border-2 border-gray-200 overflow-hidden">
             <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <CheckCircle className="w-10 h-10 text-gray-600" />
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">${formatCurrency(totalPaid)}</p>
-                  <p className="text-sm text-gray-600">Total Paid</p>
+              <div className="flex items-center gap-4 min-w-0">
+                <CheckCircle className="w-10 h-10 text-gray-600 flex-shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-2xl font-bold text-gray-900 truncate">${formatCurrency(totalPaid)}</p>
+                  <p className="text-sm text-gray-600 truncate">Total Paid</p>
                 </div>
               </div>
             </CardContent>
@@ -262,25 +262,25 @@ export default function FacilityInvoices() {
           {filteredInvoices.map(invoice => {
             const isExpanded = expandedInvoices.includes(invoice.id);
             return (
-              <Card key={invoice.id} className="border-2 border-gray-200">
+              <Card key={invoice.id} className="border-2 border-gray-200 overflow-hidden">
                 <CardHeader 
                   className="border-b bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
                   onClick={() => toggleInvoice(invoice.id)}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      {isExpanded ? <ChevronUp className="w-5 h-5 text-gray-600" /> : <ChevronDown className="w-5 h-5 text-gray-600" />}
-                      <div>
-                        <CardTitle className="text-xl">{invoice.invoice_number}</CardTitle>
-                        <p className="text-sm text-gray-600 mt-1">
+                  <div className="flex items-center justify-between gap-4 min-w-0">
+                    <div className="flex items-center gap-4 min-w-0 flex-1">
+                      {isExpanded ? <ChevronUp className="w-5 h-5 text-gray-600 flex-shrink-0" /> : <ChevronDown className="w-5 h-5 text-gray-600 flex-shrink-0" />}
+                      <div className="min-w-0 flex-1">
+                        <CardTitle className="text-xl truncate">{invoice.invoice_number}</CardTitle>
+                        <p className="text-sm text-gray-600 mt-1 truncate">
                           {invoice.bill_to_name} • {invoice.invoice_date} • {invoice.orders.length} {invoice.orders.length === 1 ? 'Order' : 'Orders'}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="text-2xl font-bold text-gray-900">${formatCurrency(invoice.total_due)}</p>
-                        <p className="text-sm text-gray-600">Paid: ${formatCurrency(invoice.total_paid)}</p>
+                    <div className="flex items-center gap-4 flex-shrink-0">
+                      <div className="text-right min-w-0">
+                        <p className="text-2xl font-bold text-gray-900 truncate">${formatCurrency(invoice.total_due)}</p>
+                        <p className="text-sm text-gray-600 truncate">Paid: ${formatCurrency(invoice.total_paid)}</p>
                       </div>
                       <Badge className={
                         invoice.status === 'paid' ? 'bg-green-100 text-green-800' :
@@ -304,20 +304,21 @@ export default function FacilityInvoices() {
                       <CardContent className="p-6">
                         <div className="space-y-3">
                           {invoice.orders.map(order => (
-                            <div key={order.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                              <div className="flex items-center gap-4">
+                            <div key={order.id} className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-lg min-w-0">
+                              <div className="flex items-center gap-4 min-w-0 flex-1">
                                 <Checkbox
                                   checked={selectedOrders.includes(order.id)}
                                   onCheckedChange={() => handleOrderSelect(order.id)}
                                   disabled={order.payment_status === 'paid'}
+                                  className="flex-shrink-0"
                                 />
-                                <div>
-                                  <p className="font-semibold">{order.id}</p>
-                                  <p className="text-sm text-gray-600">Patient: {order.patient_name} • {order.order_date}</p>
+                                <div className="min-w-0 flex-1">
+                                  <p className="font-semibold truncate">{order.id}</p>
+                                  <p className="text-sm text-gray-600 truncate">Patient: {order.patient_name} • {order.order_date}</p>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-4">
-                                <p className="font-semibold text-lg">${formatCurrency(order.total_amount)}</p>
+                              <div className="flex items-center gap-4 flex-shrink-0">
+                                <p className="font-semibold text-lg whitespace-nowrap">${formatCurrency(order.total_amount)}</p>
                                 <Badge className={
                                   order.payment_status === 'paid' ? 'bg-green-100 text-green-800' :
                                   'bg-gray-100 text-gray-800'
