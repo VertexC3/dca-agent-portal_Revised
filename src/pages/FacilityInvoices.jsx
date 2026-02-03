@@ -85,7 +85,8 @@ export default function FacilityInvoices() {
   const totalPaid = filteredInvoices.reduce((sum, inv) => sum + inv.total_paid, 0);
 
   return (
-    <div className="space-y-6">
+    <>
+      <div className="space-y-6">
         {/* Header with Search */}
         <div className="flex items-center justify-between gap-4">
           <div>
@@ -320,6 +321,6 @@ export default function FacilityInvoices() {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }

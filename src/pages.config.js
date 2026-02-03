@@ -55,9 +55,11 @@ import Communications from './pages/Communications';
 import DailyView from './pages/DailyView';
 import Dashboard from './pages/Dashboard';
 import FacilityDashboard from './pages/FacilityDashboard';
+import FacilityInvoices from './pages/FacilityInvoices';
 import FacilityPatients from './pages/FacilityPatients';
 import FacilityPayment from './pages/FacilityPayment';
 import FacilityProfile from './pages/FacilityProfile';
+import FacilitySearchResults from './pages/FacilitySearchResults';
 import FacilityUserProfile from './pages/FacilityUserProfile';
 import Home from './pages/Home';
 import PatientCommunications from './pages/PatientCommunications';
@@ -73,8 +75,6 @@ import Prescriptions from './pages/Prescriptions';
 import Roadmap from './pages/Roadmap';
 import Settings from './pages/Settings';
 import StaffMessaging from './pages/StaffMessaging';
-import FacilitySearchResults from './pages/FacilitySearchResults';
-import FacilityInvoices from './pages/FacilityInvoices';
 import __Layout from './Layout.jsx';
 
 
@@ -87,9 +87,11 @@ export const PAGES = {
     "DailyView": DailyView,
     "Dashboard": Dashboard,
     "FacilityDashboard": FacilityDashboard,
+    "FacilityInvoices": FacilityInvoices,
     "FacilityPatients": FacilityPatients,
     "FacilityPayment": FacilityPayment,
     "FacilityProfile": FacilityProfile,
+    "FacilitySearchResults": FacilitySearchResults,
     "FacilityUserProfile": FacilityUserProfile,
     "Home": Home,
     "PatientCommunications": PatientCommunications,
@@ -105,8 +107,6 @@ export const PAGES = {
     "Roadmap": Roadmap,
     "Settings": Settings,
     "StaffMessaging": StaffMessaging,
-    "FacilitySearchResults": FacilitySearchResults,
-    "FacilityInvoices": FacilityInvoices,
 }
 
 export const pagesConfig = {
