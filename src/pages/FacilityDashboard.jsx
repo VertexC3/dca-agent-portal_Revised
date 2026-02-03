@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Package, TrendingUp, Truck, FileText, Download, RefreshCw } from 'lucide-react';
+import { Package, TrendingUp, Truck, FileText, Download, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { format, subDays } from 'date-fns';
+import { format, subDays, subMonths } from 'date-fns';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { motion, AnimatePresence } from 'framer-motion';
 import { createPageUrl } from '../utils';
 import { useNavigate } from 'react-router-dom';
 import OrderDetailDialog from '../components/facility/OrderDetailDialog';
@@ -33,6 +35,8 @@ export default function FacilityDashboard() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [exportingInvoice, setExportingInvoice] = useState(null);
   const [chartView, setChartView] = useState('orders');
+  const [chartExpanded, setChartExpanded] = useState(false);
+  const [timeRange, setTimeRange] = useState('30days');
   const navigate = useNavigate();
 
   const handleExportInvoicePDF = (invoice) => {
@@ -84,12 +88,35 @@ export default function FacilityDashboard() {
     return colors[status] || 'bg-gray-100 text-gray-800 border-gray-200';
   };
 
-  // Generate chart data for last 30 days
+  // Generate chart data based on selected time range
   const generateChartData = () => {
     const data = [];
-    for (let i = 29; i >= 0; i--) {
+    let days = 30;
+    let dateFormat = 'MMM d';
+    
+    switch (timeRange) {
+      case '7days':
+        days = 7;
+        break;
+      case '14days':
+        days = 14;
+        break;
+      case '30days':
+        days = 30;
+        break;
+      case '6months':
+        days = 180;
+        dateFormat = 'MMM yyyy';
+        break;
+      case '12months':
+        days = 365;
+        dateFormat = 'MMM yyyy';
+        break;
+    }
+    
+    for (let i = days - 1; i >= 0; i--) {
       const date = subDays(new Date(), i);
-      const dateStr = format(date, 'MMM d');
+      const dateStr = format(date, dateFormat);
       
       // Generate random data for demonstration
       const ordersCount = Math.floor(Math.random() * 10) + 1;
@@ -105,6 +132,17 @@ export default function FacilityDashboard() {
   };
 
   const chartData = generateChartData();
+  
+  const getTimeRangeLabel = () => {
+    switch (timeRange) {
+      case '7days': return 'Last 7 Days';
+      case '14days': return 'Last 14 Days';
+      case '30days': return 'Last 30 Days';
+      case '6months': return 'Last 6 Months';
+      case '12months': return 'Last 12 Months';
+      default: return 'Last 30 Days';
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -183,10 +221,34 @@ export default function FacilityDashboard() {
 
       {/* Chart - Orders/Invoices Over Time */}
       <Card>
-        <CardHeader>
+        <CardHeader 
+          className="cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={() => setChartExpanded(!chartExpanded)}
+        >
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Last 30 Days</CardTitle>
-            <Tabs value={chartView} onValueChange={setChartView}>
+            <div className="flex items-center gap-3">
+              {chartExpanded ? <ChevronUp className="w-5 h-5 text-gray-600" /> : <ChevronDown className="w-5 h-5 text-gray-600" />}
+              <div className="flex items-center gap-3">
+                <CardTitle className="text-lg">{getTimeRangeLabel()}</CardTitle>
+                <Select 
+                  value={timeRange} 
+                  onValueChange={setTimeRange}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <SelectTrigger className="w-40 h-8 text-sm" onClick={(e) => e.stopPropagation()}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="7days">Last 7 Days</SelectItem>
+                    <SelectItem value="14days">Last 14 Days</SelectItem>
+                    <SelectItem value="30days">Last 30 Days</SelectItem>
+                    <SelectItem value="6months">Last 6 Months</SelectItem>
+                    <SelectItem value="12months">Last 12 Months</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <Tabs value={chartView} onValueChange={setChartView} onClick={(e) => e.stopPropagation()}>
               <TabsList>
                 <TabsTrigger value="orders">Orders</TabsTrigger>
                 <TabsTrigger value="invoices">Invoices</TabsTrigger>
@@ -194,33 +256,44 @@ export default function FacilityDashboard() {
             </Tabs>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis 
-                  dataKey="date" 
-                  tick={{ fontSize: 12 }}
-                  stroke="#6b7280"
-                />
-                <YAxis 
-                  tick={{ fontSize: 12 }}
-                  stroke="#6b7280"
-                />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
-                  labelStyle={{ fontWeight: 'bold', color: '#111827' }}
-                />
-                <Bar 
-                  dataKey={chartView} 
-                  fill={chartView === 'orders' ? '#1a1f5c' : '#3b82f6'} 
-                  radius={[8, 8, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
+        <AnimatePresence>
+          {chartExpanded && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <CardContent>
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis 
+                        dataKey="date" 
+                        tick={{ fontSize: 12 }}
+                        stroke="#6b7280"
+                      />
+                      <YAxis 
+                        tick={{ fontSize: 12 }}
+                        stroke="#6b7280"
+                      />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                        labelStyle={{ fontWeight: 'bold', color: '#111827' }}
+                      />
+                      <Bar 
+                        dataKey={chartView} 
+                        fill={chartView === 'orders' ? '#1a1f5c' : '#3b82f6'} 
+                        radius={[8, 8, 0, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </Card>
 
       {/* Recent Invoices */}
