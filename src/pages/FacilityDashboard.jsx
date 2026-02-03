@@ -111,7 +111,6 @@ export default function FacilityDashboard() {
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Facility Dashboard</h1>
-            <p className="text-gray-600 mt-1">Overview of orders and invoices</p>
           </div>
           
           <div className="flex items-center gap-3">

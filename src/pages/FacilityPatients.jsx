@@ -6,7 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, X, Filter, Pill, Stethoscope, Calendar, MapPin, ShoppingCart } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Search, X, Filter, Pill, Stethoscope, Calendar, MapPin, ShoppingCart, ArrowUpDown, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 
@@ -64,6 +65,8 @@ export default function FacilityPatients() {
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [detailDialog, setDetailDialog] = useState({ open: false, type: null, patient: null });
+  const [selectedPatients, setSelectedPatients] = useState([]);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [filters, setFilters] = useState({
     status: 'all',
     physician: 'all',
@@ -77,6 +80,34 @@ export default function FacilityPatients() {
 
   const hasActiveFilters = Object.values(filters).some(v => v && v !== 'all') || searchTerm;
 
+  const handleSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const handleSelectPatient = (patientId) => {
+    setSelectedPatients(prev =>
+      prev.includes(patientId)
+        ? prev.filter(id => id !== patientId)
+        : [...prev, patientId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedPatients.length === filteredPatients.length) {
+      setSelectedPatients([]);
+    } else {
+      setSelectedPatients(filteredPatients.map(p => p.id));
+    }
+  };
+
+  const handleExport = () => {
+    alert(`Exporting ${selectedPatients.length} selected patients...`);
+  };
+
   const filteredPatients = mockPatients.filter(patient => {
     if (searchTerm && !patient.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
         !patient.email.toLowerCase().includes(searchTerm.toLowerCase())) return false;
@@ -84,12 +115,33 @@ export default function FacilityPatients() {
     return true;
   });
 
+  const sortedPatients = [...filteredPatients].sort((a, b) => {
+    if (!sortConfig.key) return 0;
+    
+    let aValue = a[sortConfig.key];
+    let bValue = b[sortConfig.key];
+    
+    if (sortConfig.key === 'prescriptions') {
+      aValue = a.prescriptions.length;
+      bValue = b.prescriptions.length;
+    } else if (sortConfig.key === 'patient_since') {
+      aValue = new Date(a.patient_since);
+      bValue = new Date(b.patient_since);
+    } else if (sortConfig.key === 'total_orders') {
+      aValue = a.total_orders;
+      bValue = b.total_orders;
+    }
+    
+    if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+    if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+    return 0;
+  });
+
   return (
     <div className="space-y-6">
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Patients</h1>
-            <p className="text-gray-600 mt-1">Manage patient information</p>
           </div>
           
           {/* Patient-Specific Search */}
@@ -185,29 +237,92 @@ export default function FacilityPatients() {
           </div>
         </div>
 
+        {/* Action Bar */}
+        {selectedPatients.length > 0 && (
+          <div className="bg-[#1a1f5c] text-white p-4 rounded-lg flex items-center justify-between">
+            <p className="font-semibold">{selectedPatients.length} patient(s) selected</p>
+            <Button onClick={handleExport} variant="outline" className="bg-white text-[#1a1f5c] hover:bg-gray-100 border-0">
+              <Download className="w-4 h-4 mr-2" />
+              Export
+            </Button>
+          </div>
+        )}
+
         {/* Patients Table */}
         <div className="border-2 border-gray-200 rounded-lg overflow-hidden">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-50">
-                  <TableHead className="font-bold text-gray-900 whitespace-nowrap">Name</TableHead>
-                  <TableHead className="font-bold text-gray-900 whitespace-nowrap">Phone Number</TableHead>
-                  <TableHead className="font-bold text-gray-900 whitespace-nowrap">Email</TableHead>
-                  <TableHead className="font-bold text-gray-900 whitespace-nowrap">Patient Since</TableHead>
-                  <TableHead className="font-bold text-gray-900 whitespace-nowrap text-center"># Prescriptions</TableHead>
-                  <TableHead className="font-bold text-gray-900 whitespace-nowrap">Physician</TableHead>
-                  <TableHead className="font-bold text-gray-900 whitespace-nowrap">Address</TableHead>
-                  <TableHead className="font-bold text-gray-900 whitespace-nowrap text-center">Orders</TableHead>
+                  <TableHead className="w-12">
+                    <Checkbox
+                      checked={selectedPatients.length === sortedPatients.length && sortedPatients.length > 0}
+                      onCheckedChange={handleSelectAll}
+                    />
+                  </TableHead>
+                  <TableHead className="font-bold text-gray-900 whitespace-nowrap cursor-pointer hover:bg-gray-100" onClick={() => handleSort('name')}>
+                    <div className="flex items-center gap-2">
+                      Name
+                      <ArrowUpDown className="w-4 h-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead className="font-bold text-gray-900 whitespace-nowrap cursor-pointer hover:bg-gray-100" onClick={() => handleSort('phone')}>
+                    <div className="flex items-center gap-2">
+                      Phone Number
+                      <ArrowUpDown className="w-4 h-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead className="font-bold text-gray-900 whitespace-nowrap cursor-pointer hover:bg-gray-100" onClick={() => handleSort('email')}>
+                    <div className="flex items-center gap-2">
+                      Email
+                      <ArrowUpDown className="w-4 h-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead className="font-bold text-gray-900 whitespace-nowrap cursor-pointer hover:bg-gray-100" onClick={() => handleSort('patient_since')}>
+                    <div className="flex items-center gap-2">
+                      Patient Since
+                      <ArrowUpDown className="w-4 h-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead className="font-bold text-gray-900 whitespace-nowrap text-center cursor-pointer hover:bg-gray-100" onClick={() => handleSort('prescriptions')}>
+                    <div className="flex items-center gap-2 justify-center">
+                      # Prescriptions
+                      <ArrowUpDown className="w-4 h-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead className="font-bold text-gray-900 whitespace-nowrap cursor-pointer hover:bg-gray-100" onClick={() => handleSort('physician_name')}>
+                    <div className="flex items-center gap-2">
+                      Physician
+                      <ArrowUpDown className="w-4 h-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead className="font-bold text-gray-900 whitespace-nowrap cursor-pointer hover:bg-gray-100" onClick={() => handleSort('address')}>
+                    <div className="flex items-center gap-2">
+                      Address
+                      <ArrowUpDown className="w-4 h-4" />
+                    </div>
+                  </TableHead>
+                  <TableHead className="font-bold text-gray-900 whitespace-nowrap text-center cursor-pointer hover:bg-gray-100" onClick={() => handleSort('total_orders')}>
+                    <div className="flex items-center gap-2 justify-center">
+                      Orders
+                      <ArrowUpDown className="w-4 h-4" />
+                    </div>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredPatients.map(patient => (
+                {sortedPatients.map(patient => (
                   <TableRow 
                     key={patient.id} 
                     className="cursor-pointer hover:bg-gray-50 transition-colors"
                     onClick={() => setSelectedPatient(patient)}
                   >
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        checked={selectedPatients.includes(patient.id)}
+                        onCheckedChange={() => handleSelectPatient(patient.id)}
+                      />
+                    </TableCell>
                     <TableCell className="font-semibold text-gray-900 whitespace-nowrap">{patient.name}</TableCell>
                     <TableCell className="text-gray-700 whitespace-nowrap">{patient.phone}</TableCell>
                     <TableCell className="text-gray-700 whitespace-nowrap">{patient.email}</TableCell>
