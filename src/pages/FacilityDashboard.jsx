@@ -228,25 +228,22 @@ export default function FacilityDashboard() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {chartExpanded ? <ChevronUp className="w-5 h-5 text-gray-600" /> : <ChevronDown className="w-5 h-5 text-gray-600" />}
-              <div className="flex items-center gap-3">
-                <CardTitle className="text-lg">{getTimeRangeLabel()}</CardTitle>
-                <Select 
-                  value={timeRange} 
-                  onValueChange={setTimeRange}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <SelectTrigger className="w-40 h-8 text-sm" onClick={(e) => e.stopPropagation()}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="7days">Last 7 Days</SelectItem>
-                    <SelectItem value="14days">Last 14 Days</SelectItem>
-                    <SelectItem value="30days">Last 30 Days</SelectItem>
-                    <SelectItem value="6months">Last 6 Months</SelectItem>
-                    <SelectItem value="12months">Last 12 Months</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <Select 
+                value={timeRange} 
+                onValueChange={setTimeRange}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <SelectTrigger className="w-40 h-8 text-sm" onClick={(e) => e.stopPropagation()}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="7days">Last 7 Days</SelectItem>
+                  <SelectItem value="14days">Last 14 Days</SelectItem>
+                  <SelectItem value="30days">Last 30 Days</SelectItem>
+                  <SelectItem value="6months">Last 6 Months</SelectItem>
+                  <SelectItem value="12months">Last 12 Months</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <Tabs value={chartView} onValueChange={setChartView} onClick={(e) => e.stopPropagation()}>
               <TabsList>
