@@ -6,13 +6,14 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { FileText, DollarSign, Clock, CheckCircle, Search, X, Filter } from 'lucide-react';
+import { FileText, DollarSign, Clock, CheckCircle, Search, X, Filter, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function FacilityInvoices() {
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [expandedInvoices, setExpandedInvoices] = useState([]);
   const [filters, setFilters] = useState({
     status: 'all',
     dateRange: 'all',
@@ -61,6 +62,18 @@ export default function FacilityInvoices() {
     );
   };
 
+  const toggleInvoice = (invoiceId) => {
+    setExpandedInvoices(prev =>
+      prev.includes(invoiceId)
+        ? prev.filter(id => id !== invoiceId)
+        : [...prev, invoiceId]
+    );
+  };
+
+  const formatCurrency = (amount) => {
+    return amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
   const clearFilters = () => {
     setFilters({ status: 'all', dateRange: 'all', minAmount: '', maxAmount: '' });
     setSearchTerm('');
@@ -96,24 +109,13 @@ export default function FacilityInvoices() {
 
           {/* Invoice-Specific Search */}
           <div className="relative">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setSearchExpanded(!searchExpanded)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all ${
-                  searchExpanded ? 'bg-[#1a1f5c] text-white border-[#1a1f5c]' : 'border-gray-300 hover:border-[#1a1f5c]'
-                }`}
-              >
-                <Search className="w-5 h-5" />
-              </button>
-
-              <Input
-                placeholder="Search invoices..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onClick={() => setSearchExpanded(true)}
-                className="h-11 w-80 border-2 border-gray-300 cursor-pointer"
-              />
-            </div>
+            <Input
+              placeholder="Search invoices..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onClick={() => setSearchExpanded(true)}
+              className="h-11 w-80 border-2 border-gray-300 cursor-pointer"
+            />
 
             <AnimatePresence>
               {searchExpanded && (
@@ -189,8 +191,14 @@ export default function FacilityInvoices() {
                     <Button variant="outline" onClick={clearFilters} disabled={!hasActiveFilters}>
                       Clear All
                     </Button>
-                    <Button onClick={() => setSearchExpanded(false)} className="bg-[#1a1f5c]">
-                      Apply Filters
+                    <Button 
+                      onClick={() => {
+                        setSearchExpanded(false);
+                        // Filters are already applied via state
+                      }} 
+                      className="bg-[#1a1f5c]"
+                    >
+                      Apply Filters & Search
                     </Button>
                   </div>
                 </motion.div>
@@ -218,7 +226,7 @@ export default function FacilityInvoices() {
               <div className="flex items-center gap-4">
                 <DollarSign className="w-10 h-10 text-gray-600" />
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">${totalRevenue.toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-gray-900">${formatCurrency(totalRevenue)}</p>
                   <p className="text-sm text-gray-600">Total Revenue</p>
                 </div>
               </div>
@@ -242,7 +250,7 @@ export default function FacilityInvoices() {
               <div className="flex items-center gap-4">
                 <CheckCircle className="w-10 h-10 text-gray-600" />
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">${totalPaid.toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-gray-900">${formatCurrency(totalPaid)}</p>
                   <p className="text-sm text-gray-600">Total Paid</p>
                 </div>
               </div>
@@ -252,61 +260,82 @@ export default function FacilityInvoices() {
 
         {/* Invoices List */}
         <div className="space-y-4">
-          {filteredInvoices.map(invoice => (
-            <Card key={invoice.id} className="border-2 border-gray-200">
-              <CardHeader className="border-b bg-gray-50">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-xl">{invoice.invoice_number}</CardTitle>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {invoice.bill_to_name} • {invoice.invoice_date}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="text-2xl font-bold text-gray-900">${invoice.total_due.toFixed(2)}</p>
-                      <p className="text-sm text-gray-600">Paid: ${invoice.total_paid.toFixed(2)}</p>
+          {filteredInvoices.map(invoice => {
+            const isExpanded = expandedInvoices.includes(invoice.id);
+            return (
+              <Card key={invoice.id} className="border-2 border-gray-200">
+                <CardHeader 
+                  className="border-b bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
+                  onClick={() => toggleInvoice(invoice.id)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      {isExpanded ? <ChevronUp className="w-5 h-5 text-gray-600" /> : <ChevronDown className="w-5 h-5 text-gray-600" />}
+                      <div>
+                        <CardTitle className="text-xl">{invoice.invoice_number}</CardTitle>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {invoice.bill_to_name} • {invoice.invoice_date} • {invoice.orders.length} {invoice.orders.length === 1 ? 'Order' : 'Orders'}
+                        </p>
+                      </div>
                     </div>
-                    <Badge className={
-                      invoice.status === 'paid' ? 'bg-green-100 text-green-800' :
-                      invoice.status === 'open' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }>
-                      {invoice.status}
-                    </Badge>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-gray-900">${formatCurrency(invoice.total_due)}</p>
+                        <p className="text-sm text-gray-600">Paid: ${formatCurrency(invoice.total_paid)}</p>
+                      </div>
+                      <Badge className={
+                        invoice.status === 'paid' ? 'bg-green-100 text-green-800' :
+                        invoice.status === 'open' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }>
+                        {invoice.status}
+                      </Badge>
+                    </div>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="space-y-3">
-                  {invoice.orders.map(order => (
-                    <div key={order.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <Checkbox
-                          checked={selectedOrders.includes(order.id)}
-                          onCheckedChange={() => handleOrderSelect(order.id)}
-                          disabled={order.payment_status === 'paid'}
-                        />
-                        <div>
-                          <p className="font-semibold">{order.id}</p>
-                          <p className="text-sm text-gray-600">Patient: {order.patient_name} • {order.order_date}</p>
+                </CardHeader>
+
+                <AnimatePresence>
+                  {isExpanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <CardContent className="p-6">
+                        <div className="space-y-3">
+                          {invoice.orders.map(order => (
+                            <div key={order.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                              <div className="flex items-center gap-4">
+                                <Checkbox
+                                  checked={selectedOrders.includes(order.id)}
+                                  onCheckedChange={() => handleOrderSelect(order.id)}
+                                  disabled={order.payment_status === 'paid'}
+                                />
+                                <div>
+                                  <p className="font-semibold">{order.id}</p>
+                                  <p className="text-sm text-gray-600">Patient: {order.patient_name} • {order.order_date}</p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-4">
+                                <p className="font-semibold text-lg">${formatCurrency(order.total_amount)}</p>
+                                <Badge className={
+                                  order.payment_status === 'paid' ? 'bg-green-100 text-green-800' :
+                                  'bg-gray-100 text-gray-800'
+                                }>
+                                  {order.payment_status}
+                                </Badge>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <p className="font-semibold text-lg">${order.total_amount.toFixed(2)}</p>
-                        <Badge className={
-                          order.payment_status === 'paid' ? 'bg-green-100 text-green-800' :
-                          'bg-gray-100 text-gray-800'
-                        }>
-                          {order.payment_status}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                      </CardContent>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </Card>
+            );
+          })}
         </div>
 
         {/* Payment Action Bar */}

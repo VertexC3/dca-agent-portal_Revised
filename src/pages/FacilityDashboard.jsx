@@ -5,10 +5,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { format } from 'date-fns';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { format, subDays } from 'date-fns';
 import { createPageUrl } from '../utils';
 import { useNavigate } from 'react-router-dom';
 import OrderDetailDialog from '../components/facility/OrderDetailDialog';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Mock data
 const mockOrders = [
@@ -30,6 +32,7 @@ export default function FacilityDashboard() {
   const [selectedOrderStage, setSelectedOrderStage] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [exportingInvoice, setExportingInvoice] = useState(null);
+  const [chartView, setChartView] = useState('orders');
   const navigate = useNavigate();
 
   const handleExportInvoicePDF = (invoice) => {
@@ -80,6 +83,28 @@ export default function FacilityDashboard() {
     };
     return colors[status] || 'bg-gray-100 text-gray-800 border-gray-200';
   };
+
+  // Generate chart data for last 30 days
+  const generateChartData = () => {
+    const data = [];
+    for (let i = 29; i >= 0; i--) {
+      const date = subDays(new Date(), i);
+      const dateStr = format(date, 'MMM d');
+      
+      // Generate random data for demonstration
+      const ordersCount = Math.floor(Math.random() * 10) + 1;
+      const invoicesCount = Math.floor(Math.random() * 3) + 1;
+      
+      data.push({
+        date: dateStr,
+        orders: ordersCount,
+        invoices: invoicesCount
+      });
+    }
+    return data;
+  };
+
+  const chartData = generateChartData();
 
   return (
     <div className="space-y-6">
@@ -156,6 +181,48 @@ export default function FacilityDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Chart - Orders/Invoices Over Time */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">Last 30 Days</CardTitle>
+            <Tabs value={chartView} onValueChange={setChartView}>
+              <TabsList>
+                <TabsTrigger value="orders">Orders</TabsTrigger>
+                <TabsTrigger value="invoices">Invoices</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis 
+                  dataKey="date" 
+                  tick={{ fontSize: 12 }}
+                  stroke="#6b7280"
+                />
+                <YAxis 
+                  tick={{ fontSize: 12 }}
+                  stroke="#6b7280"
+                />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                  labelStyle={{ fontWeight: 'bold', color: '#111827' }}
+                />
+                <Bar 
+                  dataKey={chartView} 
+                  fill={chartView === 'orders' ? '#1a1f5c' : '#3b82f6'} 
+                  radius={[8, 8, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Recent Invoices */}
       <Card>

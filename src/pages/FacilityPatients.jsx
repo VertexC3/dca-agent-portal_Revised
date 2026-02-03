@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Search, X, Filter, Users, Pill, Stethoscope, Calendar, MapPin } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Search, X, Filter, Pill, Stethoscope, Calendar, MapPin, ShoppingCart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 
@@ -62,7 +62,8 @@ const mockPatients = [
 export default function FacilityPatients() {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchExpanded, setSearchExpanded] = useState(false);
-  const [selectedDetail, setSelectedDetail] = useState(null);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [detailDialog, setDetailDialog] = useState({ open: false, type: null, patient: null });
   const [filters, setFilters] = useState({
     status: 'all',
     physician: 'all',
@@ -93,24 +94,13 @@ export default function FacilityPatients() {
           
           {/* Patient-Specific Search */}
           <div className="relative">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setSearchExpanded(!searchExpanded)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all ${
-                  searchExpanded ? 'bg-[#1a1f5c] text-white border-[#1a1f5c]' : 'border-gray-300 hover:border-[#1a1f5c]'
-                }`}
-              >
-                <Search className="w-5 h-5" />
-              </button>
-
-              <Input
-                placeholder="Search patients by name or email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onClick={() => setSearchExpanded(true)}
-                className="h-11 w-96 border-2 border-gray-300 cursor-pointer"
-              />
-            </div>
+            <Input
+              placeholder="Search patients by name or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onClick={() => setSearchExpanded(true)}
+              className="h-11 w-96 border-2 border-gray-300 cursor-pointer"
+            />
 
             <AnimatePresence>
               {searchExpanded && (
@@ -179,8 +169,14 @@ export default function FacilityPatients() {
                     <Button variant="outline" onClick={clearFilters} disabled={!hasActiveFilters}>
                       Clear All
                     </Button>
-                    <Button onClick={() => setSearchExpanded(false)} className="bg-[#1a1f5c]">
-                      Apply Filters
+                    <Button 
+                      onClick={() => {
+                        setSearchExpanded(false);
+                        // Filters are already applied via state
+                      }} 
+                      className="bg-[#1a1f5c]"
+                    >
+                      Apply Filters & Search
                     </Button>
                   </div>
                 </motion.div>
@@ -189,98 +185,186 @@ export default function FacilityPatients() {
           </div>
         </div>
 
-        {/* Patients List */}
-        <div className="grid grid-cols-1 gap-4">
-          {filteredPatients.map(patient => (
-            <Card key={patient.id} className="hover:shadow-lg transition-all border-2 border-gray-200">
-              <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                  {/* Patient Info */}
-                  <div>
-                    <p className="text-lg font-bold text-gray-900">{patient.name}</p>
-                    <p className="text-sm text-gray-600">{patient.email}</p>
-                    <p className="text-sm text-gray-600">{patient.phone}</p>
-                    <div className="flex items-center gap-1 mt-2 text-xs text-gray-500">
-                      <Calendar className="w-3 h-3" />
-                      <span>Patient since {format(new Date(patient.patient_since), 'MMM yyyy')}</span>
-                    </div>
-                  </div>
-
-                  {/* Prescriptions */}
-                  <div>
-                    <button
-                      onClick={() => setSelectedDetail({ type: 'prescriptions', patient })}
-                      className="flex items-center gap-2 text-left hover:text-[#1a1f5c] transition-colors group"
-                    >
-                      <Pill className="w-5 h-5 text-[#1a1f5c]" />
-                      <div>
-                        <p className="font-semibold text-gray-900 group-hover:underline">
-                          {patient.prescriptions.length} Prescriptions
-                        </p>
-                        <p className="text-xs text-gray-600">Click to view details</p>
-                      </div>
-                    </button>
-                  </div>
-
-                  {/* Physician */}
-                  <div>
-                    <button
-                      onClick={() => setSelectedDetail({ type: 'physician', patient })}
-                      className="flex items-center gap-2 text-left hover:text-[#1a1f5c] transition-colors group"
-                    >
-                      <Stethoscope className="w-5 h-5 text-[#1a1f5c]" />
-                      <div>
-                        <p className="font-semibold text-gray-900 group-hover:underline">
-                          {patient.physician_name}
-                        </p>
-                        <p className="text-xs text-gray-600">{patient.physician_specialty}</p>
-                      </div>
-                    </button>
-                  </div>
-
-                  {/* Address & Orders */}
-                  <div>
-                    <button
-                      onClick={() => setSelectedDetail({ type: 'address', patient })}
-                      className="flex items-center gap-2 text-left hover:text-[#1a1f5c] transition-colors group mb-2"
-                    >
-                      <MapPin className="w-5 h-5 text-[#1a1f5c]" />
-                      <div>
-                        <p className="text-sm text-gray-900 group-hover:underline line-clamp-2">
-                          {patient.address}
-                        </p>
-                      </div>
-                    </button>
-                    <Badge className="bg-blue-100 text-blue-800 border-blue-200">
-                      {patient.total_orders} Total Orders
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        {/* Patients Table */}
+        <div className="border-2 border-gray-200 rounded-lg overflow-hidden">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50">
+                  <TableHead className="font-bold text-gray-900 whitespace-nowrap">Name</TableHead>
+                  <TableHead className="font-bold text-gray-900 whitespace-nowrap">Phone Number</TableHead>
+                  <TableHead className="font-bold text-gray-900 whitespace-nowrap">Email</TableHead>
+                  <TableHead className="font-bold text-gray-900 whitespace-nowrap">Patient Since</TableHead>
+                  <TableHead className="font-bold text-gray-900 whitespace-nowrap text-center"># Prescriptions</TableHead>
+                  <TableHead className="font-bold text-gray-900 whitespace-nowrap">Physician</TableHead>
+                  <TableHead className="font-bold text-gray-900 whitespace-nowrap">Address</TableHead>
+                  <TableHead className="font-bold text-gray-900 whitespace-nowrap text-center">Orders</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredPatients.map(patient => (
+                  <TableRow 
+                    key={patient.id} 
+                    className="cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => setSelectedPatient(patient)}
+                  >
+                    <TableCell className="font-semibold text-gray-900 whitespace-nowrap">{patient.name}</TableCell>
+                    <TableCell className="text-gray-700 whitespace-nowrap">{patient.phone}</TableCell>
+                    <TableCell className="text-gray-700 whitespace-nowrap">{patient.email}</TableCell>
+                    <TableCell className="text-gray-700 whitespace-nowrap">{format(new Date(patient.patient_since), 'MMM d, yyyy')}</TableCell>
+                    <TableCell className="text-center">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDetailDialog({ open: true, type: 'prescriptions', patient });
+                        }}
+                        className="inline-flex items-center gap-1 text-[#1a1f5c] hover:underline font-semibold"
+                      >
+                        <Pill className="w-4 h-4" />
+                        {patient.prescriptions.length}
+                      </button>
+                    </TableCell>
+                    <TableCell>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDetailDialog({ open: true, type: 'physician', patient });
+                        }}
+                        className="text-left hover:text-[#1a1f5c] hover:underline transition-colors"
+                      >
+                        <p className="font-semibold text-gray-900 whitespace-nowrap">{patient.physician_name}</p>
+                        <p className="text-xs text-gray-600 whitespace-nowrap">{patient.physician_specialty}</p>
+                      </button>
+                    </TableCell>
+                    <TableCell className="text-gray-700 max-w-xs truncate">{patient.address}</TableCell>
+                    <TableCell className="text-center">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDetailDialog({ open: true, type: 'orders', patient });
+                        }}
+                        className="inline-flex items-center gap-1 text-[#1a1f5c] hover:underline font-semibold"
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                        {patient.total_orders}
+                      </button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
 
-        {/* Detail Dialog */}
-        <Dialog open={!!selectedDetail} onOpenChange={() => setSelectedDetail(null)}>
-          <DialogContent className="max-w-2xl bg-white">
+        {/* Patient Detail Dialog (Full Profile) */}
+        <Dialog open={!!selectedPatient} onOpenChange={() => setSelectedPatient(null)}>
+          <DialogContent className="max-w-3xl bg-white max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>
-                {selectedDetail?.type === 'prescriptions' && 'Prescription Details'}
-                {selectedDetail?.type === 'physician' && 'Physician Information'}
-                {selectedDetail?.type === 'address' && 'Address Information'}
-              </DialogTitle>
+              <DialogTitle>Patient Information</DialogTitle>
             </DialogHeader>
-            {selectedDetail && (
-              <div className="space-y-4">
+            {selectedPatient && (
+              <div className="space-y-6">
+                {/* Personal Info */}
                 <div className="p-4 bg-gray-50 rounded-lg">
-                  <p className="font-semibold text-gray-900">{selectedDetail.patient.name}</p>
-                  <p className="text-sm text-gray-600">{selectedDetail.patient.email}</p>
+                  <h3 className="font-bold text-lg text-gray-900 mb-3">Personal Information</h3>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div><p className="text-gray-600">Name</p><p className="font-semibold text-gray-900">{selectedPatient.name}</p></div>
+                    <div><p className="text-gray-600">Phone</p><p className="font-semibold text-gray-900">{selectedPatient.phone}</p></div>
+                    <div><p className="text-gray-600">Email</p><p className="font-semibold text-gray-900">{selectedPatient.email}</p></div>
+                    <div><p className="text-gray-600">Patient Since</p><p className="font-semibold text-gray-900">{format(new Date(selectedPatient.patient_since), 'MMMM d, yyyy')}</p></div>
+                  </div>
                 </div>
 
-                {selectedDetail.type === 'prescriptions' && (
+                {/* Address */}
+                <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                  <h3 className="font-bold text-lg text-gray-900 mb-2">Address</h3>
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-5 h-5 text-purple-600 mt-1" />
+                    <p className="text-gray-900">{selectedPatient.address}</p>
+                  </div>
+                </div>
+
+                {/* Prescriptions */}
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-bold text-lg text-gray-900">Prescriptions ({selectedPatient.prescriptions.length})</h3>
+                    <button
+                      onClick={() => setDetailDialog({ open: true, type: 'prescriptions', patient: selectedPatient })}
+                      className="text-sm text-[#1a1f5c] hover:underline font-semibold"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {selectedPatient.prescriptions.map((rx, index) => (
+                      <div key={index} className="p-3 bg-white rounded-lg">
+                        <p className="font-semibold text-gray-900">{rx.name}</p>
+                        <p className="text-sm text-gray-600">Refills: {rx.refills_remaining} • Last filled: {format(new Date(rx.last_filled), 'MMM d, yyyy')}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Physician */}
+                <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-bold text-lg text-gray-900">Physician</h3>
+                    <button
+                      onClick={() => setDetailDialog({ open: true, type: 'physician', patient: selectedPatient })}
+                      className="text-sm text-[#1a1f5c] hover:underline font-semibold"
+                    >
+                      View Details
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Stethoscope className="w-5 h-5 text-green-600" />
+                    <div>
+                      <p className="font-semibold text-gray-900">{selectedPatient.physician_name}</p>
+                      <p className="text-sm text-gray-700">{selectedPatient.physician_specialty}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Orders */}
+                <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-bold text-lg text-gray-900">Order History</h3>
+                    <button
+                      onClick={() => setDetailDialog({ open: true, type: 'orders', patient: selectedPatient })}
+                      className="text-sm text-[#1a1f5c] hover:underline font-semibold"
+                    >
+                      View All Orders
+                    </button>
+                  </div>
+                  <Badge className="bg-blue-100 text-blue-800 border-blue-200 mt-2">
+                    {selectedPatient.total_orders} Total Orders
+                  </Badge>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Specific Detail Dialogs */}
+        <Dialog open={detailDialog.open} onOpenChange={() => setDetailDialog({ open: false, type: null, patient: null })}>
+          <DialogContent className="max-w-2xl bg-white max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>
+                {detailDialog.type === 'prescriptions' && 'Prescription Details'}
+                {detailDialog.type === 'physician' && 'Physician Information'}
+                {detailDialog.type === 'orders' && 'Order History'}
+              </DialogTitle>
+            </DialogHeader>
+            {detailDialog.patient && (
+              <div className="space-y-4">
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <p className="font-semibold text-gray-900">{detailDialog.patient.name}</p>
+                  <p className="text-sm text-gray-600">{detailDialog.patient.email}</p>
+                </div>
+
+                {detailDialog.type === 'prescriptions' && (
                   <div className="space-y-3">
-                    {selectedDetail.patient.prescriptions.map((rx, index) => (
+                    {detailDialog.patient.prescriptions.map((rx, index) => (
                       <div key={index} className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                         <p className="font-semibold text-gray-900">{rx.name}</p>
                         <div className="grid grid-cols-2 gap-4 mt-2 text-sm">
@@ -290,9 +374,7 @@ export default function FacilityPatients() {
                           </div>
                           <div>
                             <p className="text-gray-600">Last Filled</p>
-                            <p className="font-semibold text-gray-900">
-                              {format(new Date(rx.last_filled), 'MMM d, yyyy')}
-                            </p>
+                            <p className="font-semibold text-gray-900">{format(new Date(rx.last_filled), 'MMM d, yyyy')}</p>
                           </div>
                         </div>
                       </div>
@@ -300,22 +382,17 @@ export default function FacilityPatients() {
                   </div>
                 )}
 
-                {selectedDetail.type === 'physician' && (
+                {detailDialog.type === 'physician' && (
                   <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <p className="font-semibold text-gray-900 text-lg">{selectedDetail.patient.physician_name}</p>
-                    <p className="text-gray-700 mt-1">{selectedDetail.patient.physician_specialty}</p>
+                    <p className="font-semibold text-gray-900 text-lg">{detailDialog.patient.physician_name}</p>
+                    <p className="text-gray-700 mt-1">{detailDialog.patient.physician_specialty}</p>
                   </div>
                 )}
 
-                {selectedDetail.type === 'address' && (
-                  <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                    <div className="flex items-start gap-2">
-                      <MapPin className="w-5 h-5 text-purple-600 mt-1" />
-                      <div>
-                        <p className="font-semibold text-gray-900">{selectedDetail.patient.address}</p>
-                        <p className="text-sm text-gray-600 mt-2">Total Orders: {selectedDetail.patient.total_orders}</p>
-                      </div>
-                    </div>
+                {detailDialog.type === 'orders' && (
+                  <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                    <p className="font-semibold text-gray-900 text-lg">Total Orders: {detailDialog.patient.total_orders}</p>
+                    <p className="text-sm text-gray-600 mt-2">Order history and details would appear here.</p>
                   </div>
                 )}
               </div>
