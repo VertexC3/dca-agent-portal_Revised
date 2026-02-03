@@ -34,22 +34,13 @@ export default function MasterSearchBar() {
   return (
     <div className="relative">
       <div className="flex items-center gap-2">
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all ${
-            isExpanded ? 'bg-[#1a1f5c] text-white border-[#1a1f5c]' : 'border-gray-300 hover:border-[#1a1f5c]'
-          }`}
-        >
-          <Search className="w-5 h-5" />
-          <span className="font-medium">Search</span>
-        </button>
-
         <Input
           placeholder="Search patients, invoices, physicians, pharmacies..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          className="h-11 w-96 border-2 border-gray-300 focus:border-[#1a1f5c]"
+          onClick={() => setIsExpanded(true)}
+          className="h-11 w-96 border-2 border-gray-300 focus:border-[#1a1f5c] cursor-pointer"
         />
 
         {searchTerm && (
