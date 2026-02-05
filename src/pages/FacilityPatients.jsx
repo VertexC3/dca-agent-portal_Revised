@@ -22,11 +22,30 @@ const mockPatients = [
     physician_name: 'Dr. Sarah Johnson',
     physician_specialty: 'Endocrinology',
     prescriptions: [
-      { name: 'Semaglutide 2.4mg', refills_remaining: 3, last_filled: '2026-01-15' },
-      { name: 'Metformin 500mg', refills_remaining: 5, last_filled: '2026-01-10' }
+      { 
+        name: 'Semaglutide 2.4mg', 
+        refills_remaining: 3, 
+        last_filled: '2026-01-15',
+        fill_dates: ['2025-10-15', '2025-11-20', '2026-01-15']
+      },
+      { 
+        name: 'Metformin 500mg', 
+        refills_remaining: 5, 
+        last_filled: '2026-01-10',
+        fill_dates: ['2025-09-10', '2025-11-05', '2026-01-10']
+      }
     ],
     address: '123 Main St, Franklin, TN 37064',
-    total_orders: 8
+    orders: [
+      { id: 'ORD-1001', date: '2026-01-15', medication: 'Semaglutide 2.4mg', amount: 250.00, status: 'Delivered' },
+      { id: 'ORD-1002', date: '2026-01-10', medication: 'Metformin 500mg', amount: 45.00, status: 'Delivered' },
+      { id: 'ORD-1003', date: '2025-12-20', medication: 'Semaglutide 2.4mg', amount: 250.00, status: 'Delivered' },
+      { id: 'ORD-1004', date: '2025-11-20', medication: 'Semaglutide 2.4mg', amount: 250.00, status: 'Delivered' },
+      { id: 'ORD-1005', date: '2025-11-05', medication: 'Metformin 500mg', amount: 45.00, status: 'Delivered' },
+      { id: 'ORD-1006', date: '2025-10-15', medication: 'Semaglutide 2.4mg', amount: 250.00, status: 'Delivered' },
+      { id: 'ORD-1007', date: '2025-09-10', medication: 'Metformin 500mg', amount: 45.00, status: 'Delivered' },
+      { id: 'ORD-1008', date: '2025-08-05', medication: 'Semaglutide 2.4mg', amount: 250.00, status: 'Delivered' }
+    ]
   },
   {
     id: '2',
@@ -37,10 +56,21 @@ const mockPatients = [
     physician_name: 'Dr. Michael Chen',
     physician_specialty: 'Internal Medicine',
     prescriptions: [
-      { name: 'Tirzepatide 5mg', refills_remaining: 2, last_filled: '2026-01-20' }
+      { 
+        name: 'Tirzepatide 5mg', 
+        refills_remaining: 2, 
+        last_filled: '2026-01-20',
+        fill_dates: ['2025-10-20', '2025-12-15', '2026-01-20']
+      }
     ],
     address: '456 Oak Ave, Nashville, TN 37203',
-    total_orders: 5
+    orders: [
+      { id: 'ORD-2001', date: '2026-01-20', medication: 'Tirzepatide 5mg', amount: 350.00, status: 'Delivered' },
+      { id: 'ORD-2002', date: '2025-12-15', medication: 'Tirzepatide 5mg', amount: 350.00, status: 'Delivered' },
+      { id: 'ORD-2003', date: '2025-10-20', medication: 'Tirzepatide 5mg', amount: 350.00, status: 'Delivered' },
+      { id: 'ORD-2004', date: '2025-09-10', medication: 'Tirzepatide 5mg', amount: 350.00, status: 'Delivered' },
+      { id: 'ORD-2005', date: '2025-08-01', medication: 'Tirzepatide 5mg', amount: 350.00, status: 'Delivered' }
+    ]
   },
   {
     id: '3',
@@ -51,12 +81,40 @@ const mockPatients = [
     physician_name: 'Dr. Emily Rodriguez',
     physician_specialty: 'Family Medicine',
     prescriptions: [
-      { name: 'Semaglutide 1mg', refills_remaining: 4, last_filled: '2026-01-18' },
-      { name: 'Atorvastatin 20mg', refills_remaining: 6, last_filled: '2026-01-12' },
-      { name: 'Lisinopril 10mg', refills_remaining: 3, last_filled: '2026-01-08' }
+      { 
+        name: 'Semaglutide 1mg', 
+        refills_remaining: 4, 
+        last_filled: '2026-01-18',
+        fill_dates: ['2025-09-18', '2025-11-12', '2026-01-18']
+      },
+      { 
+        name: 'Atorvastatin 20mg', 
+        refills_remaining: 6, 
+        last_filled: '2026-01-12',
+        fill_dates: ['2025-08-12', '2025-10-20', '2026-01-12']
+      },
+      { 
+        name: 'Lisinopril 10mg', 
+        refills_remaining: 3, 
+        last_filled: '2026-01-08',
+        fill_dates: ['2025-07-08', '2025-10-05', '2026-01-08']
+      }
     ],
     address: '789 Pine Rd, Brentwood, TN 37027',
-    total_orders: 12
+    orders: [
+      { id: 'ORD-3001', date: '2026-01-18', medication: 'Semaglutide 1mg', amount: 200.00, status: 'Delivered' },
+      { id: 'ORD-3002', date: '2026-01-12', medication: 'Atorvastatin 20mg', amount: 35.00, status: 'Delivered' },
+      { id: 'ORD-3003', date: '2026-01-08', medication: 'Lisinopril 10mg', amount: 25.00, status: 'Delivered' },
+      { id: 'ORD-3004', date: '2025-11-12', medication: 'Semaglutide 1mg', amount: 200.00, status: 'Delivered' },
+      { id: 'ORD-3005', date: '2025-10-20', medication: 'Atorvastatin 20mg', amount: 35.00, status: 'Delivered' },
+      { id: 'ORD-3006', date: '2025-10-05', medication: 'Lisinopril 10mg', amount: 25.00, status: 'Delivered' },
+      { id: 'ORD-3007', date: '2025-09-18', medication: 'Semaglutide 1mg', amount: 200.00, status: 'Delivered' },
+      { id: 'ORD-3008', date: '2025-08-12', medication: 'Atorvastatin 20mg', amount: 35.00, status: 'Delivered' },
+      { id: 'ORD-3009', date: '2025-07-08', medication: 'Lisinopril 10mg', amount: 25.00, status: 'Delivered' },
+      { id: 'ORD-3010', date: '2025-06-15', medication: 'Semaglutide 1mg', amount: 200.00, status: 'Delivered' },
+      { id: 'ORD-3011', date: '2025-05-10', medication: 'Atorvastatin 20mg', amount: 35.00, status: 'Delivered' },
+      { id: 'ORD-3012', date: '2025-04-05', medication: 'Lisinopril 10mg', amount: 25.00, status: 'Delivered' }
+    ]
   }
 ];
 
@@ -67,6 +125,7 @@ export default function FacilityPatients() {
   const [detailDialog, setDetailDialog] = useState({ open: false, type: null, patient: null });
   const [selectedPatients, setSelectedPatients] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [expandedPrescription, setExpandedPrescription] = useState(null);
   const [filters, setFilters] = useState({
     status: 'all',
     physician: 'all',
@@ -361,7 +420,7 @@ export default function FacilityPatients() {
                         className="inline-flex items-center gap-1 text-[#1a1f5c] hover:underline font-semibold"
                       >
                         <ShoppingCart className="w-4 h-4" />
-                        {patient.total_orders}
+                        {patient.orders.length}
                       </button>
                     </TableCell>
                   </TableRow>
@@ -442,7 +501,7 @@ export default function FacilityPatients() {
 
                 {/* Orders */}
                 <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mb-3">
                     <h3 className="font-bold text-lg text-gray-900">Order History</h3>
                     <button
                       onClick={() => setDetailDialog({ open: true, type: 'orders', patient: selectedPatient })}
@@ -451,9 +510,22 @@ export default function FacilityPatients() {
                       View All Orders
                     </button>
                   </div>
-                  <Badge className="bg-blue-100 text-blue-800 border-blue-200 mt-2">
-                    {selectedPatient.total_orders} Total Orders
-                  </Badge>
+                  <div className="space-y-2">
+                    {selectedPatient.orders.slice(0, 3).map((order) => (
+                      <div key={order.id} className="p-3 bg-white rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <p className="font-semibold text-gray-900">{order.id}</p>
+                          <Badge className="bg-green-100 text-green-800">{order.status}</Badge>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">{order.medication} • {format(new Date(order.date), 'MMM d, yyyy')} • ${order.amount.toFixed(2)}</p>
+                      </div>
+                    ))}
+                    {selectedPatient.orders.length > 3 && (
+                      <p className="text-sm text-gray-600 text-center pt-1">
+                        +{selectedPatient.orders.length - 3} more orders
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -480,18 +552,54 @@ export default function FacilityPatients() {
                 {detailDialog.type === 'prescriptions' && (
                   <div className="space-y-3">
                     {detailDialog.patient.prescriptions.map((rx, index) => (
-                      <div key={index} className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                        <p className="font-semibold text-gray-900">{rx.name}</p>
-                        <div className="grid grid-cols-2 gap-4 mt-2 text-sm">
-                          <div>
-                            <p className="text-gray-600">Refills Remaining</p>
-                            <p className="font-semibold text-gray-900">{rx.refills_remaining}</p>
+                      <div key={index}>
+                        <div 
+                          className="p-4 bg-blue-50 border border-blue-200 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors"
+                          onClick={() => setExpandedPrescription(expandedPrescription === index ? null : index)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <p className="font-semibold text-gray-900">{rx.name}</p>
+                            <span className="text-sm text-[#1a1f5c] font-semibold">
+                              {expandedPrescription === index ? 'Hide Fill History' : 'View Fill History'}
+                            </span>
                           </div>
-                          <div>
-                            <p className="text-gray-600">Last Filled</p>
-                            <p className="font-semibold text-gray-900">{format(new Date(rx.last_filled), 'MMM d, yyyy')}</p>
+                          <div className="grid grid-cols-2 gap-4 mt-2 text-sm">
+                            <div>
+                              <p className="text-gray-600">Refills Remaining</p>
+                              <p className="font-semibold text-gray-900">{rx.refills_remaining}</p>
+                            </div>
+                            <div>
+                              <p className="text-gray-600">Last Filled</p>
+                              <p className="font-semibold text-gray-900">{format(new Date(rx.last_filled), 'MMM d, yyyy')}</p>
+                            </div>
                           </div>
                         </div>
+                        
+                        <AnimatePresence>
+                          {expandedPrescription === index && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="ml-4 mt-2 p-4 bg-white border-l-4 border-blue-400 rounded">
+                                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                  <Calendar className="w-4 h-4" />
+                                  Fill History
+                                </h4>
+                                <div className="space-y-2">
+                                  {rx.fill_dates.map((date, dateIndex) => (
+                                    <div key={dateIndex} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                                      <span className="text-sm text-gray-900">Fill #{rx.fill_dates.length - dateIndex}</span>
+                                      <span className="text-sm font-semibold text-gray-900">{format(new Date(date), 'MMM d, yyyy')}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                     ))}
                   </div>
@@ -505,9 +613,29 @@ export default function FacilityPatients() {
                 )}
 
                 {detailDialog.type === 'orders' && (
-                  <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                    <p className="font-semibold text-gray-900 text-lg">Total Orders: {detailDialog.patient.total_orders}</p>
-                    <p className="text-sm text-gray-600 mt-2">Order history and details would appear here.</p>
+                  <div className="space-y-3">
+                    {detailDialog.patient.orders.map((order) => (
+                      <div key={order.id} className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="font-semibold text-gray-900">{order.id}</p>
+                          <Badge className="bg-green-100 text-green-800">{order.status}</Badge>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <p className="text-gray-600">Date</p>
+                            <p className="font-semibold text-gray-900">{format(new Date(order.date), 'MMM d, yyyy')}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600">Amount</p>
+                            <p className="font-semibold text-gray-900">${order.amount.toFixed(2)}</p>
+                          </div>
+                          <div className="col-span-2">
+                            <p className="text-gray-600">Medication</p>
+                            <p className="font-semibold text-gray-900">{order.medication}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
