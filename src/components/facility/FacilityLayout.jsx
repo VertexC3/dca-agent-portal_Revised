@@ -13,10 +13,17 @@ import CollapsibleSidebar from './CollapsibleSidebar';
 import MasterSearchBar from './MasterSearchBar';
 import NotificationPopup from './NotificationPopup';
 
-const mockUser = {
-  full_name: "Admin User",
-  email: "admin@mochihealth.com",
-  role: "admin"
+const getMockUser = () => {
+  const stored = localStorage.getItem('facilityUser');
+  if (stored) {
+    return JSON.parse(stored);
+  }
+  return {
+    full_name: "Admin User",
+    email: "admin@mochihealth.com",
+    role: "admin",
+    profile_picture: null
+  };
 };
 
 export default function FacilityLayout({ children, currentPageName }) {
@@ -25,6 +32,22 @@ export default function FacilityLayout({ children, currentPageName }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
+  const [mockUser, setMockUser] = useState(getMockUser);
+
+  // Listen for profile updates
+  React.useEffect(() => {
+    const handleProfileUpdate = () => {
+      setMockUser(getMockUser());
+    };
+    
+    window.addEventListener('facilityProfileUpdated', handleProfileUpdate);
+    window.addEventListener('storage', handleProfileUpdate);
+    
+    return () => {
+      window.removeEventListener('facilityProfileUpdated', handleProfileUpdate);
+      window.removeEventListener('storage', handleProfileUpdate);
+    };
+  }, []);
 
   const notifications = [
     {
@@ -142,9 +165,17 @@ export default function FacilityLayout({ children, currentPageName }) {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-all">
-                    <div className="w-9 h-9 rounded-full bg-[#1a1f5c] flex items-center justify-center text-white font-semibold">
-                      {mockUser.full_name.charAt(0).toUpperCase()}
-                    </div>
+                    {mockUser.profile_picture ? (
+                      <img 
+                        src={mockUser.profile_picture} 
+                        alt={mockUser.full_name}
+                        className="w-9 h-9 rounded-full object-cover border-2 border-gray-200"
+                      />
+                    ) : (
+                      <div className="w-9 h-9 rounded-full bg-[#1a1f5c] flex items-center justify-center text-white font-semibold">
+                        {mockUser.full_name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
                   </button>
                 </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 bg-white border-gray-200">

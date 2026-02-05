@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { FileText, DollarSign, Clock, CheckCircle, Search, X, Filter, ChevronDown, ChevronUp, Download, Share2, CreditCard } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -157,10 +158,9 @@ export default function FacilityInvoices() {
     );
   };
 
-  const handleExportInvoices = () => {
-    const selectedData = mockInvoices.filter(inv => selectedInvoices.includes(inv.id));
-    console.log('Exporting invoices:', selectedData);
-    alert(`Exporting ${selectedInvoices.length} invoice(s)`);
+  const handleExportInvoices = (format) => {
+    console.log(`Exporting all invoices as ${format.toUpperCase()}`);
+    alert(`Exporting ${filteredInvoices.length} invoice(s) as ${format.toUpperCase()}`);
   };
 
   const handleDownloadInvoices = () => {
@@ -224,15 +224,22 @@ export default function FacilityInvoices() {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Export Buttons */}
-            <Button
-              onClick={handleExportInvoices}
-              variant="outline"
-              className="border-2"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export
-            </Button>
+            {/* Export Icon with Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="border-2">
+                  <Download className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-white">
+                <DropdownMenuItem onClick={() => handleExportInvoices('xlsx')} className="cursor-pointer">
+                  Export as Excel (XLSX)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleExportInvoices('pdf')} className="cursor-pointer">
+                  Export as PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* Invoice-Specific Search */}
             <div className="relative">
