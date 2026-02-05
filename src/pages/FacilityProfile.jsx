@@ -9,7 +9,11 @@ import { Textarea } from '@/components/ui/textarea';
 export default function FacilityProfile() {
   const [facilityData, setFacilityData] = useState({
     facility_name: 'Mochi Health Corp.',
-    address: '123 Healthcare Blvd, Suite 500, San Francisco, CA 94103',
+    address_1: '123 Healthcare Blvd',
+    address_2: 'Suite 500',
+    city: 'San Francisco',
+    state: 'CA',
+    zip: '94103',
     tax_id: '12-3456789',
     contact_email: 'billing@mochihealth.com',
     contact_phone: '(555) 888-0000',
@@ -97,18 +101,45 @@ export default function FacilityProfile() {
             />
           </div>
 
-          {/* Address */}
-          <div>
+          {/* Address Fields */}
+          <div className="space-y-4">
             <Label className="flex items-center gap-2">
               <MapPin className="w-4 h-4" />
               Address
             </Label>
-            <Textarea
-              value={facilityData.address}
-              onChange={(e) => setFacilityData({ ...facilityData, address: e.target.value })}
-              className="mt-1"
-              rows={2}
-            />
+            <div className="grid gap-4">
+              <Input
+                value={facilityData.address_1}
+                onChange={(e) => setFacilityData({ ...facilityData, address_1: e.target.value })}
+                placeholder="Address Line 1"
+              />
+              <Input
+                value={facilityData.address_2}
+                onChange={(e) => setFacilityData({ ...facilityData, address_2: e.target.value })}
+                placeholder="Address Line 2 (Optional)"
+              />
+              <div className="grid grid-cols-3 gap-4">
+                <Input
+                  value={facilityData.city}
+                  onChange={(e) => setFacilityData({ ...facilityData, city: e.target.value })}
+                  placeholder="City"
+                  className="col-span-2"
+                />
+                <Input
+                  value={facilityData.state}
+                  onChange={(e) => setFacilityData({ ...facilityData, state: e.target.value })}
+                  placeholder="State"
+                  maxLength={2}
+                />
+              </div>
+              <Input
+                value={facilityData.zip}
+                onChange={(e) => setFacilityData({ ...facilityData, zip: e.target.value })}
+                placeholder="Zip Code"
+                className="w-40"
+                maxLength={10}
+              />
+            </div>
           </div>
 
           {/* Tax ID */}
