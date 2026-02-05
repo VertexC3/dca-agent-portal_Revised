@@ -9,6 +9,7 @@ export default function CollapsibleSidebar({ currentPageName, isCollapsed, setIs
     { name: 'Dashboard', page: 'FacilityDashboard', icon: LayoutDashboard },
     { name: 'Patients', page: 'FacilityPatients', icon: Users },
     { name: 'Invoices', page: 'FacilityInvoices', icon: FileText },
+    { name: 'Physicians', page: 'FacilityPhysicians', icon: Users },
   ];
 
   return (
