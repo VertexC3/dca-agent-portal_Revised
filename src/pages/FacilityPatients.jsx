@@ -18,8 +18,10 @@ const mockPatients = [
     name: 'John Doe',
     email: 'john.doe@example.com',
     phone: '(555) 123-4567',
+    date_of_birth: '1985-03-15',
     patient_since: '2024-06-15',
     physician_name: 'Dr. Sarah Johnson',
+    physician_npi: '1245319599',
     physician_specialty: 'Endocrinology',
     prescriptions: [
       { 
@@ -52,8 +54,10 @@ const mockPatients = [
     name: 'Jane Smith',
     email: 'jane.smith@example.com',
     phone: '(555) 234-5678',
+    date_of_birth: '1978-11-22',
     patient_since: '2024-08-20',
     physician_name: 'Dr. Michael Chen',
+    physician_npi: '1356824791',
     physician_specialty: 'Internal Medicine',
     prescriptions: [
       { 
@@ -77,8 +81,10 @@ const mockPatients = [
     name: 'Bob Johnson',
     email: 'bob.johnson@example.com',
     phone: '(555) 345-6789',
+    date_of_birth: '1992-07-08',
     patient_since: '2025-02-10',
     physician_name: 'Dr. Emily Rodriguez',
+    physician_npi: '1467935802',
     physician_specialty: 'Family Medicine',
     prescriptions: [
       { 
@@ -494,7 +500,8 @@ export default function FacilityPatients() {
                     <div><p className="text-gray-600">Name</p><p className="font-semibold text-gray-900">{selectedPatient.name}</p></div>
                     <div><p className="text-gray-600">Phone</p><p className="font-semibold text-gray-900">{selectedPatient.phone}</p></div>
                     <div><p className="text-gray-600">Email</p><p className="font-semibold text-gray-900">{selectedPatient.email}</p></div>
-                    <div><p className="text-gray-600">Patient Since</p><p className="font-semibold text-gray-900">{format(new Date(selectedPatient.patient_since), 'MMMM d, yyyy')}</p></div>
+                    <div><p className="text-gray-600">Date of Birth</p><p className="font-semibold text-gray-900">{format(new Date(selectedPatient.date_of_birth), 'MM/dd/yyyy')}</p></div>
+                    <div><p className="text-gray-600">Patient Since</p><p className="font-semibold text-gray-900">{format(new Date(selectedPatient.patient_since), 'MM/dd/yyyy')}</p></div>
                   </div>
                 </div>
 
@@ -690,6 +697,7 @@ export default function FacilityPatients() {
                   <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
                     <p className="font-semibold text-gray-900 text-lg">{detailDialog.patient.physician_name}</p>
                     <p className="text-gray-700 mt-1">{detailDialog.patient.physician_specialty}</p>
+                    <p className="text-sm text-gray-600 mt-2"><strong>Physician NPI:</strong> {detailDialog.patient.physician_npi}</p>
                   </div>
                 )}
 
