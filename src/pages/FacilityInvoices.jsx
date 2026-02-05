@@ -223,8 +223,19 @@ export default function FacilityInvoices() {
             <h1 className="text-3xl font-bold text-gray-900">Invoices</h1>
           </div>
 
-          {/* Invoice-Specific Search */}
-          <div className="relative">
+          <div className="flex items-center gap-3">
+            {/* Export Buttons */}
+            <Button
+              onClick={handleExportInvoices}
+              variant="outline"
+              className="border-2"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export
+            </Button>
+
+            {/* Invoice-Specific Search */}
+            <div className="relative">
             <Input
               placeholder="Search invoices..."
               value={searchTerm}
@@ -319,9 +330,10 @@ export default function FacilityInvoices() {
                   </div>
                 </motion.div>
               )}
-            </AnimatePresence>
-          </div>
-        </div>
+              </AnimatePresence>
+              </div>
+              </div>
+              </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -364,6 +376,24 @@ export default function FacilityInvoices() {
 
         {/* Invoices List */}
         <div className="space-y-2">
+          {/* Select All Row */}
+          <div className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg">
+            <Checkbox
+              checked={selectedInvoices.length === filteredInvoices.length && filteredInvoices.length > 0}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  setSelectedInvoices(filteredInvoices.map(inv => inv.id));
+                } else {
+                  setSelectedInvoices([]);
+                }
+              }}
+              className="flex-shrink-0"
+            />
+            <p className="font-semibold text-gray-700">
+              Select All ({filteredInvoices.length} invoice{filteredInvoices.length !== 1 ? 's' : ''})
+            </p>
+          </div>
+
           {filteredInvoices.map(invoice => {
             const isExpanded = expandedInvoices.includes(invoice.id);
             const isSelected = selectedInvoices.includes(invoice.id);
