@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, LogOut, ChevronDown } from 'lucide-react';
+import { User, LogOut, ChevronDown, Bell } from 'lucide-react';
 import { createPageUrl } from '../../utils';
 import {
   DropdownMenu,
@@ -8,8 +8,10 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { Badge } from '@/components/ui/badge';
 import CollapsibleSidebar from './CollapsibleSidebar';
 import MasterSearchBar from './MasterSearchBar';
+import NotificationPopup from './NotificationPopup';
 
 const mockUser = {
   full_name: "Admin User",
@@ -20,6 +22,29 @@ const mockUser = {
 export default function FacilityLayout({ children, currentPageName }) {
   const [showPlatformSwitcher, setShowPlatformSwitcher] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showNotificationPopup, setShowNotificationPopup] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState(null);
+
+  const notifications = [
+    {
+      id: 1,
+      orderId: '1234',
+      patientName: 'Johnson, Robert',
+      medication: 'Semaglutide',
+      orderDate: '2/3/26',
+      address: '123 Main St, Los Angeles, CA',
+      message: 'Information missing for Order 1234',
+      type: 'warning',
+      unread: true
+    }
+  ];
+
+  const handleNotificationClick = (notification) => {
+    setSelectedNotification(notification);
+    setShowNotifications(false);
+    setShowNotificationPopup(true);
+  };
 
   React.useEffect(() => {
     document.title = "Mochi Health - Facility Portal";
@@ -79,14 +104,49 @@ export default function FacilityLayout({ children, currentPageName }) {
             {/* Master Search Bar */}
             <MasterSearchBar />
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-all">
-                  <div className="w-9 h-9 rounded-full bg-[#1a1f5c] flex items-center justify-center text-white font-semibold">
-                    {mockUser.full_name.charAt(0).toUpperCase()}
+            <div className="flex items-center gap-3">
+              {/* Notification Bell */}
+              <DropdownMenu open={showNotifications} onOpenChange={setShowNotifications}>
+                <DropdownMenuTrigger asChild>
+                  <button className="relative p-2 rounded-full hover:bg-gray-100 transition-all">
+                    <Bell className="w-6 h-6 text-gray-700" />
+                    {notifications.filter(n => n.unread).length > 0 && (
+                      <Badge className="absolute -top-1 -right-1 bg-red-500 text-white px-1.5 py-0.5 text-xs min-w-[20px] h-5 flex items-center justify-center">
+                        {notifications.filter(n => n.unread).length}
+                      </Badge>
+                    )}
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-80 bg-white border-gray-200">
+                  <div className="px-3 py-2 border-b border-gray-100">
+                    <p className="font-semibold text-gray-800">Notifications</p>
                   </div>
-                </button>
-              </DropdownMenuTrigger>
+                  {notifications.map(notification => (
+                    <DropdownMenuItem
+                      key={notification.id}
+                      className="flex items-start gap-3 p-3 cursor-pointer"
+                      onClick={() => handleNotificationClick(notification)}
+                    >
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900 text-sm">{notification.message}</p>
+                        <p className="text-xs text-gray-600 mt-1">Order {notification.orderId} - {notification.patientName}</p>
+                      </div>
+                      {notification.unread && (
+                        <div className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0 mt-1" />
+                      )}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-all">
+                    <div className="w-9 h-9 rounded-full bg-[#1a1f5c] flex items-center justify-center text-white font-semibold">
+                      {mockUser.full_name.charAt(0).toUpperCase()}
+                    </div>
+                  </button>
+                </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 bg-white border-gray-200">
                 <div className="px-3 py-2 border-b border-gray-100">
                   <p className="font-semibold text-gray-800">{mockUser.full_name}</p>
@@ -110,7 +170,8 @@ export default function FacilityLayout({ children, currentPageName }) {
                   Log Out
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
       </header>
@@ -131,6 +192,13 @@ export default function FacilityLayout({ children, currentPageName }) {
           {children}
         </div>
       </main>
+
+      {/* Notification Popup */}
+      <NotificationPopup
+        open={showNotificationPopup}
+        onClose={() => setShowNotificationPopup(false)}
+        notification={selectedNotification}
+      />
     </div>
   );
 }
