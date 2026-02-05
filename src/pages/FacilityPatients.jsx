@@ -437,7 +437,14 @@ export default function FacilityPatients() {
                         onCheckedChange={() => handleSelectPatient(patient.id)}
                       />
                     </TableCell>
-                    <TableCell className="font-semibold text-gray-900 whitespace-nowrap">{patient.name}</TableCell>
+                    <TableCell className="font-semibold text-gray-900 whitespace-nowrap">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                          {patient.name.split(' ').map(n => n[0]).join('')}
+                        </div>
+                        <span>{patient.name}</span>
+                      </div>
+                    </TableCell>
                     <TableCell className="text-gray-700 whitespace-nowrap">{patient.phone}</TableCell>
                     <TableCell className="text-gray-700 whitespace-nowrap">{patient.email}</TableCell>
                     <TableCell className="text-gray-700 whitespace-nowrap">{format(new Date(patient.patient_since), 'MMM d, yyyy')}</TableCell>

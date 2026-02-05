@@ -37,6 +37,8 @@ export default function FacilityDashboard() {
   const [chartView, setChartView] = useState('orders');
   const [analysisExpanded, setAnalysisExpanded] = useState(false);
   const [timeRange, setTimeRange] = useState('30days');
+  const [showDrilldown, setShowDrilldown] = useState(false);
+  const [drilldownData, setDrilldownData] = useState(null);
   const navigate = useNavigate();
 
   const handleExportInvoicePDF = (invoice) => {
@@ -295,6 +297,11 @@ export default function FacilityDashboard() {
                             dataKey={chartView} 
                             fill={chartView === 'orders' ? '#1a1f5c' : '#3b82f6'} 
                             radius={[8, 8, 0, 0]}
+                            onClick={(data) => {
+                              setDrilldownData({ type: chartView, date: data.date, count: data[chartView] });
+                              setShowDrilldown(true);
+                            }}
+                            cursor="pointer"
                           />
                         </BarChart>
                       </ResponsiveContainer>
@@ -327,6 +334,11 @@ export default function FacilityDashboard() {
                             dataKey="patients" 
                             fill="#10b981" 
                             radius={[8, 8, 0, 0]}
+                            onClick={(data) => {
+                              setDrilldownData({ type: 'patients', date: data.date, count: data.patients });
+                              setShowDrilldown(true);
+                            }}
+                            cursor="pointer"
                           />
                         </BarChart>
                       </ResponsiveContainer>
@@ -508,6 +520,61 @@ export default function FacilityDashboard() {
 
         {/* Order Detail Dialog */}
         <OrderDetailDialog order={selectedOrder} open={!!selectedOrder} onClose={() => setSelectedOrder(null)} />
+
+        {/* Drilldown Dialog */}
+        <Dialog open={showDrilldown} onOpenChange={setShowDrilldown}>
+          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto bg-white">
+            <DialogHeader>
+              <DialogTitle>
+                {drilldownData?.type === 'orders' && `Orders on ${drilldownData.date}`}
+                {drilldownData?.type === 'invoices' && `Invoices on ${drilldownData.date}`}
+                {drilldownData?.type === 'patients' && `Patients on ${drilldownData.date}`}
+              </DialogTitle>
+            </DialogHeader>
+            {drilldownData && (
+              <div className="space-y-3">
+                <p className="text-gray-600">
+                  Showing {drilldownData.count} {drilldownData.type} for {drilldownData.date}
+                </p>
+                {drilldownData.type === 'orders' && mockOrders.slice(0, drilldownData.count).map(order => (
+                  <div key={order.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-gray-900">{order.order_number}</p>
+                        <p className="text-sm text-gray-600">{order.patient_name} • {order.medication_name}</p>
+                      </div>
+                      <p className="font-bold text-gray-900">${order.total_amount.toFixed(2)}</p>
+                    </div>
+                  </div>
+                ))}
+                {drilldownData.type === 'invoices' && mockInvoices.slice(0, drilldownData.count).map(invoice => (
+                  <div key={invoice.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-gray-900">{invoice.invoice_number}</p>
+                        <p className="text-sm text-gray-600">{invoice.bill_to_name}</p>
+                      </div>
+                      <p className="font-bold text-gray-900">${invoice.total_due.toFixed(2)}</p>
+                    </div>
+                  </div>
+                ))}
+                {drilldownData.type === 'patients' && mockOrders.slice(0, drilldownData.count).map(order => (
+                  <div key={order.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                        {order.patient_name.split(' ').map(n => n[0]).join('')}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-900">{order.patient_name}</p>
+                        <p className="text-sm text-gray-600">{order.medication_name}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
     </div>
   );
 }

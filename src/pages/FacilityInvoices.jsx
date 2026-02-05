@@ -399,6 +399,38 @@ export default function FacilityInvoices() {
               </div>
               </div>
 
+        {/* Selection Action Bar - Above Summary Cards */}
+        {selectedInvoices.length > 0 && (
+          <div className="bg-[#1a1f5c] text-white p-4 rounded-lg flex items-center justify-between">
+            <p className="font-semibold">{selectedInvoices.length} invoice(s) selected</p>
+            <div className="flex gap-3">
+              <Button 
+                onClick={handlePayOutstanding} 
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                <CreditCard className="w-4 h-4 mr-2" />
+                Pay Outstanding
+              </Button>
+              <Button 
+                onClick={handleDownloadInvoices}
+                variant="outline"
+                className="bg-white text-[#1a1f5c] hover:bg-gray-100 border-0"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Download
+              </Button>
+              <Button 
+                onClick={handleShareInvoices}
+                variant="outline"
+                className="bg-white text-[#1a1f5c] hover:bg-gray-100 border-0"
+              >
+                <Share2 className="w-4 h-4 mr-2" />
+                Share
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="border-2 border-gray-200 overflow-hidden">
@@ -523,13 +555,10 @@ export default function FacilityInvoices() {
                                 >
                                   {isOrderExpanded ? <ChevronUp className="w-4 h-4 text-gray-600 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-gray-600 flex-shrink-0" />}
                                   <div className="flex-1 min-w-0">
-                                    <p className="font-semibold text-gray-900 truncate">{order.patient_name}</p>
+                                    <p className="font-semibold text-gray-900 truncate">{order.patient_name} <span className="text-gray-500 font-normal">– Rx: {order.rx_number}</span></p>
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <p className="text-sm text-gray-600 truncate">{order.prescribed_item_name}</p>
-                                  </div>
-                                  <div className="flex-shrink-0">
-                                    <p className="text-sm text-gray-600">Rx: {order.rx_number}</p>
                                   </div>
                                   <div className="flex-shrink-0">
                                     <p className="font-semibold text-gray-900">${formatCurrency(order.amount)}</p>
@@ -589,28 +618,12 @@ export default function FacilityInvoices() {
                                             <p className="text-gray-600">{order.shipped_date}</p>
                                           </div>
                                           <div>
-                                            <p className="font-semibold text-gray-700">Shipper</p>
+                                            <p className="font-semibold text-gray-700">Delivery</p>
                                             <p className="text-gray-600">{order.shipper}</p>
                                           </div>
                                           <div>
                                             <p className="font-semibold text-gray-700">Tracking Number</p>
                                             <p className="text-gray-600">{order.tracking_number}</p>
-                                          </div>
-                                          <div>
-                                            <p className="font-semibold text-gray-700">DCA ID</p>
-                                            <p className="text-gray-600">{order.dca_id}</p>
-                                          </div>
-                                          <div>
-                                            <p className="font-semibold text-gray-700">External ID</p>
-                                            <p className="text-gray-600 truncate" title={order.external_id}>{order.external_id}</p>
-                                          </div>
-                                          <div>
-                                            <p className="font-semibold text-gray-700">Facility Confirmation Date</p>
-                                            <p className="text-gray-600">{order.facility_confirmation_date}</p>
-                                          </div>
-                                          <div>
-                                            <p className="font-semibold text-gray-700">Facility Confirmation ID</p>
-                                            <p className="text-gray-600">{order.facility_confirmation_id}</p>
                                           </div>
                                         </div>
                                       </div>
@@ -629,38 +642,6 @@ export default function FacilityInvoices() {
             );
           })}
         </div>
-
-        {/* Selection Action Bar - Moved Below Summary Cards */}
-        {selectedInvoices.length > 0 && (
-          <div className="bg-[#1a1f5c] text-white p-4 rounded-lg flex items-center justify-between">
-            <p className="font-semibold">{selectedInvoices.length} invoice(s) selected</p>
-            <div className="flex gap-3">
-              <Button 
-                onClick={handlePayOutstanding} 
-                className="bg-green-600 hover:bg-green-700 text-white"
-              >
-                <CreditCard className="w-4 h-4 mr-2" />
-                Pay Outstanding
-              </Button>
-              <Button 
-                onClick={handleDownloadInvoices}
-                variant="outline"
-                className="bg-white text-[#1a1f5c] hover:bg-gray-100 border-0"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Download
-              </Button>
-              <Button 
-                onClick={handleShareInvoices}
-                variant="outline"
-                className="bg-white text-[#1a1f5c] hover:bg-gray-100 border-0"
-              >
-                <Share2 className="w-4 h-4 mr-2" />
-                Share
-              </Button>
-            </div>
-          </div>
-        )}
 
         {/* Share Dialog */}
         <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>

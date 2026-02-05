@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Package, User, Pill, DollarSign, FileText, Truck } from 'lucide-react';
+import { Package, User, Pill, DollarSign, FileText, Truck, ChevronDown, ChevronUp } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function OrderDetailDialog({ order, open, onClose }) {
+  const [expandedIds, setExpandedIds] = useState(false);
+  
   if (!order) return null;
+
+  const toggleIds = () => setExpandedIds(!expandedIds);
 
   const getPaymentStatusBadge = (status) => {
     const colors = {
@@ -181,9 +185,13 @@ export default function OrderDetailDialog({ order, open, onClose }) {
             <div className="p-4 bg-green-50 rounded-lg border border-green-200">
               <div className="flex items-center gap-2 mb-3">
                 <Truck className="w-5 h-5 text-green-600" />
-                <h3 className="text-lg font-bold text-green-900">FedEx Shipment Information</h3>
+                <h3 className="text-lg font-bold text-green-900">Delivery Information</h3>
               </div>
               <div className="space-y-2">
+                <div>
+                  <p className="text-sm font-semibold text-gray-700">Delivery Method</p>
+                  <p className="text-base text-gray-900">{order.carrier || 'FedEx'}</p>
+                </div>
                 <div>
                   <p className="text-sm font-semibold text-gray-700">Tracking Number</p>
                   <a 
@@ -197,15 +205,47 @@ export default function OrderDetailDialog({ order, open, onClose }) {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-gray-700">Shipped Date</p>
-                  <p className="text-base text-gray-900">{format(new Date(order.shipped_date), 'MMMM d, yyyy')}</p>
+                  <p className="text-base text-gray-900">{format(new Date(order.shipped_date), 'MM/dd/yyyy')}</p>
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-gray-700">Estimated Delivery</p>
-                  <p className="text-base text-gray-900">{format(new Date(order.estimated_delivery), 'MMMM d, yyyy')}</p>
+                  <p className="text-base text-gray-900">{format(new Date(order.estimated_delivery), 'MM/dd/yyyy')}</p>
                 </div>
               </div>
             </div>
           )}
+
+          {/* System Identifiers - Collapsible */}
+          <div className="border-t pt-4">
+            <button
+              onClick={toggleIds}
+              className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold text-sm w-full justify-between p-2 hover:bg-gray-50 rounded transition-all"
+            >
+              <span>System Identifiers</span>
+              {expandedIds ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+            
+            {expandedIds && (
+              <div className="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-700 font-semibold">DCA ID</span>
+                  <span className="text-gray-900 font-mono">{order.dca_id || 'DCA-' + order.id}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-700 font-semibold">External ID</span>
+                  <span className="text-gray-900 font-mono text-xs">{order.external_id || 'ext-' + order.order_number}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-700 font-semibold">Facility Confirmation ID</span>
+                  <span className="text-gray-900 font-mono">{order.facility_confirmation_id || 'FC-' + order.id}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-700 font-semibold">Facility Confirmation Date</span>
+                  <span className="text-gray-900">{order.facility_confirmation_date || format(new Date(order.order_date), 'MM/dd/yyyy')}</span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

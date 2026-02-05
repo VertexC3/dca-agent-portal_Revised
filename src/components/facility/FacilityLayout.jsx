@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import CollapsibleSidebar from './CollapsibleSidebar';
 import MasterSearchBar from './MasterSearchBar';
 import NotificationPopup from './NotificationPopup';
+import NotificationPanel from './NotificationPanel';
 
 const getMockUser = () => {
   const stored = localStorage.getItem('facilityUser');
@@ -33,6 +34,16 @@ export default function FacilityLayout({ children, currentPageName }) {
   const [showNotificationPopup, setShowNotificationPopup] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [mockUser, setMockUser] = useState(getMockUser);
+  const [showNotificationPanel, setShowNotificationPanel] = useState(false);
+
+  // Show notification panel on first entry
+  React.useEffect(() => {
+    const hasSeenPanel = sessionStorage.getItem('facilityNotificationPanelSeen');
+    if (!hasSeenPanel) {
+      setShowNotificationPanel(true);
+      sessionStorage.setItem('facilityNotificationPanelSeen', 'true');
+    }
+  }, []);
 
   // Listen for profile updates
   React.useEffect(() => {
@@ -131,7 +142,10 @@ export default function FacilityLayout({ children, currentPageName }) {
               {/* Notification Bell */}
               <DropdownMenu open={showNotifications} onOpenChange={setShowNotifications}>
                 <DropdownMenuTrigger asChild>
-                  <button className="relative p-2 rounded-full hover:bg-gray-100 transition-all">
+                  <button 
+                    className="relative p-2 rounded-full hover:bg-gray-100 transition-all"
+                    onClick={() => setShowNotificationPanel(true)}
+                  >
                     <Bell className="w-6 h-6 text-gray-700" />
                     {notifications.filter(n => n.unread).length > 0 && (
                       <Badge className="absolute -top-1 -right-1 bg-red-500 text-white px-1.5 py-0.5 text-xs min-w-[20px] h-5 flex items-center justify-center">
@@ -140,26 +154,6 @@ export default function FacilityLayout({ children, currentPageName }) {
                     )}
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-80 bg-white border-gray-200">
-                  <div className="px-3 py-2 border-b border-gray-100">
-                    <p className="font-semibold text-gray-800">Notifications</p>
-                  </div>
-                  {notifications.map(notification => (
-                    <DropdownMenuItem
-                      key={notification.id}
-                      className="flex items-start gap-3 p-3 cursor-pointer"
-                      onClick={() => handleNotificationClick(notification)}
-                    >
-                      <div className="flex-1">
-                        <p className="font-semibold text-gray-900 text-sm">{notification.message}</p>
-                        <p className="text-xs text-gray-600 mt-1">Order {notification.orderId} - {notification.patientName}</p>
-                      </div>
-                      {notification.unread && (
-                        <div className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0 mt-1" />
-                      )}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
               </DropdownMenu>
 
               <DropdownMenu>
@@ -229,6 +223,12 @@ export default function FacilityLayout({ children, currentPageName }) {
         open={showNotificationPopup}
         onClose={() => setShowNotificationPopup(false)}
         notification={selectedNotification}
+      />
+
+      {/* Notification Panel */}
+      <NotificationPanel
+        isOpen={showNotificationPanel}
+        onClose={() => setShowNotificationPanel(false)}
       />
     </div>
   );
