@@ -233,7 +233,7 @@ export default function FacilityInvoices() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="bg-white">
                 <DropdownMenuItem onClick={() => handleExportInvoices('xlsx')} className="cursor-pointer">
-                  Export as Excel (XLSX)
+                  Export as Excel
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleExportInvoices('pdf')} className="cursor-pointer">
                   Export as PDF
