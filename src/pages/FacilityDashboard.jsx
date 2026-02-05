@@ -262,7 +262,9 @@ export default function FacilityDashboard() {
                   {/* Orders/Invoices Chart */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-gray-900">Orders/Invoices Over Time</h3>
+                      <h3 className="font-semibold text-gray-900">
+                        {chartView === 'orders' ? 'Orders Over Time' : 'Invoices Over Time'}
+                      </h3>
                       <Tabs value={chartView} onValueChange={setChartView}>
                         <TabsList>
                           <TabsTrigger value="orders">Orders</TabsTrigger>
@@ -272,16 +274,18 @@ export default function FacilityDashboard() {
                     </div>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={chartData}>
+                        <BarChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                           <XAxis 
                             dataKey="date" 
-                            tick={{ fontSize: 12 }}
+                            tick={{ fontSize: 11 }}
                             stroke="#6b7280"
+                            height={60}
                           />
                           <YAxis 
-                            tick={{ fontSize: 12 }}
+                            tick={{ fontSize: 11 }}
                             stroke="#6b7280"
+                            width={40}
                           />
                           <Tooltip 
                             contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
@@ -302,16 +306,18 @@ export default function FacilityDashboard() {
                     <h3 className="font-semibold text-gray-900">Patients Over Time</h3>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={chartData}>
+                        <BarChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                           <XAxis 
                             dataKey="date" 
-                            tick={{ fontSize: 12 }}
+                            tick={{ fontSize: 11 }}
                             stroke="#6b7280"
+                            height={60}
                           />
                           <YAxis 
-                            tick={{ fontSize: 12 }}
+                            tick={{ fontSize: 11 }}
                             stroke="#6b7280"
+                            width={40}
                           />
                           <Tooltip 
                             contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
