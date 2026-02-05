@@ -194,7 +194,7 @@ export default function FacilityInvoices() {
   };
 
   const clearFilters = () => {
-    setFilters({ status: 'all', dateRange: 'all', minAmount: '', maxAmount: '', customDateFrom: '', customDateTo: '' });
+    setFilters({ status: 'all', dateRange: 'all', minAmount: '', maxAmount: '', customDateFrom: '', customDateTo: '', paymentType: 'all', physician: '', rxNumber: '' });
     setSearchTerm('');
   };
 
@@ -304,6 +304,21 @@ export default function FacilityInvoices() {
                     </div>
 
                     <div>
+                      <Label className="text-sm font-medium mb-2">Type of Payment</Label>
+                      <Select value={filters.paymentType || 'all'} onValueChange={(v) => setFilters({...filters, paymentType: v})}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Types</SelectItem>
+                          <SelectItem value="weekly">Weekly</SelectItem>
+                          <SelectItem value="monthly">Monthly</SelectItem>
+                          <SelectItem value="bill_now">Bill Now</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
                       <Label className="text-sm font-medium mb-2">Min Amount</Label>
                       <Input
                         type="number"
@@ -343,7 +358,25 @@ export default function FacilityInvoices() {
                         </div>
                       </>
                     )}
-                  </div>
+
+                    <div>
+                      <Label className="text-sm font-medium mb-2">Physician</Label>
+                      <Input
+                        placeholder="Search by name or NPI..."
+                        value={filters.physician || ''}
+                        onChange={(e) => setFilters({...filters, physician: e.target.value})}
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium mb-2">RX Number</Label>
+                      <Input
+                        placeholder="Search by RX number..."
+                        value={filters.rxNumber || ''}
+                        onChange={(e) => setFilters({...filters, rxNumber: e.target.value})}
+                      />
+                    </div>
+                    </div>
 
                   <div className="flex justify-between pt-4 border-t">
                     <Button variant="outline" onClick={clearFilters} disabled={!hasActiveFilters}>
