@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Search, X, Filter, Pill, Stethoscope, Calendar, MapPin, ShoppingCart, ArrowUpDown, Download } from 'lucide-react';
+import { Search, X, Filter, Pill, Stethoscope, Calendar, MapPin, ShoppingCart, ArrowUpDown, Download, Share2, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
 
@@ -127,18 +127,24 @@ export default function FacilityPatients() {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [expandedPrescription, setExpandedPrescription] = useState(null);
   const [expandedOrder, setExpandedOrder] = useState(null);
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [shareEmail, setShareEmail] = useState('');
+  const [editingZip, setEditingZip] = useState(null);
+  const [zipCode, setZipCode] = useState('');
   const [filters, setFilters] = useState({
     status: 'all',
     physician: 'all',
-    medication: 'all'
+    medication: 'all',
+    dateFrom: '',
+    dateTo: ''
   });
 
   const clearFilters = () => {
-    setFilters({ status: 'all', physician: 'all', medication: 'all' });
+    setFilters({ status: 'all', physician: 'all', medication: 'all', dateFrom: '', dateTo: '' });
     setSearchTerm('');
   };
 
-  const hasActiveFilters = Object.values(filters).some(v => v && v !== 'all') || searchTerm;
+  const hasActiveFilters = Object.entries(filters).some(([k, v]) => v && v !== 'all' && v !== '') || searchTerm;
 
   const handleSort = (key) => {
     let direction = 'asc';
@@ -166,6 +172,24 @@ export default function FacilityPatients() {
 
   const handleExport = () => {
     alert(`Exporting ${selectedPatients.length} selected patients...`);
+  };
+
+  const handleShare = () => {
+    setShowShareDialog(true);
+  };
+
+  const handleSendEmail = () => {
+    console.log('Sharing patient data with:', shareEmail);
+    alert(`Patient data shared with ${shareEmail}`);
+    setShowShareDialog(false);
+    setShareEmail('');
+  };
+
+  const handleSaveZip = (patientId) => {
+    console.log(`Updated zip code for patient ${patientId}: ${zipCode}`);
+    alert(`Zip code updated to: ${zipCode}`);
+    setEditingZip(null);
+    setZipCode('');
   };
 
   const filteredPatients = mockPatients.filter(patient => {
@@ -275,6 +299,24 @@ export default function FacilityPatients() {
                         </SelectContent>
                       </Select>
                     </div>
+
+                    <div>
+                      <Label className="text-sm font-medium mb-2">Date From</Label>
+                      <Input
+                        type="date"
+                        value={filters.dateFrom}
+                        onChange={(e) => setFilters({...filters, dateFrom: e.target.value})}
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-sm font-medium mb-2">Date To</Label>
+                      <Input
+                        type="date"
+                        value={filters.dateTo}
+                        onChange={(e) => setFilters({...filters, dateTo: e.target.value})}
+                      />
+                    </div>
                   </div>
 
                   <div className="flex justify-between pt-4 border-t">
@@ -301,10 +343,16 @@ export default function FacilityPatients() {
         {selectedPatients.length > 0 && (
           <div className="bg-[#1a1f5c] text-white p-4 rounded-lg flex items-center justify-between">
             <p className="font-semibold">{selectedPatients.length} patient(s) selected</p>
-            <Button onClick={handleExport} variant="outline" className="bg-white text-[#1a1f5c] hover:bg-gray-100 border-0">
-              <Download className="w-4 h-4 mr-2" />
-              Export
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button onClick={handleExport} variant="outline" className="bg-white text-[#1a1f5c] hover:bg-gray-100 border-0">
+                <Download className="w-4 h-4 mr-2" />
+                Export
+              </Button>
+              <Button onClick={handleShare} variant="outline" className="bg-white text-[#1a1f5c] hover:bg-gray-100 border-0">
+                <Share2 className="w-4 h-4 mr-2" />
+                Share
+              </Button>
+            </div>
           </div>
         )}
 
@@ -455,7 +503,39 @@ export default function FacilityPatients() {
                   <h3 className="font-bold text-lg text-gray-900 mb-2">Address</h3>
                   <div className="flex items-start gap-2">
                     <MapPin className="w-5 h-5 text-purple-600 mt-1" />
-                    <p className="text-gray-900">{selectedPatient.address}</p>
+                    <div className="flex-1">
+                      <p className="text-gray-900">{selectedPatient.address}</p>
+                      {!selectedPatient.address.match(/\d{5}/) && (
+                        <div className="mt-2 flex items-center gap-2">
+                          {editingZip === selectedPatient.id ? (
+                            <div className="flex items-center gap-2">
+                              <Input
+                                type="text"
+                                placeholder="Enter 5-digit zip"
+                                value={zipCode}
+                                onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                                className="w-32"
+                                maxLength={5}
+                              />
+                              <Button size="sm" onClick={() => handleSaveZip(selectedPatient.id)} disabled={zipCode.length !== 5}>
+                                Save
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => { setEditingZip(null); setZipCode(''); }}>
+                                Cancel
+                              </Button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setEditingZip(selectedPatient.id)}
+                              className="inline-flex items-center gap-1 text-sm text-red-600 hover:underline font-semibold"
+                            >
+                              <AlertCircle className="w-4 h-4" />
+                              Missing Zip Code - Click to Add
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -632,7 +712,7 @@ export default function FacilityPatients() {
                           </div>
                           <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
-                              <p className="text-gray-600">Date</p>
+                              <p className="text-gray-600">Date Filled</p>
                               <p className="font-semibold text-gray-900">{format(new Date(order.date), 'MMM d, yyyy')}</p>
                             </div>
                             <div>
@@ -651,27 +731,51 @@ export default function FacilityPatients() {
                               className="overflow-hidden"
                             >
                               <div className="ml-4 mt-2 p-4 bg-white border-l-4 border-orange-400 rounded">
-                                <h4 className="font-semibold text-gray-900 mb-3">Order Details</h4>
+                                <h4 className="font-semibold text-gray-900 mb-3">Receipt Details</h4>
                                 <div className="space-y-2 text-sm">
-                                  <div className="flex justify-between">
-                                    <span className="text-gray-600">Medication</span>
-                                    <span className="font-semibold text-gray-900">{order.medication}</span>
-                                  </div>
                                   <div className="flex justify-between">
                                     <span className="text-gray-600">Order ID</span>
                                     <span className="font-semibold text-gray-900">{order.id}</span>
                                   </div>
                                   <div className="flex justify-between">
-                                    <span className="text-gray-600">Order Date</span>
+                                    <span className="text-gray-600">Date Filled</span>
                                     <span className="font-semibold text-gray-900">{format(new Date(order.date), 'MMMM d, yyyy')}</span>
                                   </div>
-                                  <div className="flex justify-between">
-                                    <span className="text-gray-600">Amount</span>
-                                    <span className="font-semibold text-gray-900">${order.amount.toFixed(2)}</span>
+                                  <div className="border-t pt-2 mt-2">
+                                    <div className="flex justify-between mb-1">
+                                      <span className="text-gray-600">Product</span>
+                                      <span className="text-gray-600">Price</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span className="font-semibold text-gray-900">{order.medication}</span>
+                                      <span className="font-semibold text-gray-900">${(order.amount * 0.85).toFixed(2)}</span>
+                                    </div>
                                   </div>
-                                  <div className="flex justify-between">
-                                    <span className="text-gray-600">Status</span>
-                                    <Badge className="bg-green-100 text-green-800">{order.status}</Badge>
+                                  <div className="border-t pt-2 mt-2 space-y-1">
+                                    <div className="flex justify-between">
+                                      <span className="text-gray-600">Subtotal</span>
+                                      <span className="text-gray-900">${(order.amount * 0.85).toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span className="text-gray-600">Tax (8.5%)</span>
+                                      <span className="text-gray-900">${(order.amount * 0.0723).toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                      <span className="text-gray-600">Shipping</span>
+                                      <span className="text-gray-900">${(order.amount * 0.0777).toFixed(2)}</span>
+                                    </div>
+                                  </div>
+                                  <div className="border-t pt-2 mt-2">
+                                    <div className="flex justify-between">
+                                      <span className="text-gray-700 font-semibold">Total</span>
+                                      <span className="font-bold text-gray-900">${order.amount.toFixed(2)}</span>
+                                    </div>
+                                  </div>
+                                  <div className="border-t pt-2 mt-2">
+                                    <div className="flex justify-between">
+                                      <span className="text-gray-600">Status</span>
+                                      <Badge className="bg-green-100 text-green-800">{order.status}</Badge>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
@@ -684,6 +788,38 @@ export default function FacilityPatients() {
                 )}
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Share Dialog */}
+        <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+          <DialogContent className="bg-white">
+            <DialogHeader>
+              <DialogTitle>Share Patient Data via Email</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <Label htmlFor="email" className="text-sm font-medium mb-2">Recipient Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter email address"
+                value={shareEmail}
+                onChange={(e) => setShareEmail(e.target.value)}
+                className="mt-2"
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowShareDialog(false)}>
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleSendEmail}
+                disabled={!shareEmail}
+                className="bg-[#1a1f5c]"
+              >
+                Send
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
     </div>

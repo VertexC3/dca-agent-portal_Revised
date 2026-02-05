@@ -24,7 +24,9 @@ export default function FacilityInvoices() {
     status: 'all',
     dateRange: 'all',
     minAmount: '',
-    maxAmount: ''
+    maxAmount: '',
+    customDateFrom: '',
+    customDateTo: ''
   });
 
   // Mock data
@@ -192,12 +194,12 @@ export default function FacilityInvoices() {
   };
 
   const clearFilters = () => {
-    setFilters({ status: 'all', dateRange: 'all', minAmount: '', maxAmount: '' });
+    setFilters({ status: 'all', dateRange: 'all', minAmount: '', maxAmount: '', customDateFrom: '', customDateTo: '' });
     setSearchTerm('');
   };
 
   const hasActiveFilters = Object.entries(filters).some(([k, v]) => 
-    v && v !== 'all' && (k !== 'minAmount' && k !== 'maxAmount' ? true : v !== '')
+    v && v !== 'all' && v !== ''
   ) || searchTerm;
 
   const filteredInvoices = mockInvoices.filter(inv => {
@@ -296,6 +298,7 @@ export default function FacilityInvoices() {
                           <SelectItem value="month">This Month</SelectItem>
                           <SelectItem value="quarter">This Quarter</SelectItem>
                           <SelectItem value="year">This Year</SelectItem>
+                          <SelectItem value="custom">Custom</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -319,6 +322,27 @@ export default function FacilityInvoices() {
                         onChange={(e) => setFilters({...filters, maxAmount: e.target.value})}
                       />
                     </div>
+
+                    {filters.dateRange === 'custom' && (
+                      <>
+                        <div>
+                          <Label className="text-sm font-medium mb-2">From</Label>
+                          <Input
+                            type="date"
+                            value={filters.customDateFrom}
+                            onChange={(e) => setFilters({...filters, customDateFrom: e.target.value})}
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium mb-2">To</Label>
+                          <Input
+                            type="date"
+                            value={filters.customDateTo}
+                            onChange={(e) => setFilters({...filters, customDateTo: e.target.value})}
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <div className="flex justify-between pt-4 border-t">
@@ -437,11 +461,11 @@ export default function FacilityInvoices() {
                     <p className="font-bold text-gray-900">${formatCurrency(invoice.total_due)}</p>
                     <p className="text-xs text-gray-600">Paid: ${formatCurrency(invoice.total_paid)}</p>
                   </div>
-                  <Badge className={
+                  <Badge className={`${
                     invoice.status === 'paid' ? 'bg-green-100 text-green-800' :
                     invoice.status === 'open' ? 'bg-yellow-100 text-yellow-800' :
                     'bg-red-100 text-red-800'
-                  }>
+                  } pointer-events-none`}>
                     {invoice.status}
                   </Badge>
                 </div>
@@ -477,10 +501,10 @@ export default function FacilityInvoices() {
                                   <div className="flex-shrink-0">
                                     <p className="font-semibold text-gray-900">${formatCurrency(order.amount)}</p>
                                   </div>
-                                  <Badge className={
+                                  <Badge className={`${
                                     order.payment_status === 'paid' ? 'bg-green-100 text-green-800' :
                                     'bg-gray-100 text-gray-800'
-                                  }>
+                                  } pointer-events-none`}>
                                     {order.payment_status}
                                   </Badge>
                                 </div>

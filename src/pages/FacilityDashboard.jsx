@@ -36,6 +36,7 @@ export default function FacilityDashboard() {
   const [exportingInvoice, setExportingInvoice] = useState(null);
   const [chartView, setChartView] = useState('orders');
   const [chartExpanded, setChartExpanded] = useState(false);
+  const [chartExpanded2, setChartExpanded2] = useState(false);
   const [timeRange, setTimeRange] = useState('30days');
   const navigate = useNavigate();
 
@@ -121,11 +122,13 @@ export default function FacilityDashboard() {
       // Generate random data for demonstration
       const ordersCount = Math.floor(Math.random() * 10) + 1;
       const invoicesCount = Math.floor(Math.random() * 3) + 1;
+      const patientsCount = Math.floor(Math.random() * 5) + 1;
       
       data.push({
         date: dateStr,
         orders: ordersCount,
-        invoices: invoicesCount
+        invoices: invoicesCount,
+        patients: patientsCount
       });
     }
     return data;
@@ -152,6 +155,23 @@ export default function FacilityDashboard() {
           </div>
           
           <div className="flex items-center gap-3">
+            {/* Time Range Selector */}
+            <Select 
+              value={timeRange} 
+              onValueChange={setTimeRange}
+            >
+              <SelectTrigger className="w-40 border-2 border-gray-300">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="7days">Last 7 Days</SelectItem>
+                <SelectItem value="14days">Last 14 Days</SelectItem>
+                <SelectItem value="30days">Last 30 Days</SelectItem>
+                <SelectItem value="6months">Last 6 Months</SelectItem>
+                <SelectItem value="12months">Last 12 Months</SelectItem>
+              </SelectContent>
+            </Select>
+
             {/* Export Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -219,7 +239,7 @@ export default function FacilityDashboard() {
         </Card>
       </div>
 
-      {/* Chart - Orders/Invoices Over Time */}
+      {/* Chart - Orders Over Time */}
       <Card>
         <CardHeader 
           className="cursor-pointer hover:bg-gray-50 transition-colors"
@@ -228,29 +248,8 @@ export default function FacilityDashboard() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {chartExpanded ? <ChevronUp className="w-5 h-5 text-gray-600" /> : <ChevronDown className="w-5 h-5 text-gray-600" />}
-              <Select 
-                value={timeRange} 
-                onValueChange={setTimeRange}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <SelectTrigger className="w-40 h-8 text-sm" onClick={(e) => e.stopPropagation()}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="7days">Last 7 Days</SelectItem>
-                  <SelectItem value="14days">Last 14 Days</SelectItem>
-                  <SelectItem value="30days">Last 30 Days</SelectItem>
-                  <SelectItem value="6months">Last 6 Months</SelectItem>
-                  <SelectItem value="12months">Last 12 Months</SelectItem>
-                </SelectContent>
-              </Select>
+              <CardTitle className="text-lg">Orders Over Time</CardTitle>
             </div>
-            <Tabs value={chartView} onValueChange={setChartView} onClick={(e) => e.stopPropagation()}>
-              <TabsList>
-                <TabsTrigger value="orders">Orders</TabsTrigger>
-                <TabsTrigger value="invoices">Invoices</TabsTrigger>
-              </TabsList>
-            </Tabs>
           </div>
         </CardHeader>
         <AnimatePresence>
@@ -280,8 +279,61 @@ export default function FacilityDashboard() {
                         labelStyle={{ fontWeight: 'bold', color: '#111827' }}
                       />
                       <Bar 
-                        dataKey={chartView} 
-                        fill={chartView === 'orders' ? '#1a1f5c' : '#3b82f6'} 
+                        dataKey="orders" 
+                        fill="#1a1f5c" 
+                        radius={[8, 8, 0, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </Card>
+
+      {/* Chart - Patients Over Time */}
+      <Card>
+        <CardHeader 
+          className="cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={() => setChartExpanded2(!chartExpanded2)}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {chartExpanded2 ? <ChevronUp className="w-5 h-5 text-gray-600" /> : <ChevronDown className="w-5 h-5 text-gray-600" />}
+              <CardTitle className="text-lg">Patients Over Time</CardTitle>
+            </div>
+          </div>
+        </CardHeader>
+        <AnimatePresence>
+          {chartExpanded2 && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <CardContent>
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis 
+                        dataKey="date" 
+                        tick={{ fontSize: 12 }}
+                        stroke="#6b7280"
+                      />
+                      <YAxis 
+                        tick={{ fontSize: 12 }}
+                        stroke="#6b7280"
+                      />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                        labelStyle={{ fontWeight: 'bold', color: '#111827' }}
+                      />
+                      <Bar 
+                        dataKey="patients" 
+                        fill="#10b981" 
                         radius={[8, 8, 0, 0]}
                       />
                     </BarChart>
