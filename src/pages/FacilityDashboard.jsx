@@ -35,8 +35,7 @@ export default function FacilityDashboard() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [exportingInvoice, setExportingInvoice] = useState(null);
   const [chartView, setChartView] = useState('orders');
-  const [chartExpanded, setChartExpanded] = useState(false);
-  const [chartExpanded2, setChartExpanded2] = useState(false);
+  const [analysisExpanded, setAnalysisExpanded] = useState(false);
   const [timeRange, setTimeRange] = useState('30days');
   const navigate = useNavigate();
 
@@ -239,21 +238,19 @@ export default function FacilityDashboard() {
         </Card>
       </div>
 
-      {/* Chart - Orders Over Time */}
+      {/* Analysis Section - Orders/Invoices and Patients Over Time */}
       <Card>
         <CardHeader 
           className="cursor-pointer hover:bg-gray-50 transition-colors"
-          onClick={() => setChartExpanded(!chartExpanded)}
+          onClick={() => setAnalysisExpanded(!analysisExpanded)}
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {chartExpanded ? <ChevronUp className="w-5 h-5 text-gray-600" /> : <ChevronDown className="w-5 h-5 text-gray-600" />}
-              <CardTitle className="text-lg">Orders Over Time</CardTitle>
-            </div>
+          <div className="flex items-center gap-3">
+            {analysisExpanded ? <ChevronUp className="w-5 h-5 text-gray-600" /> : <ChevronDown className="w-5 h-5 text-gray-600" />}
+            <CardTitle className="text-lg">Analysis</CardTitle>
           </div>
         </CardHeader>
         <AnimatePresence>
-          {chartExpanded && (
+          {analysisExpanded && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
@@ -261,83 +258,74 @@ export default function FacilityDashboard() {
               transition={{ duration: 0.2 }}
             >
               <CardContent>
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis 
-                        dataKey="date" 
-                        tick={{ fontSize: 12 }}
-                        stroke="#6b7280"
-                      />
-                      <YAxis 
-                        tick={{ fontSize: 12 }}
-                        stroke="#6b7280"
-                      />
-                      <Tooltip 
-                        contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
-                        labelStyle={{ fontWeight: 'bold', color: '#111827' }}
-                      />
-                      <Bar 
-                        dataKey="orders" 
-                        fill="#1a1f5c" 
-                        radius={[8, 8, 0, 0]}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </Card>
+                <div className="grid grid-cols-2 gap-6">
+                  {/* Orders/Invoices Chart */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold text-gray-900">Orders/Invoices Over Time</h3>
+                      <Tabs value={chartView} onValueChange={setChartView}>
+                        <TabsList>
+                          <TabsTrigger value="orders">Orders</TabsTrigger>
+                          <TabsTrigger value="invoices">Invoices</TabsTrigger>
+                        </TabsList>
+                      </Tabs>
+                    </div>
+                    <div className="h-80">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={chartData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                          <XAxis 
+                            dataKey="date" 
+                            tick={{ fontSize: 12 }}
+                            stroke="#6b7280"
+                          />
+                          <YAxis 
+                            tick={{ fontSize: 12 }}
+                            stroke="#6b7280"
+                          />
+                          <Tooltip 
+                            contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                            labelStyle={{ fontWeight: 'bold', color: '#111827' }}
+                          />
+                          <Bar 
+                            dataKey={chartView} 
+                            fill={chartView === 'orders' ? '#1a1f5c' : '#3b82f6'} 
+                            radius={[8, 8, 0, 0]}
+                          />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
 
-      {/* Chart - Patients Over Time */}
-      <Card>
-        <CardHeader 
-          className="cursor-pointer hover:bg-gray-50 transition-colors"
-          onClick={() => setChartExpanded2(!chartExpanded2)}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {chartExpanded2 ? <ChevronUp className="w-5 h-5 text-gray-600" /> : <ChevronDown className="w-5 h-5 text-gray-600" />}
-              <CardTitle className="text-lg">Patients Over Time</CardTitle>
-            </div>
-          </div>
-        </CardHeader>
-        <AnimatePresence>
-          {chartExpanded2 && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <CardContent>
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                      <XAxis 
-                        dataKey="date" 
-                        tick={{ fontSize: 12 }}
-                        stroke="#6b7280"
-                      />
-                      <YAxis 
-                        tick={{ fontSize: 12 }}
-                        stroke="#6b7280"
-                      />
-                      <Tooltip 
-                        contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
-                        labelStyle={{ fontWeight: 'bold', color: '#111827' }}
-                      />
-                      <Bar 
-                        dataKey="patients" 
-                        fill="#10b981" 
-                        radius={[8, 8, 0, 0]}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  {/* Patients Chart */}
+                  <div className="space-y-3">
+                    <h3 className="font-semibold text-gray-900">Patients Over Time</h3>
+                    <div className="h-80">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={chartData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                          <XAxis 
+                            dataKey="date" 
+                            tick={{ fontSize: 12 }}
+                            stroke="#6b7280"
+                          />
+                          <YAxis 
+                            tick={{ fontSize: 12 }}
+                            stroke="#6b7280"
+                          />
+                          <Tooltip 
+                            contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                            labelStyle={{ fontWeight: 'bold', color: '#111827' }}
+                          />
+                          <Bar 
+                            dataKey="patients" 
+                            fill="#10b981" 
+                            radius={[8, 8, 0, 0]}
+                          />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </motion.div>
