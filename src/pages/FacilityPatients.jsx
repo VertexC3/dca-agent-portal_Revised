@@ -797,16 +797,21 @@ export default function FacilityPatients() {
             <DialogHeader>
               <DialogTitle>Share Patient Data via Email</DialogTitle>
             </DialogHeader>
-            <div className="py-4">
-              <Label htmlFor="email" className="text-sm font-medium mb-2">Recipient Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter email address"
-                value={shareEmail}
-                onChange={(e) => setShareEmail(e.target.value)}
-                className="mt-2"
-              />
+            <div className="py-4 space-y-4">
+              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-xs text-gray-700 leading-relaxed">
+                <strong>PHI Disclaimer:</strong> This message contains protected health information (PHI) and is being shared in accordance with the Health Insurance Portability and Accountability Act (HIPAA). It is intended solely for the use of the authorized recipient for treatment, payment, or healthcare operations. Any unauthorized review, use, disclosure, distribution, or copying is strictly prohibited. If you are not the intended recipient, please notify the sender immediately and delete all copies of this message and any attachments.
+              </div>
+              <div>
+                <Label htmlFor="email" className="text-sm font-medium mb-2">Recipient Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter email address"
+                  value={shareEmail}
+                  onChange={(e) => setShareEmail(e.target.value)}
+                  className="mt-2"
+                />
+              </div>
             </div>
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setShowShareDialog(false)}>
