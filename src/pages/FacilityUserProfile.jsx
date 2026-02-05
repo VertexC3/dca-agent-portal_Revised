@@ -26,7 +26,19 @@ export default function FacilityUserProfile() {
   };
 
   const handleSave = () => {
-    // Save to backend
+    // Save to localStorage
+    const userData = {
+      full_name: `${profileData.first_name} ${profileData.last_name}`,
+      email: profileData.email,
+      phone: profileData.phone,
+      profile_picture: profileData.profile_picture,
+      role: 'admin'
+    };
+    localStorage.setItem('facilityUser', JSON.stringify(userData));
+    
+    // Trigger event to update layout
+    window.dispatchEvent(new Event('facilityProfileUpdated'));
+    
     alert('Profile updated successfully!');
   };
 
