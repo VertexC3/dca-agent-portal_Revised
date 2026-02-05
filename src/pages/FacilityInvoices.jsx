@@ -6,14 +6,19 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { FileText, DollarSign, Clock, CheckCircle, Search, X, Filter, ChevronDown, ChevronUp } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { FileText, DollarSign, Clock, CheckCircle, Search, X, Filter, ChevronDown, ChevronUp, Download, Share2, CreditCard } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function FacilityInvoices() {
+  const [selectedInvoices, setSelectedInvoices] = useState([]);
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedInvoices, setExpandedInvoices] = useState([]);
+  const [expandedOrders, setExpandedOrders] = useState([]);
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [shareEmail, setShareEmail] = useState('');
   const [filters, setFilters] = useState({
     status: 'all',
     dateRange: 'all',
@@ -26,33 +31,107 @@ export default function FacilityInvoices() {
     {
       id: 'INV-001',
       invoice_number: 'INV-2026-001',
-      invoice_date: '2026-01-15',
+      invoice_date: '2026-01-31',
       billing_period_start: '2026-01-01',
       billing_period_end: '2026-01-31',
-      total_due: 1250.00,
+      total_due: 200.00,
       total_paid: 0,
       status: 'open',
       bill_to_name: 'DCA Pharmacy',
       orders: [
-        { id: 'ORD-001', patient_name: 'J.D.', order_date: '2026-01-10', total_amount: 625.00, payment_status: 'unpaid' },
-        { id: 'ORD-002', patient_name: 'S.M.', order_date: '2026-01-12', total_amount: 625.00, payment_status: 'unpaid' }
+        { 
+          id: 'ORD-001', 
+          account: 'Mochi Health',
+          origin_reference: 'Electronic',
+          patient_name: 'Jones, Karen',
+          prescribed_item_name: 'Tirzepatide + Niacinamide',
+          dispensed_item_name: 'Tirzepatide + Niacinamide',
+          rx_number: '924314',
+          receipt: '883659',
+          priority: 'MOCHI-Local ND RXMile',
+          accepted_date: '1/28/26 18:11',
+          pos_date: '1/28/26 10:42',
+          shipped_date: '1/29/26 19:55',
+          shipper: 'Inhouse',
+          tracking_number: '144RCQ7IMNAA1LOERC6VSF6FK',
+          amount: 100.00,
+          dca_id: 'DCA-SW1CXw8nNG3ajuU',
+          external_id: '74f29080-b88a-4149-8d11-8be3f6648ba9',
+          facility_confirmation_date: '1/29/26 20:05',
+          facility_confirmation_id: '21679981',
+          physician_name: 'Dr. Sarah Mitchell',
+          payment_status: 'unpaid'
+        },
+        { 
+          id: 'ORD-002', 
+          account: 'Mochi Health',
+          origin_reference: 'Electronic',
+          patient_name: 'Smith, Michael',
+          prescribed_item_name: 'Semaglutide',
+          dispensed_item_name: 'Semaglutide',
+          rx_number: '924315',
+          receipt: '883660',
+          priority: 'MOCHI-Local ND RXMile',
+          accepted_date: '1/28/26 19:20',
+          pos_date: '1/28/26 11:30',
+          shipped_date: '1/29/26 20:10',
+          shipper: 'Inhouse',
+          tracking_number: '144RCQ7IMNAA1LOERC6VSF6FL',
+          amount: 100.00,
+          dca_id: 'DCA-TX2DYx9oOH4bkvV',
+          external_id: '85g30191-c99b-5250-9e22-9cf4g7759ca0',
+          facility_confirmation_date: '1/29/26 20:15',
+          facility_confirmation_id: '21679982',
+          physician_name: 'Dr. James Wilson',
+          payment_status: 'unpaid'
+        }
       ]
     },
     {
       id: 'INV-002',
       invoice_number: 'INV-2026-002',
-      invoice_date: '2026-01-20',
+      invoice_date: '2026-01-31',
       billing_period_start: '2026-01-01',
       billing_period_end: '2026-01-31',
-      total_due: 875.50,
-      total_paid: 875.50,
+      total_due: 150.00,
+      total_paid: 150.00,
       status: 'paid',
       bill_to_name: 'DCA Pharmacy',
       orders: [
-        { id: 'ORD-003', patient_name: 'A.J.', order_date: '2026-01-15', total_amount: 875.50, payment_status: 'paid' }
+        { 
+          id: 'ORD-003', 
+          account: 'Mochi Health',
+          origin_reference: 'Electronic',
+          patient_name: 'Anderson, Julie',
+          prescribed_item_name: 'Tirzepatide',
+          dispensed_item_name: 'Tirzepatide',
+          rx_number: '924316',
+          receipt: '883661',
+          priority: 'MOCHI-Local ND RXMile',
+          accepted_date: '1/27/26 15:45',
+          pos_date: '1/27/26 09:20',
+          shipped_date: '1/28/26 18:30',
+          shipper: 'Inhouse',
+          tracking_number: '144RCQ7IMNAA1LOERC6VSF6FM',
+          amount: 150.00,
+          dca_id: 'DCA-UY3EZy0pPI5clwW',
+          external_id: '96h41202-d00c-6361-0f33-0dg5h8860db1',
+          facility_confirmation_date: '1/28/26 18:40',
+          facility_confirmation_id: '21679980',
+          physician_name: 'Dr. Emily Chen',
+          payment_status: 'paid'
+        }
       ]
     }
   ];
+
+  const handleInvoiceSelect = (invoiceId) => {
+    setSelectedInvoices(prev =>
+      prev.includes(invoiceId)
+        ? prev.filter(id => id !== invoiceId)
+        : [...prev, invoiceId]
+    );
+  };
 
   const handleOrderSelect = (orderId) => {
     setSelectedOrders(prev =>
@@ -68,6 +147,44 @@ export default function FacilityInvoices() {
         ? prev.filter(id => id !== invoiceId)
         : [...prev, invoiceId]
     );
+  };
+
+  const toggleOrder = (orderId) => {
+    setExpandedOrders(prev =>
+      prev.includes(orderId)
+        ? prev.filter(id => id !== orderId)
+        : [...prev, orderId]
+    );
+  };
+
+  const handleExportInvoices = () => {
+    const selectedData = mockInvoices.filter(inv => selectedInvoices.includes(inv.id));
+    console.log('Exporting invoices:', selectedData);
+    alert(`Exporting ${selectedInvoices.length} invoice(s)`);
+  };
+
+  const handleDownloadInvoices = () => {
+    const selectedData = mockInvoices.filter(inv => selectedInvoices.includes(inv.id));
+    console.log('Downloading invoices:', selectedData);
+    alert(`Downloading ${selectedInvoices.length} invoice(s)`);
+  };
+
+  const handleShareInvoices = () => {
+    setShowShareDialog(true);
+  };
+
+  const handleSendEmail = () => {
+    console.log('Sending invoices to:', shareEmail);
+    alert(`Invoices shared with ${shareEmail}`);
+    setShowShareDialog(false);
+    setShareEmail('');
+  };
+
+  const handlePayOutstanding = () => {
+    const selectedData = mockInvoices.filter(inv => selectedInvoices.includes(inv.id) && inv.status === 'open');
+    const total = selectedData.reduce((sum, inv) => sum + (inv.total_due - inv.total_paid), 0);
+    console.log('Processing payment for:', selectedData);
+    alert(`Processing payment of $${formatCurrency(total)}`);
   };
 
   const formatCurrency = (amount) => {
@@ -210,88 +327,87 @@ export default function FacilityInvoices() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="border-2 border-gray-200 overflow-hidden">
             <CardContent className="p-6">
-              <div className="flex items-center gap-4 min-w-0">
-                <FileText className="w-10 h-10 text-gray-600 flex-shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-2xl font-bold text-gray-900 truncate">{filteredInvoices.length}</p>
-                  <p className="text-sm text-gray-600 truncate">Total Invoices</p>
-                </div>
+              <div className="min-w-0">
+                <p className="text-2xl font-bold text-gray-900 truncate">{filteredInvoices.length}</p>
+                <p className="text-sm text-gray-600 truncate">Total Invoices</p>
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-2 border-gray-200 overflow-hidden">
             <CardContent className="p-6">
-              <div className="flex items-center gap-4 min-w-0">
-                <DollarSign className="w-10 h-10 text-gray-600 flex-shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-2xl font-bold text-gray-900 truncate">${formatCurrency(totalRevenue)}</p>
-                  <p className="text-sm text-gray-600 truncate">Total Revenue</p>
-                </div>
+              <div className="min-w-0">
+                <p className="text-2xl font-bold text-gray-900 truncate">${formatCurrency(totalRevenue)}</p>
+                <p className="text-sm text-gray-600 truncate">Total Revenue</p>
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-2 border-gray-200 overflow-hidden">
             <CardContent className="p-6">
-              <div className="flex items-center gap-4 min-w-0">
-                <Clock className="w-10 h-10 text-gray-600 flex-shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-2xl font-bold text-gray-900 truncate">{openInvoices}</p>
-                  <p className="text-sm text-gray-600 truncate">Open Invoices</p>
-                </div>
+              <div className="min-w-0">
+                <p className="text-2xl font-bold text-gray-900 truncate">{openInvoices}</p>
+                <p className="text-sm text-gray-600 truncate">Open Invoices</p>
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-2 border-gray-200 overflow-hidden">
             <CardContent className="p-6">
-              <div className="flex items-center gap-4 min-w-0">
-                <CheckCircle className="w-10 h-10 text-gray-600 flex-shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-2xl font-bold text-gray-900 truncate">${formatCurrency(totalPaid)}</p>
-                  <p className="text-sm text-gray-600 truncate">Total Paid</p>
-                </div>
+              <div className="min-w-0">
+                <p className="text-2xl font-bold text-gray-900 truncate">${formatCurrency(totalPaid)}</p>
+                <p className="text-sm text-gray-600 truncate">Total Paid</p>
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Invoices List */}
-        <div className="space-y-4">
+        <div className="space-y-2">
           {filteredInvoices.map(invoice => {
             const isExpanded = expandedInvoices.includes(invoice.id);
+            const isSelected = selectedInvoices.includes(invoice.id);
             return (
               <Card key={invoice.id} className="border-2 border-gray-200 overflow-hidden">
-                <CardHeader 
-                  className="border-b bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
-                  onClick={() => toggleInvoice(invoice.id)}
+                <div 
+                  className={`flex items-center gap-4 p-4 cursor-pointer hover:bg-gray-50 transition-colors h-16 ${isSelected ? 'bg-blue-50' : ''}`}
+                  onClick={(e) => {
+                    if (e.target.type !== 'checkbox') {
+                      toggleInvoice(invoice.id);
+                    }
+                  }}
                 >
-                  <div className="flex items-center justify-between gap-4 min-w-0">
-                    <div className="flex items-center gap-4 min-w-0 flex-1">
-                      {isExpanded ? <ChevronUp className="w-5 h-5 text-gray-600 flex-shrink-0" /> : <ChevronDown className="w-5 h-5 text-gray-600 flex-shrink-0" />}
-                      <div className="min-w-0 flex-1">
-                        <CardTitle className="text-xl truncate">{invoice.invoice_number}</CardTitle>
-                        <p className="text-sm text-gray-600 mt-1 truncate">
-                          {invoice.bill_to_name} • {invoice.invoice_date} • {invoice.orders.length} {invoice.orders.length === 1 ? 'Order' : 'Orders'}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 flex-shrink-0">
-                      <div className="text-right min-w-0">
-                        <p className="text-2xl font-bold text-gray-900 truncate">${formatCurrency(invoice.total_due)}</p>
-                        <p className="text-sm text-gray-600 truncate">Paid: ${formatCurrency(invoice.total_paid)}</p>
-                      </div>
-                      <Badge className={
-                        invoice.status === 'paid' ? 'bg-green-100 text-green-800' :
-                        invoice.status === 'open' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
-                      }>
-                        {invoice.status}
-                      </Badge>
-                    </div>
+                  <Checkbox
+                    checked={isSelected}
+                    onCheckedChange={() => handleInvoiceSelect(invoice.id)}
+                    className="flex-shrink-0"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                  {isExpanded ? <ChevronUp className="w-5 h-5 text-gray-600 flex-shrink-0" /> : <ChevronDown className="w-5 h-5 text-gray-600 flex-shrink-0" />}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-900 truncate">{invoice.invoice_number}</p>
                   </div>
-                </CardHeader>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-gray-600 truncate">{invoice.bill_to_name}</p>
+                  </div>
+                  <div className="flex-shrink-0">
+                    <p className="text-sm text-gray-600">{invoice.invoice_date}</p>
+                  </div>
+                  <div className="flex-shrink-0">
+                    <p className="text-sm text-gray-600">{invoice.orders.length} {invoice.orders.length === 1 ? 'Order' : 'Orders'}</p>
+                  </div>
+                  <div className="flex-shrink-0 text-right">
+                    <p className="font-bold text-gray-900">${formatCurrency(invoice.total_due)}</p>
+                    <p className="text-xs text-gray-600">Paid: ${formatCurrency(invoice.total_paid)}</p>
+                  </div>
+                  <Badge className={
+                    invoice.status === 'paid' ? 'bg-green-100 text-green-800' :
+                    invoice.status === 'open' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-red-100 text-red-800'
+                  }>
+                    {invoice.status}
+                  </Badge>
+                </div>
 
                 <AnimatePresence>
                   {isExpanded && (
@@ -301,35 +417,117 @@ export default function FacilityInvoices() {
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <CardContent className="p-6">
-                        <div className="space-y-3">
-                          {invoice.orders.map(order => (
-                            <div key={order.id} className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-lg min-w-0">
-                              <div className="flex items-center gap-4 min-w-0 flex-1">
-                                <Checkbox
-                                  checked={selectedOrders.includes(order.id)}
-                                  onCheckedChange={() => handleOrderSelect(order.id)}
-                                  disabled={order.payment_status === 'paid'}
-                                  className="flex-shrink-0"
-                                />
-                                <div className="min-w-0 flex-1">
-                                  <p className="font-semibold truncate">{order.id}</p>
-                                  <p className="text-sm text-gray-600 truncate">Patient: {order.patient_name} • {order.order_date}</p>
+                      <div className="border-t bg-gray-50 p-4">
+                        <div className="space-y-2">
+                          {invoice.orders.map(order => {
+                            const isOrderExpanded = expandedOrders.includes(order.id);
+                            return (
+                              <div key={order.id}>
+                                <div 
+                                  className="flex items-center gap-4 p-3 bg-white rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                                  onClick={() => toggleOrder(order.id)}
+                                >
+                                  {isOrderExpanded ? <ChevronUp className="w-4 h-4 text-gray-600 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-gray-600 flex-shrink-0" />}
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-semibold text-gray-900 truncate">{order.patient_name}</p>
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm text-gray-600 truncate">{order.prescribed_item_name}</p>
+                                  </div>
+                                  <div className="flex-shrink-0">
+                                    <p className="text-sm text-gray-600">Rx: {order.rx_number}</p>
+                                  </div>
+                                  <div className="flex-shrink-0">
+                                    <p className="font-semibold text-gray-900">${formatCurrency(order.amount)}</p>
+                                  </div>
+                                  <Badge className={
+                                    order.payment_status === 'paid' ? 'bg-green-100 text-green-800' :
+                                    'bg-gray-100 text-gray-800'
+                                  }>
+                                    {order.payment_status}
+                                  </Badge>
                                 </div>
+
+                                <AnimatePresence>
+                                  {isOrderExpanded && (
+                                    <motion.div
+                                      initial={{ height: 0, opacity: 0 }}
+                                      animate={{ height: 'auto', opacity: 1 }}
+                                      exit={{ height: 0, opacity: 0 }}
+                                      transition={{ duration: 0.2 }}
+                                    >
+                                      <div className="ml-8 mt-2 p-4 bg-white border border-gray-200 rounded-lg">
+                                        <div className="grid grid-cols-3 gap-4 text-sm">
+                                          <div>
+                                            <p className="font-semibold text-gray-700">Account</p>
+                                            <p className="text-gray-600">{order.account}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-gray-700">Origin Reference</p>
+                                            <p className="text-gray-600">{order.origin_reference}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-gray-700">Physician</p>
+                                            <p className="text-gray-600">{order.physician_name}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-gray-700">Dispensed Item</p>
+                                            <p className="text-gray-600">{order.dispensed_item_name}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-gray-700">Receipt</p>
+                                            <p className="text-gray-600">{order.receipt}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-gray-700">Priority</p>
+                                            <p className="text-gray-600">{order.priority}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-gray-700">Accepted Date</p>
+                                            <p className="text-gray-600">{order.accepted_date}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-gray-700">POS Date</p>
+                                            <p className="text-gray-600">{order.pos_date}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-gray-700">Shipped Date</p>
+                                            <p className="text-gray-600">{order.shipped_date}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-gray-700">Shipper</p>
+                                            <p className="text-gray-600">{order.shipper}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-gray-700">Tracking Number</p>
+                                            <p className="text-gray-600">{order.tracking_number}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-gray-700">DCA ID</p>
+                                            <p className="text-gray-600">{order.dca_id}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-gray-700">External ID</p>
+                                            <p className="text-gray-600 truncate" title={order.external_id}>{order.external_id}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-gray-700">Facility Confirmation Date</p>
+                                            <p className="text-gray-600">{order.facility_confirmation_date}</p>
+                                          </div>
+                                          <div>
+                                            <p className="font-semibold text-gray-700">Facility Confirmation ID</p>
+                                            <p className="text-gray-600">{order.facility_confirmation_id}</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </motion.div>
+                                  )}
+                                </AnimatePresence>
                               </div>
-                              <div className="flex items-center gap-4 flex-shrink-0">
-                                <p className="font-semibold text-lg whitespace-nowrap">${formatCurrency(order.total_amount)}</p>
-                                <Badge className={
-                                  order.payment_status === 'paid' ? 'bg-green-100 text-green-800' :
-                                  'bg-gray-100 text-gray-800'
-                                }>
-                                  {order.payment_status}
-                                </Badge>
-                              </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
-                      </CardContent>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -338,17 +536,69 @@ export default function FacilityInvoices() {
           })}
         </div>
 
-        {/* Payment Action Bar */}
-        {selectedOrders.length > 0 && (
+        {/* Global Actions Bar */}
+        {selectedInvoices.length > 0 && (
           <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-lg z-50">
             <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-              <p className="font-semibold text-lg">{selectedOrders.length} order(s) selected</p>
-              <Button className="bg-green-600 hover:bg-green-700 text-white px-8 py-2">
-                Process Payment
-              </Button>
+              <p className="font-semibold text-lg">{selectedInvoices.length} invoice(s) selected</p>
+              <div className="flex gap-3">
+                <Button 
+                  onClick={handlePayOutstanding} 
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Pay Outstanding
+                </Button>
+                <Button 
+                  onClick={handleDownloadInvoices}
+                  variant="outline"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download
+                </Button>
+                <Button 
+                  onClick={handleShareInvoices}
+                  variant="outline"
+                >
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Share
+                </Button>
+              </div>
             </div>
           </div>
         )}
+
+        {/* Share Dialog */}
+        <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Share Invoices via Email</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <Label htmlFor="email" className="text-sm font-medium mb-2">Recipient Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter email address"
+                value={shareEmail}
+                onChange={(e) => setShareEmail(e.target.value)}
+                className="mt-2"
+              />
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowShareDialog(false)}>
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleSendEmail}
+                disabled={!shareEmail}
+                className="bg-[#1a1f5c]"
+              >
+                Send
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </>
   );
