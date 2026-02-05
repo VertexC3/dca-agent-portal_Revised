@@ -1,10 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { AlertTriangle } from 'lucide-react';
 
 export default function NotificationPopup({ open, onClose, notification }) {
+  const [editingZip, setEditingZip] = useState(false);
+  const [zipCode, setZipCode] = useState('');
+
   if (!notification) return null;
+
+  const handleSaveZip = () => {
+    console.log(`Updated zip code for order ${notification.orderId}: ${zipCode}`);
+    alert(`Zip code updated to: ${zipCode}`);
+    setEditingZip(false);
+    setZipCode('');
+    onClose();
+  };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -49,9 +62,33 @@ export default function NotificationPopup({ open, onClose, notification }) {
               <div>
                 <p className="font-semibold text-gray-700">Zip Code</p>
                 <div className="flex items-center gap-2">
-                  <Badge variant="destructive" className="bg-red-100 text-red-800">
-                    Missing
-                  </Badge>
+                  {editingZip ? (
+                    <>
+                      <Input
+                        type="text"
+                        placeholder="Enter 5-digit zip"
+                        value={zipCode}
+                        onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                        className="w-32"
+                        maxLength={5}
+                      />
+                      <Button size="sm" onClick={handleSaveZip} disabled={zipCode.length !== 5}>
+                        Save
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => { setEditingZip(false); setZipCode(''); }}>
+                        Cancel
+                      </Button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={() => setEditingZip(true)}
+                      className="inline-flex items-center gap-1"
+                    >
+                      <Badge variant="destructive" className="bg-red-100 text-red-800 hover:bg-red-200 cursor-pointer">
+                        Missing - Click to Add
+                      </Badge>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
