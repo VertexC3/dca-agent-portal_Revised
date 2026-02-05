@@ -126,6 +126,7 @@ export default function FacilityPatients() {
   const [selectedPatients, setSelectedPatients] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [expandedPrescription, setExpandedPrescription] = useState(null);
+  const [expandedOrder, setExpandedOrder] = useState(null);
   const [filters, setFilters] = useState({
     status: 'all',
     physician: 'all',
@@ -614,26 +615,69 @@ export default function FacilityPatients() {
 
                 {detailDialog.type === 'orders' && (
                   <div className="space-y-3">
-                    {detailDialog.patient.orders.map((order) => (
-                      <div key={order.id} className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <p className="font-semibold text-gray-900">{order.id}</p>
-                          <Badge className="bg-green-100 text-green-800">{order.status}</Badge>
+                    {detailDialog.patient.orders.map((order, index) => (
+                      <div key={order.id}>
+                        <div 
+                          className="p-4 bg-orange-50 border border-orange-200 rounded-lg cursor-pointer hover:bg-orange-100 transition-colors"
+                          onClick={() => setExpandedOrder(expandedOrder === index ? null : index)}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <p className="font-semibold text-gray-900">{order.id}</p>
+                            <div className="flex items-center gap-2">
+                              <Badge className="bg-green-100 text-green-800">{order.status}</Badge>
+                              <span className="text-sm text-[#1a1f5c] font-semibold">
+                                {expandedOrder === index ? 'Hide Details' : 'View Details'}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <p className="text-gray-600">Date</p>
+                              <p className="font-semibold text-gray-900">{format(new Date(order.date), 'MMM d, yyyy')}</p>
+                            </div>
+                            <div>
+                              <p className="text-gray-600">Amount</p>
+                              <p className="font-semibold text-gray-900">${order.amount.toFixed(2)}</p>
+                            </div>
+                          </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <p className="text-gray-600">Date</p>
-                            <p className="font-semibold text-gray-900">{format(new Date(order.date), 'MMM d, yyyy')}</p>
-                          </div>
-                          <div>
-                            <p className="text-gray-600">Amount</p>
-                            <p className="font-semibold text-gray-900">${order.amount.toFixed(2)}</p>
-                          </div>
-                          <div className="col-span-2">
-                            <p className="text-gray-600">Medication</p>
-                            <p className="font-semibold text-gray-900">{order.medication}</p>
-                          </div>
-                        </div>
+                        
+                        <AnimatePresence>
+                          {expandedOrder === index && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="ml-4 mt-2 p-4 bg-white border-l-4 border-orange-400 rounded">
+                                <h4 className="font-semibold text-gray-900 mb-3">Order Details</h4>
+                                <div className="space-y-2 text-sm">
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-600">Medication</span>
+                                    <span className="font-semibold text-gray-900">{order.medication}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-600">Order ID</span>
+                                    <span className="font-semibold text-gray-900">{order.id}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-600">Order Date</span>
+                                    <span className="font-semibold text-gray-900">{format(new Date(order.date), 'MMMM d, yyyy')}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-600">Amount</span>
+                                    <span className="font-semibold text-gray-900">${order.amount.toFixed(2)}</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-600">Status</span>
+                                    <Badge className="bg-green-100 text-green-800">{order.status}</Badge>
+                                  </div>
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                     ))}
                   </div>
