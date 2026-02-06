@@ -1,13 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, AlertTriangle, DollarSign, Info, ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { createPageUrl } from '../../utils';
 import { useNavigate } from 'react-router-dom';
 
 export default function NotificationPanel({ isOpen, onClose }) {
   const navigate = useNavigate();
+  const [showMissingInfoDialog, setShowMissingInfoDialog] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState(null);
+  const [missingZip, setMissingZip] = useState('');
 
   const notifications = [
     {
@@ -25,8 +30,15 @@ export default function NotificationPanel({ isOpen, onClose }) {
       type: 'missing_info',
       title: 'Missing Information',
       message: 'Order 1234 is missing zip code for patient Johnson, Robert',
+      missingField: 'zip_code',
+      missingFieldLabel: 'Zip Code',
+      orderId: '1234',
+      patientName: 'Johnson, Robert',
       severity: 'error',
-      action: () => {}
+      action: (notification) => {
+        setSelectedNotification(notification);
+        setShowMissingInfoDialog(true);
+      }
     },
     {
       id: 3,
@@ -111,7 +123,7 @@ export default function NotificationPanel({ isOpen, onClose }) {
                 <div
                   key={notification.id}
                   className={`p-4 border rounded-lg cursor-pointer transition-all ${getSeverityStyles(notification.severity)}`}
-                  onClick={notification.action}
+                  onClick={() => notification.action(notification)}
                 >
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 mt-0.5">
@@ -120,6 +132,11 @@ export default function NotificationPanel({ isOpen, onClose }) {
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-gray-900 mb-1">{notification.title}</p>
                       <p className="text-sm text-gray-700">{notification.message}</p>
+                      {notification.type === 'missing_info' && (
+                        <p className="text-xs text-red-600 mt-2 font-semibold">
+                          Missing: {notification.missingFieldLabel}
+                        </p>
+                      )}
                       {notification.amount && (
                         <p className="text-lg font-bold text-gray-900 mt-2">${notification.amount.toFixed(2)}</p>
                       )}
@@ -134,6 +151,66 @@ export default function NotificationPanel({ isOpen, onClose }) {
             </div>
           </motion.div>
         </>
+      )}
+
+      {/* Missing Info Dialog */}
+      {showMissingInfoDialog && (
+        <Dialog open={showMissingInfoDialog} onOpenChange={setShowMissingInfoDialog}>
+          <DialogContent className="max-w-md bg-white">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-red-600" />
+                Missing Information
+              </DialogTitle>
+            </DialogHeader>
+            {selectedNotification && (
+              <div className="space-y-4">
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-gray-700">
+                    <strong>Order:</strong> #{selectedNotification.orderId}
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    <strong>Patient:</strong> {selectedNotification.patientName}
+                  </p>
+                  <p className="text-sm text-gray-700 mt-2">
+                    <strong>Missing:</strong> {selectedNotification.missingFieldLabel}
+                  </p>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 mb-2 block">
+                    Enter {selectedNotification.missingFieldLabel}
+                  </label>
+                  <Input
+                    placeholder={selectedNotification.missingField === 'zip_code' ? '12345' : 'Enter value'}
+                    value={missingZip}
+                    onChange={(e) => setMissingZip(e.target.value)}
+                    maxLength={selectedNotification.missingField === 'zip_code' ? 5 : undefined}
+                  />
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => {
+                setShowMissingInfoDialog(false);
+                setMissingZip('');
+              }}>
+                Cancel
+              </Button>
+              <Button 
+                onClick={() => {
+                  alert(`${selectedNotification?.missingFieldLabel} saved: ${missingZip}`);
+                  setShowMissingInfoDialog(false);
+                  setMissingZip('');
+                }}
+                className="bg-[#1a1f5c]"
+                disabled={!missingZip}
+              >
+                Save
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
     </AnimatePresence>
   );

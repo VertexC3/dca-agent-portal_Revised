@@ -18,6 +18,7 @@ export default function FacilityInvoices() {
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedInvoices, setExpandedInvoices] = useState([]);
   const [expandedOrders, setExpandedOrders] = useState([]);
+  const [expandedOrderIds, setExpandedOrderIds] = useState([]);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [shareEmail, setShareEmail] = useState('');
   const [filters, setFilters] = useState({
@@ -162,6 +163,14 @@ export default function FacilityInvoices() {
 
   const toggleOrder = (orderId) => {
     setExpandedOrders(prev =>
+      prev.includes(orderId)
+        ? prev.filter(id => id !== orderId)
+        : [...prev, orderId]
+    );
+  };
+
+  const toggleOrderIds = (orderId) => {
+    setExpandedOrderIds(prev =>
       prev.includes(orderId)
         ? prev.filter(id => id !== orderId)
         : [...prev, orderId]
@@ -626,15 +635,50 @@ export default function FacilityInvoices() {
                                             <p className="text-gray-600">{order.shipped_date}</p>
                                           </div>
                                           <div>
-                                            <p className="font-semibold text-gray-700">Delivery</p>
-                                            <p className="text-gray-600">{order.shipper}</p>
+                                           <p className="font-semibold text-gray-700">Delivery</p>
+                                           <p className="text-gray-600">{order.shipper}</p>
                                           </div>
                                           <div>
-                                            <p className="font-semibold text-gray-700">Tracking Number</p>
-                                            <p className="text-gray-600">{order.tracking_number}</p>
+                                           <p className="font-semibold text-gray-700">Tracking Number</p>
+                                           <p className="text-gray-600">{order.tracking_number}</p>
                                           </div>
-                                        </div>
-                                      </div>
+                                          </div>
+
+                                          {/* System Identifiers - Collapsible */}
+                                          <div className="mt-4 border-t pt-3">
+                                          <button
+                                           onClick={(e) => {
+                                             e.stopPropagation();
+                                             toggleOrderIds(order.id);
+                                           }}
+                                           className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold text-sm w-full justify-between p-2 hover:bg-gray-50 rounded transition-all"
+                                          >
+                                           <span>System Identifiers</span>
+                                           {expandedOrderIds.includes(order.id) ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                                          </button>
+
+                                          {expandedOrderIds.includes(order.id) && (
+                                           <div className="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-2 text-sm">
+                                             <div className="flex justify-between">
+                                               <span className="text-gray-700 font-semibold">DCA ID</span>
+                                               <span className="text-gray-900 font-mono">{order.dca_id}</span>
+                                             </div>
+                                             <div className="flex justify-between">
+                                               <span className="text-gray-700 font-semibold">External ID</span>
+                                               <span className="text-gray-900 font-mono text-xs break-all">{order.external_id}</span>
+                                             </div>
+                                             <div className="flex justify-between">
+                                               <span className="text-gray-700 font-semibold">Facility Confirmation ID</span>
+                                               <span className="text-gray-900 font-mono">{order.facility_confirmation_id}</span>
+                                             </div>
+                                             <div className="flex justify-between">
+                                               <span className="text-gray-700 font-semibold">Facility Confirmation Date</span>
+                                               <span className="text-gray-900">{order.facility_confirmation_date}</span>
+                                             </div>
+                                           </div>
+                                          )}
+                                          </div>
+                                          </div>
                                     </motion.div>
                                   )}
                                 </AnimatePresence>

@@ -16,7 +16,7 @@ export default function Prescriptions() {
       dateWritten: '2025-05-01',
       dateExpires: '2026-05-01',
       status: 'Ready for Pickup',
-      image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6915f90e9513d40c38a60116/a43f1a648_LisinoprilPills_5mg-scaled.jpg'
+      image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/20aa3eaaf_Tizepatide.jpg'
     },
     {
       id: 2,
@@ -30,7 +30,7 @@ export default function Prescriptions() {
       status: 'Shipped',
       tracking: '1Z999AA10123456784',
       expectedDelivery: 'Nov 16, 2025',
-      image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop&q=60'
+      image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/20aa3eaaf_Tizepatide.jpg'
     },
     {
       id: 3,
@@ -44,7 +44,7 @@ export default function Prescriptions() {
       status: 'In Delivery',
       tracking: '1Z999AA10987654321',
       expectedDelivery: 'Nov 15, 2025',
-      image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=800&auto=format&fit=crop&q=60'
+      image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/20aa3eaaf_Tizepatide.jpg'
     },
     {
       id: 4,
@@ -56,7 +56,7 @@ export default function Prescriptions() {
       dateWritten: '2025-03-20',
       dateExpires: '2026-03-20',
       status: 'Ready for Pickup',
-      image: 'https://images.unsplash.com/photo-1628771065518-0d82f1938462?w=800&auto=format&fit=crop&q=60'
+      image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/20aa3eaaf_Tizepatide.jpg'
     },
     {
       id: 5,
@@ -70,7 +70,7 @@ export default function Prescriptions() {
       status: 'Shipped',
       tracking: '1Z999AA10555666777',
       expectedDelivery: 'Nov 17, 2025',
-      image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=800&auto=format&fit=crop&q=60'
+      image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/20aa3eaaf_Tizepatide.jpg'
     },
     {
       id: 6,
@@ -84,7 +84,7 @@ export default function Prescriptions() {
       status: 'In Delivery',
       tracking: '1Z999AA10888999000',
       expectedDelivery: 'Nov 15, 2025',
-      image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=800&auto=format&fit=crop&q=60'
+      image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/20aa3eaaf_Tizepatide.jpg'
     }
   ];
 

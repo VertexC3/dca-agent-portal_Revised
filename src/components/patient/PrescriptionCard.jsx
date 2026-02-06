@@ -147,6 +147,15 @@ export default function PrescriptionCard({ prescription }) {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-4">
+            {/* Medication Image */}
+            <div className="flex-shrink-0">
+              <img 
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/20aa3eaaf_Tizepatide.jpg" 
+                alt={prescription.name}
+                className="w-20 h-20 object-contain rounded-lg border border-gray-200 bg-white"
+              />
+            </div>
+            
             <div className="flex-1 grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
               <p className="text-gray-600">
                 <strong>Prescriber:</strong> 
