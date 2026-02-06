@@ -275,7 +275,7 @@ export default function FacilityLayout({ children, currentPageName }) {
                     <p className="text-sm text-gray-600">{item.bill_to_name}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-gray-900">${item.total_due.toFixed(2)}</p>
+                    <p className="font-bold text-gray-900">${(item.total_due || 0).toFixed(2)}</p>
                     <Badge className={item.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
                       {item.status}
                     </Badge>
