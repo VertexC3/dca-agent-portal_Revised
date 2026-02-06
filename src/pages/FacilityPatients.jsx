@@ -513,9 +513,8 @@ export default function FacilityPatients() {
                           e.stopPropagation();
                           setDetailDialog({ open: true, type: 'prescriptions', patient });
                         }}
-                        className="inline-flex items-center gap-1 text-[#1a1f5c] hover:underline font-semibold"
+                        className="text-[#1a1f5c] hover:underline font-semibold"
                       >
-                        <Pill className="w-4 h-4" />
                         {patient.prescriptions.length}
                       </button>
                     </TableCell>
@@ -538,9 +537,8 @@ export default function FacilityPatients() {
                           e.stopPropagation();
                           setDetailDialog({ open: true, type: 'orders', patient });
                         }}
-                        className="inline-flex items-center gap-1 text-[#1a1f5c] hover:underline font-semibold"
+                        className="text-[#1a1f5c] hover:underline font-semibold"
                       >
-                        <ShoppingCart className="w-4 h-4" />
                         {patient.orders.length}
                       </button>
                     </TableCell>
@@ -572,48 +570,33 @@ export default function FacilityPatients() {
                 </div>
 
                 {/* Address */}
-                <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                  <h3 className="font-bold text-lg text-gray-900 mb-2">Address</h3>
-                  <div className="flex items-start gap-2">
-                    <MapPin className="w-5 h-5 text-purple-600 mt-1" />
-                    <div className="flex-1">
-                      <p className="text-gray-900">{selectedPatient.address}</p>
-                      {!selectedPatient.address.match(/\d{5}/) && (
-                        <div className="mt-2 flex items-center gap-2">
-                          {editingZip === selectedPatient.id ? (
-                            <div className="flex items-center gap-2">
-                              <Input
-                                type="text"
-                                placeholder="Enter 5-digit zip"
-                                value={zipCode}
-                                onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
-                                className="w-32"
-                                maxLength={5}
-                              />
-                              <Button size="sm" onClick={() => handleSaveZip(selectedPatient.id)} disabled={zipCode.length !== 5}>
-                                Save
-                              </Button>
-                              <Button size="sm" variant="outline" onClick={() => { setEditingZip(null); setZipCode(''); }}>
-                                Cancel
-                              </Button>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => setEditingZip(selectedPatient.id)}
-                              className="inline-flex items-center gap-1 text-sm text-red-600 hover:underline font-semibold"
-                            >
-                              <AlertCircle className="w-4 h-4" />
-                              Missing Zip Code - Click to Add
-                            </button>
-                          )}
+                <div className="p-4 border border-gray-200 rounded-lg">
+                  <h3 className="font-bold text-lg text-gray-900 mb-3">Address</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-2">
+                      <MapPin className="w-5 h-5 text-gray-600 mt-1" />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge className="bg-blue-100 text-blue-800">Primary</Badge>
+                          <Badge variant="outline">Home</Badge>
                         </div>
-                      )}
+                        <p className="text-gray-900">{selectedPatient.address}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2 pt-2 border-t border-gray-200">
+                      <MapPin className="w-5 h-5 text-gray-600 mt-1" />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge variant="outline">Work</Badge>
+                        </div>
+                        <p className="text-gray-900">350 5th Ave, New York, NY 10118</p>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Prescriptions */}
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="p-4 border border-gray-200 rounded-lg">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-bold text-lg text-gray-900">Prescriptions ({selectedPatient.prescriptions.length})</h3>
                     <button
@@ -625,7 +608,7 @@ export default function FacilityPatients() {
                   </div>
                   <div className="space-y-2">
                     {selectedPatient.prescriptions.map((rx, index) => (
-                      <div key={index} className="p-3 bg-white rounded-lg">
+                      <div key={index} className="p-3 bg-gray-50 rounded-lg">
                         <p className="font-semibold text-gray-900">{rx.name}</p>
                         <p className="text-sm text-gray-600">Refills: {rx.refills_remaining} • Last filled: {format(new Date(rx.last_filled), 'MMM d, yyyy')}</p>
                       </div>
@@ -634,7 +617,7 @@ export default function FacilityPatients() {
                 </div>
 
                 {/* Physician */}
-                <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="p-4 border border-gray-200 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-bold text-lg text-gray-900">Physician</h3>
                     <button
@@ -645,7 +628,7 @@ export default function FacilityPatients() {
                     </button>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Stethoscope className="w-5 h-5 text-green-600" />
+                    <Stethoscope className="w-5 h-5 text-gray-600" />
                     <div>
                       <p className="font-semibold text-gray-900">{selectedPatient.physician_name}</p>
                       <p className="text-sm text-gray-700">{selectedPatient.physician_specialty}</p>
@@ -654,7 +637,7 @@ export default function FacilityPatients() {
                 </div>
 
                 {/* Orders */}
-                <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                <div className="p-4 border border-gray-200 rounded-lg">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-bold text-lg text-gray-900">Order History</h3>
                     <button
@@ -666,7 +649,7 @@ export default function FacilityPatients() {
                   </div>
                   <div className="space-y-2">
                     {selectedPatient.orders.slice(0, 3).map((order) => (
-                      <div key={order.id} className="p-3 bg-white rounded-lg">
+                      <div key={order.id} className="p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-center justify-between">
                           <p className="font-semibold text-gray-900">{order.id}</p>
                           <Badge className="bg-green-100 text-green-800">{order.status}</Badge>
