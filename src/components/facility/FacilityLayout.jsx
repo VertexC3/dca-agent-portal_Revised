@@ -35,6 +35,8 @@ export default function FacilityLayout({ children, currentPageName }) {
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [mockUser, setMockUser] = useState(getMockUser);
   const [showNotificationPanel, setShowNotificationPanel] = useState(false);
+  const [showCart, setShowCart] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
 
   // Show notification panel on first entry
   React.useEffect(() => {
@@ -43,6 +45,16 @@ export default function FacilityLayout({ children, currentPageName }) {
       setShowNotificationPanel(true);
       sessionStorage.setItem('facilityNotificationPanelSeen', 'true');
     }
+  }, []);
+
+  // Listen for cart updates from FacilityInvoices
+  React.useEffect(() => {
+    const handleCartUpdate = (event) => {
+      setCartItems(event.detail.items);
+    };
+    
+    window.addEventListener('facilityCartUpdate', handleCartUpdate);
+    return () => window.removeEventListener('facilityCartUpdate', handleCartUpdate);
   }, []);
 
   // Listen for profile updates
@@ -230,6 +242,36 @@ export default function FacilityLayout({ children, currentPageName }) {
         isOpen={showNotificationPanel}
         onClose={() => setShowNotificationPanel(false)}
       />
+
+      {/* Cart Dialog */}
+      <Dialog open={showCart} onOpenChange={setShowCart}>
+        <DialogContent className="max-w-2xl bg-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShoppingCart className="w-5 h-5 text-[#1a1f5c]" />
+              Selected Invoices ({cartItems.length})
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 max-h-[400px] overflow-y-auto">
+            {cartItems.map(item => (
+              <div key={item.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-gray-900">{item.invoice_number}</p>
+                    <p className="text-sm text-gray-600">{item.bill_to_name}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-gray-900">${item.total_due.toFixed(2)}</p>
+                    <Badge className={item.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
+                      {item.status}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

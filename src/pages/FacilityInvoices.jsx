@@ -29,6 +29,14 @@ export default function FacilityInvoices() {
     customDateTo: ''
   });
 
+  // Emit cart update when selected invoices change
+  React.useEffect(() => {
+    const selectedData = mockInvoices.filter(inv => selectedInvoices.includes(inv.id));
+    window.dispatchEvent(new CustomEvent('facilityCartUpdate', { 
+      detail: { items: selectedData } 
+    }));
+  }, [selectedInvoices]);
+
   // Mock data
   const mockInvoices = [
     {

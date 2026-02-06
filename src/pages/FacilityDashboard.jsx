@@ -310,7 +310,7 @@ export default function FacilityDashboard() {
 
                   {/* Patients Chart */}
                   <div className="space-y-3">
-                    <h3 className="font-semibold text-gray-900">Patients Over Time</h3>
+                    <h3 className="font-semibold text-gray-900 h-[40px] flex items-center">Patients Over Time</h3>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
