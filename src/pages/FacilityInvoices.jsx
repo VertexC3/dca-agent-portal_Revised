@@ -540,8 +540,8 @@ export default function FacilityInvoices() {
                     <p className="text-sm text-gray-600">{invoice.orders.length} {invoice.orders.length === 1 ? 'Order' : 'Orders'}</p>
                   </div>
                   <div className="flex-shrink-0 text-right">
-                    <p className="font-bold text-gray-900">${formatCurrency(invoice.total_due)}</p>
-                    <p className="text-xs text-gray-600">Paid: ${formatCurrency(invoice.total_paid)}</p>
+                    <p className="font-bold text-gray-900">${formatCurrency(invoice.total_due - invoice.total_paid)}</p>
+                    <p className="text-xs text-gray-600">Outstanding: ${formatCurrency(invoice.total_due)}</p>
                   </div>
                   <Badge className={`${
                     invoice.status === 'paid' ? 'bg-green-100 text-green-800' :
@@ -564,13 +564,29 @@ export default function FacilityInvoices() {
                         <div className="space-y-2">
                           {invoice.orders.map(order => {
                             const isOrderExpanded = expandedOrders.includes(order.id);
+                            const isOrderSelected = selectedOrders.includes(order.id);
                             return (
                               <div key={order.id}>
                                 <div 
-                                  className="flex items-center gap-4 p-3 bg-white rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
-                                  onClick={() => toggleOrder(order.id)}
+                                  className={`flex items-center gap-4 p-3 bg-white rounded-lg cursor-pointer hover:bg-gray-100 transition-colors ${isOrderSelected ? 'bg-blue-50' : ''}`}
+                                  onClick={(e) => {
+                                    if (e.target.type !== 'checkbox') {
+                                      toggleOrder(order.id);
+                                    }
+                                  }}
                                 >
+                                  <Checkbox
+                                    checked={isOrderSelected}
+                                    onCheckedChange={() => handleOrderSelect(order.id)}
+                                    className="flex-shrink-0"
+                                    onClick={(e) => e.stopPropagation()}
+                                  />
                                   {isOrderExpanded ? <ChevronUp className="w-4 h-4 text-gray-600 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-gray-600 flex-shrink-0" />}
+                                  <img 
+                                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/681817096_Tizepatide.jpg"
+                                    alt={order.prescribed_item_name}
+                                    className="w-10 h-10 object-cover rounded-lg flex-shrink-0"
+                                  />
                                   <div className="flex-1 min-w-0">
                                     <p className="font-semibold text-gray-900 truncate">{order.patient_name} <span className="text-gray-500 font-normal">– Rx: {order.rx_number}</span></p>
                                   </div>

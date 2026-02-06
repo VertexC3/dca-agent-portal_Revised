@@ -58,6 +58,7 @@ import FacilityDashboard from './pages/FacilityDashboard';
 import FacilityInvoices from './pages/FacilityInvoices';
 import FacilityPatients from './pages/FacilityPatients';
 import FacilityPayment from './pages/FacilityPayment';
+import FacilityPhysicians from './pages/FacilityPhysicians';
 import FacilityProfile from './pages/FacilityProfile';
 import FacilitySearchResults from './pages/FacilitySearchResults';
 import FacilityUserProfile from './pages/FacilityUserProfile';
@@ -75,7 +76,6 @@ import Prescriptions from './pages/Prescriptions';
 import Roadmap from './pages/Roadmap';
 import Settings from './pages/Settings';
 import StaffMessaging from './pages/StaffMessaging';
-import FacilityPhysicians from './pages/FacilityPhysicians';
 import __Layout from './Layout.jsx';
 
 
@@ -91,6 +91,7 @@ export const PAGES = {
     "FacilityInvoices": FacilityInvoices,
     "FacilityPatients": FacilityPatients,
     "FacilityPayment": FacilityPayment,
+    "FacilityPhysicians": FacilityPhysicians,
     "FacilityProfile": FacilityProfile,
     "FacilitySearchResults": FacilitySearchResults,
     "FacilityUserProfile": FacilityUserProfile,
@@ -108,7 +109,6 @@ export const PAGES = {
     "Roadmap": Roadmap,
     "Settings": Settings,
     "StaffMessaging": StaffMessaging,
-    "FacilityPhysicians": FacilityPhysicians,
 }
 
 export const pagesConfig = {
