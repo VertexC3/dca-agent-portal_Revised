@@ -28,13 +28,21 @@ const mockPatients = [
         name: 'Semaglutide 2.4mg', 
         refills_remaining: 3, 
         last_filled: '2026-01-15',
-        fill_dates: ['2025-10-15', '2025-11-20', '2026-01-15']
+        fill_history: [
+          { date: '2026-01-15', hasChange: false, changeNote: "" },
+          { date: '2025-11-20', hasChange: true, changeNote: "Reviewed patient's current therapy and instructed change in prescription as follows: increase dosage of lisinopril from 10 mg once daily to 20 mg once daily due to persistent elevated blood pressure; quantity updated to 30 tablets with 2 refills. Patient was informed of the change, counseled on potential side effects (including dizziness and cough), and advised to monitor blood pressure at home and report any adverse symptoms." },
+          { date: '2025-10-15', hasChange: false, changeNote: "" }
+        ]
       },
       { 
         name: 'Metformin 500mg', 
         refills_remaining: 5, 
         last_filled: '2026-01-10',
-        fill_dates: ['2025-09-10', '2025-11-05', '2026-01-10']
+        fill_history: [
+          { date: '2026-01-10', hasChange: false, changeNote: "" },
+          { date: '2025-11-05', hasChange: true, changeNote: "Reviewed patient's current therapy and instructed change in prescription as follows: Metformin dosage changed from 1000mg BID to 500mg BID due to patient experiencing hypoglycemic episodes; quantity updated to 60 tablets with 3 refills. Patient was informed of the change, counseled on potential side effects (including gastrointestinal upset), and advised to monitor blood glucose levels closely." },
+          { date: '2025-09-10', hasChange: false, changeNote: "" }
+        ]
       }
     ],
     address: '123 Main St, Franklin, TN 37064',
@@ -64,7 +72,11 @@ const mockPatients = [
         name: 'Tirzepatide 5mg', 
         refills_remaining: 2, 
         last_filled: '2026-01-20',
-        fill_dates: ['2025-10-20', '2025-12-15', '2026-01-20']
+        fill_history: [
+          { date: '2026-01-20', hasChange: false, changeNote: "" },
+          { date: '2025-12-15', hasChange: false, changeNote: "" },
+          { date: '2025-10-20', hasChange: false, changeNote: "" }
+        ]
       }
     ],
     address: '456 Oak Ave, Nashville, TN 37203',
@@ -91,19 +103,31 @@ const mockPatients = [
         name: 'Semaglutide 1mg', 
         refills_remaining: 4, 
         last_filled: '2026-01-18',
-        fill_dates: ['2025-09-18', '2025-11-12', '2026-01-18']
+        fill_history: [
+          { date: '2026-01-18', hasChange: false, changeNote: "" },
+          { date: '2025-11-12', hasChange: false, changeNote: "" },
+          { date: '2025-09-18', hasChange: false, changeNote: "" }
+        ]
       },
       { 
         name: 'Atorvastatin 20mg', 
         refills_remaining: 6, 
         last_filled: '2026-01-12',
-        fill_dates: ['2025-08-12', '2025-10-20', '2026-01-12']
+        fill_history: [
+          { date: '2026-01-12', hasChange: false, changeNote: "" },
+          { date: '2025-10-20', hasChange: false, changeNote: "" },
+          { date: '2025-08-12', hasChange: false, changeNote: "" }
+        ]
       },
       { 
         name: 'Lisinopril 10mg', 
         refills_remaining: 3, 
         last_filled: '2026-01-08',
-        fill_dates: ['2025-07-08', '2025-10-05', '2026-01-08']
+        fill_history: [
+          { date: '2026-01-08', hasChange: false, changeNote: "" },
+          { date: '2025-10-05', hasChange: false, changeNote: "" },
+          { date: '2025-07-08', hasChange: false, changeNote: "" }
+        ]
       }
     ],
     address: '789 Pine Rd, Brentwood, TN 37027',
@@ -137,6 +161,7 @@ export default function FacilityPatients() {
   const [shareEmail, setShareEmail] = useState('');
   const [editingZip, setEditingZip] = useState(null);
   const [zipCode, setZipCode] = useState('');
+  const [showChangeNote, setShowChangeNote] = useState(null); // State to manage visibility of change note dialog
   const [filters, setFilters] = useState({
     status: 'all',
     physician: 'all',
@@ -691,10 +716,21 @@ export default function FacilityPatients() {
                                   Fill History
                                 </h4>
                                 <div className="space-y-2">
-                                  {rx.fill_dates.map((date, dateIndex) => (
-                                    <div key={dateIndex} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                                      <span className="text-sm text-gray-900">Fill #{rx.fill_dates.length - dateIndex}</span>
-                                      <span className="text-sm font-semibold text-gray-900">{format(new Date(date), 'MMM d, yyyy')}</span>
+                                  {rx.fill_history.map((fill, fillIndex) => (
+                                    <div key={fillIndex} className="p-2 bg-gray-50 rounded">
+                                      <div className="flex items-center justify-between">
+                                        <span className="text-sm text-gray-900">Fill #{rx.fill_history.length - fillIndex}</span>
+                                        <span className="text-sm font-semibold text-gray-900">{format(new Date(fill.date), 'MMM d, yyyy')}</span>
+                                      </div>
+                                      {fill.hasChange && (
+                                        <button
+                                          onClick={() => setShowChangeNote({ rxIndex: index, fillIndex: fillIndex })}
+                                          className="mt-1 text-xs text-blue-600 hover:text-blue-800 underline flex items-center gap-1"
+                                        >
+                                          <AlertCircle className="w-3 h-3" />
+                                          View Change Information
+                                        </button>
+                                      )}
                                     </div>
                                   ))}
                                 </div>
@@ -808,6 +844,35 @@ export default function FacilityPatients() {
                     ))}
                   </div>
                 )}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Change Note Dialog */}
+        <Dialog open={showChangeNote !== null} onOpenChange={() => setShowChangeNote(null)}>
+          <DialogContent className="max-w-2xl bg-white">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-blue-600" />
+                Prescription Change Information
+              </DialogTitle>
+            </DialogHeader>
+            {showChangeNote !== null && detailDialog.patient && (
+              <div className="space-y-4">
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-gray-800 leading-relaxed">
+                    {detailDialog.patient.prescriptions[showChangeNote.rxIndex].fill_history[showChangeNote.fillIndex].changeNote}
+                  </p>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-600">
+                    <strong>Fill Date:</strong> {format(new Date(detailDialog.patient.prescriptions[showChangeNote.rxIndex].fill_history[showChangeNote.fillIndex].date), 'MM/dd/yyyy')}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <strong>Medication:</strong> {detailDialog.patient.prescriptions[showChangeNote.rxIndex].name}
+                  </p>
+                </div>
               </div>
             )}
           </DialogContent>
