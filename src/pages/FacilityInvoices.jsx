@@ -581,7 +581,7 @@ export default function FacilityInvoices() {
                                   className={`flex items-center gap-4 p-3 bg-white rounded-lg cursor-pointer hover:bg-gray-100 transition-colors ${isOrderSelected ? 'bg-blue-50' : ''}`}
                                   onClick={(e) => {
                                     if (e.target.type !== 'checkbox') {
-                                      toggleOrder(order.id);
+                                      handleOrderSelect(order.id);
                                     }
                                   }}
                                 >
