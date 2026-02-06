@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, LogOut, ChevronDown, Bell } from 'lucide-react';
+import { User, LogOut, ChevronDown, Bell, ShoppingCart } from 'lucide-react';
 import { createPageUrl } from '../../utils';
 import {
   DropdownMenu,
@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import CollapsibleSidebar from './CollapsibleSidebar';
 import MasterSearchBar from './MasterSearchBar';
@@ -151,6 +152,19 @@ export default function FacilityLayout({ children, currentPageName }) {
             <MasterSearchBar />
 
             <div className="flex items-center gap-3">
+              {/* Cart Icon - Only show when on Invoices page and has items */}
+              {currentPageName === 'FacilityInvoices' && cartItems.length > 0 && (
+                <button
+                  onClick={() => setShowCart(true)}
+                  className="relative p-2 rounded-full hover:bg-gray-100 transition-all"
+                >
+                  <ShoppingCart className="w-6 h-6 text-gray-700" />
+                  <Badge className="absolute -top-1 -right-1 bg-[#1a1f5c] text-white px-1.5 py-0.5 text-xs min-w-[20px] h-5 flex items-center justify-center">
+                    {cartItems.length}
+                  </Badge>
+                </button>
+              )}
+
               {/* Notification Bell */}
               <DropdownMenu open={showNotifications} onOpenChange={setShowNotifications}>
                 <DropdownMenuTrigger asChild>
