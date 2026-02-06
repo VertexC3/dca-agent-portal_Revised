@@ -263,26 +263,55 @@ export default function FacilityLayout({ children, currentPageName }) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <ShoppingCart className="w-5 h-5 text-[#1a1f5c]" />
-              Selected Invoices ({cartItems.length})
+              Selected Items ({cartItems.length})
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3 max-h-[400px] overflow-y-auto">
-            {cartItems.map(item => (
-              <div key={item.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold text-gray-900">{item.invoice_number}</p>
-                    <p className="text-sm text-gray-600">{item.bill_to_name}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-gray-900">${(item.total_due || 0).toFixed(2)}</p>
-                    <Badge className={item.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
-                      {item.status}
-                    </Badge>
+            {cartItems.map(item => {
+              // Check if it's an order or invoice
+              const isOrder = item.rx_number !== undefined;
+              
+              return (
+                <div key={item.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      {isOrder ? (
+                        <>
+                          <p className="font-semibold text-gray-900">{item.patient_name} - Rx: {item.rx_number}</p>
+                          <p className="text-sm text-gray-600">{item.prescribed_item_name}</p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="font-semibold text-gray-900">{item.invoice_number}</p>
+                          <p className="text-sm text-gray-600">{item.bill_to_name}</p>
+                        </>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-gray-900">
+                        ${isOrder ? (item.amount || 0).toFixed(2) : (item.total_due || 0).toFixed(2)}
+                      </p>
+                      <Badge className={
+                        (isOrder ? item.payment_status : item.status) === 'paid' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-yellow-100 text-yellow-800'
+                      }>
+                        {isOrder ? item.payment_status : item.status}
+                      </Badge>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
+          </div>
+          <div className="border-t pt-4 flex justify-between items-center">
+            <p className="font-semibold text-gray-700">Total</p>
+            <p className="font-bold text-xl text-gray-900">
+              ${cartItems.reduce((sum, item) => {
+                const isOrder = item.rx_number !== undefined;
+                return sum + (isOrder ? (item.amount || 0) : (item.total_due || 0));
+              }, 0).toFixed(2)}
+            </p>
           </div>
         </DialogContent>
       </Dialog>
