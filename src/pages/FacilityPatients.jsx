@@ -20,6 +20,7 @@ const mockPatients = [
     phone: '(555) 123-4567',
     date_of_birth: '1985-03-15',
     patient_since: '2024-06-15',
+    profile_picture: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/3816584ae_John.jpg',
     physician_name: 'Dr. Sarah Johnson',
     physician_npi: '1245319599',
     physician_specialty: 'Endocrinology',
@@ -64,6 +65,7 @@ const mockPatients = [
     phone: '(555) 234-5678',
     date_of_birth: '1978-11-22',
     patient_since: '2024-08-20',
+    profile_picture: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/2137e6a9f_Jane.jpg',
     physician_name: 'Dr. Michael Chen',
     physician_npi: '1356824791',
     physician_specialty: 'Internal Medicine',
@@ -95,6 +97,7 @@ const mockPatients = [
     phone: '(555) 345-6789',
     date_of_birth: '1992-07-08',
     patient_since: '2025-02-10',
+    profile_picture: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/f2d7127a8_Bob.jpg',
     physician_name: 'Dr. Emily Rodriguez',
     physician_npi: '1467935802',
     physician_specialty: 'Family Medicine',
@@ -486,9 +489,17 @@ export default function FacilityPatients() {
                     </TableCell>
                     <TableCell className="font-semibold text-gray-900 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                          {patient.name.split(' ').map(n => n[0]).join('')}
-                        </div>
+                        {patient.profile_picture ? (
+                          <img 
+                            src={patient.profile_picture} 
+                            alt={patient.name}
+                            className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                            {patient.name.split(' ').map(n => n[0]).join('')}
+                          </div>
+                        )}
                         <span>{patient.name}</span>
                       </div>
                     </TableCell>
