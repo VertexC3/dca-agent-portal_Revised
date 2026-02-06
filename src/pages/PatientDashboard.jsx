@@ -105,7 +105,7 @@ export default function PatientDashboard() {
       dateExpires: '2026-05-01',
       status: 'Ready for Pickup',
       category: 'Active',
-      image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6915f90e9513d40c38a60116/a43f1a648_LisinoprilPills_5mg-scaled.jpg'
+      image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/20aa3eaaf_Tizepatide.jpg'
     },
     {
       id: 2,
@@ -121,7 +121,7 @@ export default function PatientDashboard() {
       tracking: '1Z999AA10123456784',
       expectedDelivery: 'Nov 16, 2025',
       category: 'Active',
-      image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop&q=60'
+      image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/20aa3eaaf_Tizepatide.jpg'
     },
     {
       id: 3,
@@ -137,7 +137,7 @@ export default function PatientDashboard() {
       tracking: '1Z999AA10987654321',
       expectedDelivery: 'Nov 15, 2025',
       category: 'Active',
-      image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=800&auto=format&fit=crop&q=60'
+      image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/20aa3eaaf_Tizepatide.jpg'
     },
     {
       id: 4,
@@ -151,7 +151,7 @@ export default function PatientDashboard() {
       dateExpires: '2026-02-01',
       status: 'Request Renewal',
       category: 'Inactive',
-      image: 'https://images.unsplash.com/photo-1628771065518-0d82f1938462?w=800&auto=format&fit=crop&q=60'
+      image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/20aa3eaaf_Tizepatide.jpg'
     },
     {
       id: 5,
@@ -165,7 +165,7 @@ export default function PatientDashboard() {
       dateExpires: '2026-01-15',
       status: 'Renewal Requested',
       category: 'Inactive',
-      image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=800&auto=format&fit=crop&q=60'
+      image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/20aa3eaaf_Tizepatide.jpg'
     },
     {
       id: 6,
@@ -179,7 +179,7 @@ export default function PatientDashboard() {
       dateExpires: '2025-12-01',
       status: 'Discontinued',
       category: 'Inactive',
-      image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=800&auto=format&fit=crop&q=60'
+      image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/20aa3eaaf_Tizepatide.jpg'
     },
     {
       id: 7,
@@ -193,7 +193,7 @@ export default function PatientDashboard() {
       dateExpires: '2025-11-15',
       status: 'Discontinued',
       category: 'Inactive',
-      image: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?w=800&auto=format&fit=crop&q=60'
+      image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/20aa3eaaf_Tizepatide.jpg'
     },
     {
       id: 8,
@@ -207,7 +207,7 @@ export default function PatientDashboard() {
       dateExpires: '2025-10-01',
       status: 'Discontinued',
       category: 'Inactive',
-      image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&auto=format&fit=crop&q=60'
+      image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/20aa3eaaf_Tizepatide.jpg'
     }
     ];
 

@@ -14,7 +14,7 @@ export default function FillHistoryDialog({ open, onClose, prescription }) {
   // Dummy fill history data with receipt URLs and RX numbers
   const fillHistory = [
     { date: '2025-11-01', quantity: 30, dosage: '20 mg', prescriber: prescription.prescriber, rx_number: 'RX-2025-89432', status: 'Completed', receipt_url: 'https://images.unsplash.com/photo-1554224311-beee460c201a?w=400', hasChange: true, changeNote: "Reviewed patient's current therapy and instructed change in prescription as follows: increase dosage of lisinopril from 10 mg once daily to 20 mg once daily due to persistent elevated blood pressure; quantity updated to 30 tablets with 2 refills. Patient was informed of the change, counseled on potential side effects (including dizziness and cough), and advised to monitor blood pressure at home and report any adverse symptoms." },
-    { date: '2025-10-01', quantity: 30, dosage: '10 mg', prescriber: prescription.prescriber, rx_number: 'RX-2025-76521', status: 'Completed', receipt_url: 'https://images.unsplash.com/photo-1554224311-beee460c201a?w=400' },
+    { date: '2025-10-01', quantity: 30, dosage: '10 mg', prescriber: prescription.prescriber, rx_number: 'RX-2025-76521', status: 'Completed', receipt_url: 'https://images.unsplash.com/photo-1554224311-beee460c201a?w=400', hasChange: true, changeNote: "Reviewed patient's current therapy and instructed change in prescription as follows: increase dosage of lisinopril from 10 mg once daily to 20 mg once daily due to persistent elevated blood pressure; quantity updated to 30 tablets with 2 refills. Patient was informed of the change, counseled on potential side effects (including dizziness and cough), and advised to monitor blood pressure at home and report any adverse symptoms." },
     { date: '2025-09-01', quantity: 30, dosage: '10 mg', prescriber: prescription.prescriber, rx_number: 'RX-2025-63410', status: 'Completed', receipt_url: 'https://images.unsplash.com/photo-1554224311-beee460c201a?w=400' },
     { date: '2025-08-01', quantity: 30, dosage: '10 mg', prescriber: prescription.prescriber, rx_number: 'RX-2025-51299', status: 'Completed' },
     { date: '2025-07-01', quantity: 30, dosage: '10 mg', prescriber: prescription.prescriber, rx_number: 'RX-2025-42188', status: 'Completed' }
@@ -71,13 +71,13 @@ export default function FillHistoryDialog({ open, onClose, prescription }) {
                         </p>
                         
                         {/* Show changes from previous fill */}
-                        {hasChanges && (
+                        {fill.hasChange && (
                           <button
                             onClick={() => setShowChangeNote(idx)}
                             className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline flex items-center gap-1"
                           >
                             <AlertCircle className="w-3 h-3" />
-                            Changed from previous fill
+                            View Change Information
                           </button>
                         )}
                       </div>
@@ -135,15 +135,15 @@ export default function FillHistoryDialog({ open, onClose, prescription }) {
         )}
 
         {/* Change Note Dialog */}
-        {showChangeNote !== null && fillHistory[showChangeNote]?.hasChange && (
-          <Dialog open={showChangeNote !== null} onOpenChange={() => setShowChangeNote(null)}>
-            <DialogContent className="max-w-2xl bg-white">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5 text-blue-600" />
-                  Prescription Change Notes
-                </DialogTitle>
-              </DialogHeader>
+        <Dialog open={showChangeNote !== null} onOpenChange={() => setShowChangeNote(null)}>
+          <DialogContent className="max-w-2xl bg-white">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-blue-600" />
+                Prescription Change Information
+              </DialogTitle>
+            </DialogHeader>
+            {showChangeNote !== null && fillHistory[showChangeNote] && (
               <div className="space-y-4">
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                   <p className="text-sm text-gray-800 leading-relaxed">
@@ -159,9 +159,9 @@ export default function FillHistoryDialog({ open, onClose, prescription }) {
                   </p>
                 </div>
               </div>
-            </DialogContent>
-          </Dialog>
-        )}
+            )}
+          </DialogContent>
+        </Dialog>
       </DialogContent>
     </Dialog>
   );
