@@ -38,6 +38,16 @@ export default function FacilityInvoices() {
     }));
   }, [selectedInvoices]);
 
+  // Emit cart update when selected orders change
+  React.useEffect(() => {
+    const selectedOrdersData = mockInvoices
+      .flatMap(inv => inv.orders)
+      .filter(order => selectedOrders.includes(order.id));
+    window.dispatchEvent(new CustomEvent('facilityCartUpdate', { 
+      detail: { items: selectedOrdersData } 
+    }));
+  }, [selectedOrders]);
+
   // Mock data
   const mockInvoices = [
     {
@@ -582,15 +592,15 @@ export default function FacilityInvoices() {
                                     onClick={(e) => e.stopPropagation()}
                                   />
                                   {isOrderExpanded ? <ChevronUp className="w-4 h-4 text-gray-600 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-gray-600 flex-shrink-0" />}
-                                  <img 
-                                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/681817096_Tizepatide.jpg"
-                                    alt={order.prescribed_item_name}
-                                    className="w-10 h-10 object-cover rounded-lg flex-shrink-0"
-                                  />
                                   <div className="flex-1 min-w-0">
                                     <p className="font-semibold text-gray-900 truncate">{order.patient_name} <span className="text-gray-500 font-normal">– Rx: {order.rx_number}</span></p>
                                   </div>
-                                  <div className="flex-1 min-w-0">
+                                  <div className="flex-1 min-w-0 flex items-center gap-2">
+                                    <img 
+                                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/681817096_Tizepatide.jpg"
+                                      alt={order.prescribed_item_name}
+                                      className="w-10 h-10 object-cover rounded-lg flex-shrink-0"
+                                    />
                                     <p className="text-sm text-gray-600 truncate">{order.prescribed_item_name}</p>
                                   </div>
                                   <div className="flex-shrink-0">

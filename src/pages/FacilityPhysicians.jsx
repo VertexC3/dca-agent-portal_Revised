@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '../utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -281,7 +283,15 @@ export default function FacilityPhysicians() {
                   </TableCell>
                   <TableCell className="text-gray-700 whitespace-nowrap">{physician.npi}</TableCell>
                   <TableCell className="text-gray-700 whitespace-nowrap">{physician.dea_id}</TableCell>
-                  <TableCell className="text-center text-gray-900 font-semibold">{physician.num_patients}</TableCell>
+                  <TableCell className="text-center">
+                    <Link
+                      to={`${createPageUrl('FacilityPatients')}?physician=${encodeURIComponent(physician.name)}`}
+                      className="text-[#1a1f5c] hover:underline font-semibold"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {physician.num_patients}
+                    </Link>
+                  </TableCell>
                   <TableCell className="text-right text-gray-900 font-semibold">${formatCurrency(physician.billed_12m)}</TableCell>
                   <TableCell className="text-right text-gray-900 font-semibold">${formatCurrency(physician.billed_ytd)}</TableCell>
                 </TableRow>

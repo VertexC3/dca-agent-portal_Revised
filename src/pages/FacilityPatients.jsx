@@ -170,6 +170,15 @@ export default function FacilityPatients() {
     dateTo: ''
   });
 
+  // Check for URL parameter for physician filter
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const physicianName = urlParams.get('physician');
+    if (physicianName) {
+      setFilters(prev => ({ ...prev, physician: physicianName }));
+    }
+  }, []);
+
   const clearFilters = () => {
     setFilters({ status: 'all', physician: 'all', medication: 'all', dateFrom: '', dateTo: '' });
     setSearchTerm('');
@@ -254,10 +263,15 @@ export default function FacilityPatients() {
 
   return (
     <div className="space-y-6">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Patients</h1>
-          </div>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Patients</h1>
+          {filters.physician !== 'all' && (
+            <p className="text-sm text-gray-600 mt-1">
+              Showing patients of <span className="font-semibold">{filters.physician}</span>
+            </p>
+          )}
+        </div>
           
           {/* Patient-Specific Search */}
           <div className="relative">
