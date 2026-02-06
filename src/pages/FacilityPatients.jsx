@@ -348,18 +348,20 @@ export default function FacilityPatients() {
                     <div>
                       <Label className="text-sm font-medium mb-2">Date From</Label>
                       <Input
-                        type="date"
+                        type="text"
                         value={filters.dateFrom}
                         onChange={(e) => setFilters({...filters, dateFrom: e.target.value})}
+                        placeholder="mm/dd/yyyy"
                       />
                     </div>
 
                     <div>
                       <Label className="text-sm font-medium mb-2">Date To</Label>
                       <Input
-                        type="date"
+                        type="text"
                         value={filters.dateTo}
                         onChange={(e) => setFilters({...filters, dateTo: e.target.value})}
+                        placeholder="mm/dd/yyyy"
                       />
                     </div>
                   </div>
