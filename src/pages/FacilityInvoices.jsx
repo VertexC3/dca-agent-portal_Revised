@@ -550,8 +550,8 @@ export default function FacilityInvoices() {
                     <p className="text-sm text-gray-600">{invoice.orders.length} {invoice.orders.length === 1 ? 'Order' : 'Orders'}</p>
                   </div>
                   <div className="flex-shrink-0 text-right">
-                    <p className="font-bold text-gray-900">${formatCurrency(invoice.total_due - invoice.total_paid)}</p>
-                    <p className="text-xs text-gray-600">Outstanding: ${formatCurrency(invoice.total_due)}</p>
+                    <p className="font-bold text-gray-900">${formatCurrency((invoice.total_due || 0) - (invoice.total_paid || 0))}</p>
+                    <p className="text-xs text-gray-600">Outstanding: ${formatCurrency(invoice.total_due || 0)}</p>
                   </div>
                   <Badge className={`${
                     invoice.status === 'paid' ? 'bg-green-100 text-green-800' :
