@@ -379,7 +379,7 @@ export default function FacilityInvoices() {
                         <div>
                           <Label className="text-sm font-medium mb-2">From</Label>
                           <Input
-                            type="date"
+                            type="text"
                             value={filters.customDateFrom}
                             onChange={(e) => setFilters({...filters, customDateFrom: e.target.value})}
                             placeholder="mm/dd/yyyy"
@@ -388,7 +388,7 @@ export default function FacilityInvoices() {
                         <div>
                           <Label className="text-sm font-medium mb-2">To</Label>
                           <Input
-                            type="date"
+                            type="text"
                             value={filters.customDateTo}
                             onChange={(e) => setFilters({...filters, customDateTo: e.target.value})}
                             placeholder="mm/dd/yyyy"
