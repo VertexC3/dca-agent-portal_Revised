@@ -39,7 +39,7 @@ export default function InsightsCard({ communications }) {
           </div>
         ) : (
           topRequests.map((request, index) => {
-            const percentage = ((request.count / totalRequests) * 100).toFixed(1);
+            const percentage = totalRequests > 0 ? ((request.count / totalRequests) * 100).toFixed(1) : 0;
             return (
               <div key={request.type} className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                 <div className="flex items-center justify-between mb-2">
