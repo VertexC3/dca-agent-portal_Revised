@@ -346,6 +346,15 @@ export default function FacilityInvoices() {
                     </div>
 
                     <div>
+                      <Label className="text-sm font-medium mb-2">Physician</Label>
+                      <Input
+                        placeholder="Search by name or NPI..."
+                        value={filters.physician || ''}
+                        onChange={(e) => setFilters({...filters, physician: e.target.value})}
+                      />
+                    </div>
+
+                    <div>
                       <Label className="text-sm font-medium mb-2">Min Amount</Label>
                       <Input
                         type="number"
@@ -373,6 +382,7 @@ export default function FacilityInvoices() {
                             type="date"
                             value={filters.customDateFrom}
                             onChange={(e) => setFilters({...filters, customDateFrom: e.target.value})}
+                            placeholder="mm/dd/yyyy"
                           />
                         </div>
                         <div>
@@ -381,19 +391,11 @@ export default function FacilityInvoices() {
                             type="date"
                             value={filters.customDateTo}
                             onChange={(e) => setFilters({...filters, customDateTo: e.target.value})}
+                            placeholder="mm/dd/yyyy"
                           />
                         </div>
                       </>
                     )}
-
-                    <div>
-                      <Label className="text-sm font-medium mb-2">Physician</Label>
-                      <Input
-                        placeholder="Search by name or NPI..."
-                        value={filters.physician || ''}
-                        onChange={(e) => setFilters({...filters, physician: e.target.value})}
-                      />
-                    </div>
 
                     <div>
                       <Label className="text-sm font-medium mb-2">RX Number</Label>
