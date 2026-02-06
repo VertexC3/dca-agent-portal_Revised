@@ -380,6 +380,12 @@ export default function FacilityPatients() {
                       <ArrowUpDown className="w-4 h-4" />
                     </div>
                   </TableHead>
+                  <TableHead className="font-bold text-gray-900 whitespace-nowrap cursor-pointer hover:bg-gray-100" onClick={() => handleSort('date_of_birth')}>
+                    <div className="flex items-center gap-2">
+                      Date of Birth
+                      <ArrowUpDown className="w-4 h-4" />
+                    </div>
+                  </TableHead>
                   <TableHead className="font-bold text-gray-900 whitespace-nowrap cursor-pointer hover:bg-gray-100" onClick={() => handleSort('phone')}>
                     <div className="flex items-center gap-2">
                       Phone Number
@@ -445,6 +451,7 @@ export default function FacilityPatients() {
                         <span>{patient.name}</span>
                       </div>
                     </TableCell>
+                    <TableCell className="text-gray-600 text-sm whitespace-nowrap">{format(new Date(patient.date_of_birth), 'MM/dd/yyyy')}</TableCell>
                     <TableCell className="text-gray-700 whitespace-nowrap">{patient.phone}</TableCell>
                     <TableCell className="text-gray-700 whitespace-nowrap">{patient.email}</TableCell>
                     <TableCell className="text-gray-700 whitespace-nowrap">{format(new Date(patient.patient_since), 'MMM d, yyyy')}</TableCell>
