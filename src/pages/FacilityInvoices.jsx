@@ -552,8 +552,8 @@ export default function FacilityInvoices() {
                     <p className="text-sm text-gray-600">{invoice.orders.length} {invoice.orders.length === 1 ? 'Order' : 'Orders'}</p>
                   </div>
                   <div className="flex-shrink-0 text-right">
-                    <p className="font-bold text-gray-900">${formatCurrency((invoice.total_due || 0) - (invoice.total_paid || 0))}</p>
-                    <p className="text-xs text-gray-600">Outstanding: ${formatCurrency(invoice.total_due || 0)}</p>
+                    <p className="font-bold text-gray-900">${formatCurrency(invoice.total_due || 0)}</p>
+                    <p className="text-xs text-gray-600">Outstanding: ${formatCurrency((invoice.total_due || 0) - (invoice.total_paid || 0))}</p>
                   </div>
                   <Badge className={`${
                     invoice.status === 'paid' ? 'bg-green-100 text-green-800' :
@@ -583,7 +583,7 @@ export default function FacilityInvoices() {
                                   className={`flex items-center gap-4 p-3 bg-white rounded-lg cursor-pointer hover:bg-gray-100 transition-colors ${isOrderSelected ? 'bg-blue-50' : ''}`}
                                   onClick={(e) => {
                                     if (e.target.type !== 'checkbox') {
-                                      handleOrderSelect(order.id);
+                                      toggleOrder(order.id);
                                     }
                                   }}
                                 >
@@ -643,7 +643,7 @@ export default function FacilityInvoices() {
                                             <p className="text-gray-600">{order.dispensed_item_name}</p>
                                           </div>
                                           <div>
-                                            <p className="font-semibold text-gray-700">Receipt</p>
+                                            <p className="font-semibold text-gray-700">Receipt Number</p>
                                             <p className="text-gray-600">{order.receipt}</p>
                                           </div>
                                           <div>
