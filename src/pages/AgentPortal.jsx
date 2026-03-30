@@ -1,5 +1,8 @@
 import React, { useState, useRef, useCallback } from 'react';
-import AgentPatientSearch from '../components/agent/AgentPatientSearch';
+import { ChevronDown } from 'lucide-react';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue
+} from '@/components/ui/select';
 import AgentWorkspaceTabs from '../components/agent/AgentWorkspaceTabs';
 import AgentRightPanel from '../components/agent/AgentRightPanel';
 
@@ -141,41 +144,54 @@ function ResizeDivider({ onDrag }) {
 
 export default function AgentPortal() {
   const [selectedPatient, setSelectedPatient] = useState(null);
-  const [middleW, setMiddleW] = useState(600);
+  const [middleW, setMiddleW] = useState(700);
 
-  const MIN = 300;
-  const MAX = 900;
+  const MIN = 400;
+  const MAX = 1000;
 
   const dragMiddle = useCallback((delta) => {
     setMiddleW(w => Math.min(MAX, Math.max(MIN, w + delta)));
   }, []);
 
   return (
-    <div
-      className="flex gap-0 -mx-6 px-3"
-      style={{ height: 'calc(100vh - 88px)' }}
-    >
-      {/* Patient Search - Always visible on left, collapsible dropdown inside */}
-      <div className="flex-shrink-0 w-full md:w-72 md:border-r md:border-gray-200 overflow-hidden">
-        <AgentPatientSearch
-          patients={mockPatients}
-          selectedPatient={selectedPatient}
-          onSelect={setSelectedPatient}
-        />
+    <div className="flex flex-col h-full bg-gray-50">
+      {/* Top Bar: Patient Selection */}
+      <div className="px-4 py-3 bg-white border-b border-gray-200 shadow-sm">
+        <div className="flex items-center gap-3">
+          <label className="text-xs font-bold text-gray-700 uppercase tracking-wide">Select Patient:</label>
+          <Select value={selectedPatient?.id || ''} onValueChange={(id) => {
+            const patient = mockPatients.find(p => p.id === id);
+            setSelectedPatient(patient || null);
+          }}>
+            <SelectTrigger className="w-80">
+              <SelectValue placeholder="Choose a patient..." />
+            </SelectTrigger>
+            <SelectContent>
+              {mockPatients.map(p => (
+                <SelectItem key={p.id} value={p.id}>
+                  <span className="font-semibold">{p.name}</span> • {p.email}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      <ResizeDivider onDrag={dragMiddle} />
+      {/* Main Content */}
+      <div
+        className="flex gap-0 flex-1 overflow-hidden"
+      >
+        {/* Middle: Workspace with Patient Info + Tabs */}
+        <div style={{ width: middleW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden flex flex-col border-r border-gray-200">
+          <AgentWorkspaceTabs patient={selectedPatient} />
+        </div>
 
-      {/* Middle: Workspace with Patient Info + Tabs */}
-      <div style={{ width: middleW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden">
-        <AgentWorkspaceTabs patient={selectedPatient} />
-      </div>
+        <ResizeDivider onDrag={dragMiddle} />
 
-      <ResizeDivider onDrag={dragMiddle} />
-
-      {/* Right: Right Panel */}
-      <div className="flex-1 min-w-0 overflow-hidden">
-        <AgentRightPanel patient={selectedPatient} />
+        {/* Right: Right Panel */}
+        <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
+          <AgentRightPanel patient={selectedPatient} />
+        </div>
       </div>
     </div>
   );

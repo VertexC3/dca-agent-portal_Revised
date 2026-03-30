@@ -9,8 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import FloatingWidget from './FloatingWidget';
 
-
-
 const kbArticles = [
   { id: 1, title: 'How to use Semaglutide injections', category: 'medication_inquiry' },
   { id: 2, title: 'Tirzepatide side effects & what to expect', category: 'side_effects' },
@@ -20,21 +18,6 @@ const kbArticles = [
   { id: 6, title: 'Insurance coverage questions', category: 'insurance_question' },
   { id: 7, title: 'Injection site instructions', category: 'medication_inquiry' },
   { id: 8, title: 'Storage & handling medications', category: 'medication_inquiry' },
-];
-
-const urgencyClasses = {
-  high: 'bg-red-100 text-red-700',
-  medium: 'bg-yellow-100 text-yellow-700',
-  low: 'bg-gray-100 text-gray-600',
-};
-
-const quickActionsList = [
-  { label: 'Refill Rx', icon: RefreshCw, color: 'text-blue-600', hover: 'hover:bg-blue-50' },
-  { label: 'Log Call', icon: Phone, color: 'text-green-600', hover: 'hover:bg-green-50' },
-  { label: 'Send Email', icon: Mail, color: 'text-purple-600', hover: 'hover:bg-purple-50' },
-  { label: 'Send Text', icon: Send, color: 'text-orange-600', hover: 'hover:bg-orange-50' },
-  { label: 'Escalate', icon: AlertTriangle, color: 'text-red-600', hover: 'hover:bg-red-50' },
-  { label: 'Add Note', icon: FileText, color: 'text-yellow-600', hover: 'hover:bg-yellow-50' },
 ];
 
 function SectionHeader({ icon: Icon, title, color = 'bg-[#8B1F1F]', badge, extra, onPopOut }) {
@@ -59,15 +42,39 @@ function SectionHeader({ icon: Icon, title, color = 'bg-[#8B1F1F]', badge, extra
   );
 }
 
+const ActionModal = ({ isOpen, onClose, title, children }) => {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-md mx-4 p-4">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-bold text-lg text-gray-900">{title}</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">✕</button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+};
+
 export default function AgentRightPanel({ patient }) {
   const [kbSearch, setKbSearch] = useState('');
   const [viewedMessages, setViewedMessages] = useState([]);
   const [kbExpanded, setKbExpanded] = useState(false);
+  
+  // Modal states
+  const [showRefillModal, setShowRefillModal] = useState(false);
+  const [showCallModal, setShowCallModal] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [showTextModal, setShowTextModal] = useState(false);
+  const [showEscalateModal, setShowEscalateModal] = useState(false);
+  const [showNoteModal, setShowNoteModal] = useState(false);
+  const [showNewPatientModal, setShowNewPatientModal] = useState(false);
 
   // Pop-out state
   const [floats, setFloats] = useState({ priority: false, quick: false, alerts: false, kb: false });
   const popOut = (key) => setFloats(f => ({ ...f, [key]: true }));
-  const popIn  = (key) => setFloats(f => ({ ...f, [key]: false }));
+  const popIn = (key) => setFloats(f => ({ ...f, [key]: false }));
 
   const filteredKb = kbArticles.filter(a =>
     !kbSearch || a.title.toLowerCase().includes(kbSearch.toLowerCase())
@@ -116,17 +123,37 @@ export default function AgentRightPanel({ patient }) {
 
   const QuickContent = () => (
     <div className="p-2 grid grid-cols-2 gap-1.5">
-      {quickActionsList.map(action => {
-        const Icon = action.icon;
-        return (
-          <Button key={action.label} size="sm" variant="outline"
-            className={`h-8 text-xs justify-start gap-1.5 border-gray-200 ${action.hover}`}>
-            <Icon className={`w-3.5 h-3.5 ${action.color}`} />
-            {action.label}
-          </Button>
-        );
-      })}
-      <Button size="sm" variant="outline"
+      <Button size="sm" variant="outline" onClick={() => setShowRefillModal(true)}
+        className={`h-8 text-xs justify-start gap-1.5 border-gray-200 hover:bg-blue-50`}>
+        <RefreshCw className={`w-3.5 h-3.5 text-blue-600`} />
+        Refill Rx
+      </Button>
+      <Button size="sm" variant="outline" onClick={() => setShowCallModal(true)}
+        className={`h-8 text-xs justify-start gap-1.5 border-gray-200 hover:bg-green-50`}>
+        <Phone className={`w-3.5 h-3.5 text-green-600`} />
+        Log Call
+      </Button>
+      <Button size="sm" variant="outline" onClick={() => setShowEmailModal(true)}
+        className={`h-8 text-xs justify-start gap-1.5 border-gray-200 hover:bg-purple-50`}>
+        <Mail className={`w-3.5 h-3.5 text-purple-600`} />
+        Send Email
+      </Button>
+      <Button size="sm" variant="outline" onClick={() => setShowTextModal(true)}
+        className={`h-8 text-xs justify-start gap-1.5 border-gray-200 hover:bg-orange-50`}>
+        <Send className={`w-3.5 h-3.5 text-orange-600`} />
+        Send Text
+      </Button>
+      <Button size="sm" variant="outline" onClick={() => setShowEscalateModal(true)}
+        className={`h-8 text-xs justify-start gap-1.5 border-gray-200 hover:bg-red-50`}>
+        <AlertTriangle className={`w-3.5 h-3.5 text-red-600`} />
+        Escalate
+      </Button>
+      <Button size="sm" variant="outline" onClick={() => setShowNoteModal(true)}
+        className={`h-8 text-xs justify-start gap-1.5 border-gray-200 hover:bg-yellow-50`}>
+        <FileText className={`w-3.5 h-3.5 text-yellow-600`} />
+        Add Note
+      </Button>
+      <Button size="sm" variant="outline" onClick={() => setShowNewPatientModal(true)}
         className="h-8 text-xs justify-start gap-1.5 border-gray-200 hover:bg-teal-50 col-span-2">
         <UserPlus className="w-3.5 h-3.5 text-teal-600" />
         New Patient Record
@@ -182,101 +209,183 @@ export default function AgentRightPanel({ patient }) {
   );
 
   return (
-    <div className="flex flex-col gap-3 overflow-y-auto h-full">
+    <>
+      <div className="flex flex-col gap-3 overflow-y-auto h-full p-3">
 
-      {/* Patient Messages */}
-      {!floats.priority && (
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-          <SectionHeader
-            icon={ArrowUpCircle} title="Patient Messages"
-            badge={patient && <Badge className="bg-white text-[#8B1F1F] text-xs px-1.5 font-bold">{patientMessages.length}</Badge>}
-            onPopOut={() => popOut('priority')}
-          />
-          <PriorityContent />
-        </div>
-      )}
-      {floats.priority && (
-        <>
-          <div className="bg-white border border-dashed border-gray-300 rounded-lg p-3 text-center text-xs text-gray-400">
-            Patient Messages — popped out
-          </div>
-          <FloatingWidget title="Patient Messages" onClose={() => popIn('priority')} defaultPos={{ x: 80, y: 120 }}>
+        {/* Patient Messages */}
+        {!floats.priority && (
+          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+            <SectionHeader
+              icon={ArrowUpCircle} title="Patient Messages"
+              badge={patient && <Badge className="bg-white text-[#8B1F1F] text-xs px-1.5 font-bold">{patientMessages.length}</Badge>}
+              onPopOut={() => popOut('priority')}
+            />
             <PriorityContent />
-          </FloatingWidget>
-        </>
-      )}
-
-      {/* Quick Actions */}
-      {!floats.quick && (
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-          <SectionHeader icon={Zap} title="Quick Actions" onPopOut={() => popOut('quick')} />
-          <QuickContent />
-        </div>
-      )}
-      {floats.quick && (
-        <>
-          <div className="bg-white border border-dashed border-gray-300 rounded-lg p-3 text-center text-xs text-gray-400">
-            Quick Actions — popped out
           </div>
-          <FloatingWidget title="Quick Actions" onClose={() => popIn('quick')} defaultPos={{ x: 120, y: 200 }}>
+        )}
+        {floats.priority && (
+          <>
+            <div className="bg-white border border-dashed border-gray-300 rounded-lg p-3 text-center text-xs text-gray-400">
+              Patient Messages — popped out
+            </div>
+            <FloatingWidget title="Patient Messages" onClose={() => popIn('priority')} defaultPos={{ x: 80, y: 120 }}>
+              <PriorityContent />
+            </FloatingWidget>
+          </>
+        )}
+
+        {/* Quick Actions */}
+        {!floats.quick && (
+          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+            <SectionHeader icon={Zap} title="Quick Actions" onPopOut={() => popOut('quick')} />
             <QuickContent />
-          </FloatingWidget>
-        </>
-      )}
-
-      {/* Patient Alerts */}
-      {!floats.alerts && (
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-          <SectionHeader icon={AlertTriangle} title="Patient Alerts" color="bg-amber-700" onPopOut={() => popOut('alerts')} />
-          <AlertsContent />
-        </div>
-      )}
-      {floats.alerts && (
-        <>
-          <div className="bg-white border border-dashed border-gray-300 rounded-lg p-3 text-center text-xs text-gray-400">
-            Patient Alerts — popped out
           </div>
-          <FloatingWidget title="Patient Alerts" headerColor="bg-amber-700" onClose={() => popIn('alerts')} defaultPos={{ x: 160, y: 300 }}>
+        )}
+        {floats.quick && (
+          <>
+            <div className="bg-white border border-dashed border-gray-300 rounded-lg p-3 text-center text-xs text-gray-400">
+              Quick Actions — popped out
+            </div>
+            <FloatingWidget title="Quick Actions" onClose={() => popIn('quick')} defaultPos={{ x: 120, y: 200 }}>
+              <QuickContent />
+            </FloatingWidget>
+          </>
+        )}
+
+        {/* Patient Alerts */}
+        {!floats.alerts && (
+          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+            <SectionHeader icon={AlertTriangle} title="Patient Alerts" color="bg-amber-700" onPopOut={() => popOut('alerts')} />
             <AlertsContent />
-          </FloatingWidget>
-        </>
-      )}
-
-      {/* Knowledge Base */}
-      {!floats.kb && (
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-          <div className="px-3 py-2 bg-[#8B1F1F] text-white flex items-center justify-between">
-            <button
-              className="flex items-center gap-1.5 flex-1"
-              onClick={() => setKbExpanded(!kbExpanded)}
-            >
-              <BookOpen className="w-3.5 h-3.5" />
-              <h3 className="font-bold text-xs uppercase tracking-wider">Knowledge Base</h3>
-              {kbExpanded ? <ChevronUp className="w-3.5 h-3.5 ml-auto" /> : <ChevronDown className="w-3.5 h-3.5 ml-auto" />}
-            </button>
-            <button onClick={() => popOut('kb')} className="ml-2 p-0.5 rounded hover:bg-white/20" title="Pop out">
-              <ExternalLink className="w-3 h-3" />
-            </button>
           </div>
-          {kbExpanded ? <KbContent /> : (
-            <button className="w-full text-center p-2 text-xs text-[#8B1F1F] hover:bg-red-50 transition-colors font-semibold"
-              onClick={() => setKbExpanded(true)}>
-              Browse {kbArticles.length} articles →
-            </button>
-          )}
+        )}
+        {floats.alerts && (
+          <>
+            <div className="bg-white border border-dashed border-gray-300 rounded-lg p-3 text-center text-xs text-gray-400">
+              Patient Alerts — popped out
+            </div>
+            <FloatingWidget title="Patient Alerts" headerColor="bg-amber-700" onClose={() => popIn('alerts')} defaultPos={{ x: 160, y: 300 }}>
+              <AlertsContent />
+            </FloatingWidget>
+          </>
+        )}
+
+        {/* Knowledge Base */}
+        {!floats.kb && (
+          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+            <div className="px-3 py-2 bg-[#8B1F1F] text-white flex items-center justify-between">
+              <button
+                className="flex items-center gap-1.5 flex-1"
+                onClick={() => setKbExpanded(!kbExpanded)}
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <h3 className="font-bold text-xs uppercase tracking-wider">Knowledge Base</h3>
+                {kbExpanded ? <ChevronUp className="w-3.5 h-3.5 ml-auto" /> : <ChevronDown className="w-3.5 h-3.5 ml-auto" />}
+              </button>
+              <button onClick={() => popOut('kb')} className="ml-2 p-0.5 rounded hover:bg-white/20" title="Pop out">
+                <ExternalLink className="w-3 h-3" />
+              </button>
+            </div>
+            {kbExpanded ? <KbContent /> : (
+              <button className="w-full text-center p-2 text-xs text-[#8B1F1F] hover:bg-red-50 transition-colors font-semibold"
+                onClick={() => setKbExpanded(true)}>
+                Browse {kbArticles.length} articles →
+              </button>
+            )}
+          </div>
+        )}
+        {floats.kb && (
+          <>
+            <div className="bg-white border border-dashed border-gray-300 rounded-lg p-3 text-center text-xs text-gray-400">
+              Knowledge Base — popped out
+            </div>
+            <FloatingWidget title="Knowledge Base" onClose={() => popIn('kb')} defaultPos={{ x: 200, y: 160 }}>
+              <KbContent />
+            </FloatingWidget>
+          </>
+        )}
+
+      </div>
+
+      {/* Action Modals */}
+      <ActionModal isOpen={showRefillModal} onClose={() => setShowRefillModal(false)} title="Request Prescription Refill">
+        <div className="space-y-3 text-sm">
+          <p className="text-gray-600">Refill prescriptions for {patient?.name || 'patient'}:</p>
+          {patient?.prescriptions.map(rx => (
+            <label key={rx.id} className="flex items-center gap-2">
+              <input type="checkbox" defaultChecked className="w-4 h-4" />
+              <span>{rx.name} ({rx.dosage})</span>
+            </label>
+          ))}
+          <div className="flex gap-2 justify-end pt-3 border-t">
+            <Button variant="outline" size="sm" onClick={() => setShowRefillModal(false)}>Cancel</Button>
+            <Button className="bg-[#8B1F1F] hover:bg-[#721919]" size="sm" onClick={() => { setShowRefillModal(false); alert('Refill request submitted'); }}>Submit</Button>
+          </div>
         </div>
-      )}
-      {floats.kb && (
-        <>
-          <div className="bg-white border border-dashed border-gray-300 rounded-lg p-3 text-center text-xs text-gray-400">
-            Knowledge Base — popped out
-          </div>
-          <FloatingWidget title="Knowledge Base" onClose={() => popIn('kb')} defaultPos={{ x: 200, y: 160 }}>
-            <KbContent />
-          </FloatingWidget>
-        </>
-      )}
+      </ActionModal>
 
-    </div>
+      <ActionModal isOpen={showCallModal} onClose={() => setShowCallModal(false)} title="Log Call">
+        <div className="space-y-3 text-sm">
+          <textarea placeholder="Call notes..." className="w-full border border-gray-200 rounded p-2 text-xs h-20 resize-none" />
+          <div className="flex gap-2 justify-end pt-3 border-t">
+            <Button variant="outline" size="sm" onClick={() => setShowCallModal(false)}>Cancel</Button>
+            <Button className="bg-[#8B1F1F] hover:bg-[#721919]" size="sm" onClick={() => { setShowCallModal(false); alert('Call logged'); }}>Save</Button>
+          </div>
+        </div>
+      </ActionModal>
+
+      <ActionModal isOpen={showEmailModal} onClose={() => setShowEmailModal(false)} title="Send Email">
+        <div className="space-y-3 text-sm">
+          <input placeholder="Subject..." className="w-full border border-gray-200 rounded p-2 text-xs" />
+          <textarea placeholder="Message..." className="w-full border border-gray-200 rounded p-2 text-xs h-24 resize-none" />
+          <div className="flex gap-2 justify-end pt-3 border-t">
+            <Button variant="outline" size="sm" onClick={() => setShowEmailModal(false)}>Cancel</Button>
+            <Button className="bg-[#8B1F1F] hover:bg-[#721919]" size="sm" onClick={() => { setShowEmailModal(false); alert('Email sent'); }}>Send</Button>
+          </div>
+        </div>
+      </ActionModal>
+
+      <ActionModal isOpen={showTextModal} onClose={() => setShowTextModal(false)} title="Send Text Message">
+        <div className="space-y-3 text-sm">
+          <textarea placeholder="Message..." className="w-full border border-gray-200 rounded p-2 text-xs h-20 resize-none" />
+          <div className="flex gap-2 justify-end pt-3 border-t">
+            <Button variant="outline" size="sm" onClick={() => setShowTextModal(false)}>Cancel</Button>
+            <Button className="bg-[#8B1F1F] hover:bg-[#721919]" size="sm" onClick={() => { setShowTextModal(false); alert('Text sent'); }}>Send</Button>
+          </div>
+        </div>
+      </ActionModal>
+
+      <ActionModal isOpen={showEscalateModal} onClose={() => setShowEscalateModal(false)} title="Escalate to Manager">
+        <div className="space-y-3 text-sm">
+          <textarea placeholder="Reason for escalation..." className="w-full border border-gray-200 rounded p-2 text-xs h-20 resize-none" />
+          <div className="flex gap-2 justify-end pt-3 border-t">
+            <Button variant="outline" size="sm" onClick={() => setShowEscalateModal(false)}>Cancel</Button>
+            <Button className="bg-red-600 hover:bg-red-700" size="sm" onClick={() => { setShowEscalateModal(false); alert('Case escalated'); }}>Escalate</Button>
+          </div>
+        </div>
+      </ActionModal>
+
+      <ActionModal isOpen={showNoteModal} onClose={() => setShowNoteModal(false)} title="Add Internal Note">
+        <div className="space-y-3 text-sm">
+          <textarea placeholder="Note content..." className="w-full border border-gray-200 rounded p-2 text-xs h-20 resize-none" />
+          <div className="flex gap-2 justify-end pt-3 border-t">
+            <Button variant="outline" size="sm" onClick={() => setShowNoteModal(false)}>Cancel</Button>
+            <Button className="bg-[#8B1F1F] hover:bg-[#721919]" size="sm" onClick={() => { setShowNoteModal(false); alert('Note added'); }}>Save</Button>
+          </div>
+        </div>
+      </ActionModal>
+
+      <ActionModal isOpen={showNewPatientModal} onClose={() => setShowNewPatientModal(false)} title="Create New Patient Record">
+        <div className="space-y-3 text-sm">
+          <input placeholder="Patient name..." className="w-full border border-gray-200 rounded p-2 text-xs" />
+          <input placeholder="Email..." className="w-full border border-gray-200 rounded p-2 text-xs" />
+          <input placeholder="Phone..." className="w-full border border-gray-200 rounded p-2 text-xs" />
+          <div className="flex gap-2 justify-end pt-3 border-t">
+            <Button variant="outline" size="sm" onClick={() => setShowNewPatientModal(false)}>Cancel</Button>
+            <Button className="bg-teal-600 hover:bg-teal-700" size="sm" onClick={() => { setShowNewPatientModal(false); alert('Patient record created'); }}>Create</Button>
+          </div>
+        </div>
+      </ActionModal>
+    </>
   );
 }
