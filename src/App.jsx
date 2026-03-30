@@ -6,6 +6,8 @@ import VisualEditAgent from '@/lib/VisualEditAgent'
 import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import AgentPortal from './pages/AgentPortal';
+import AgentLayout from './Layout';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -60,6 +62,14 @@ const AuthenticatedApp = () => {
           }
         />
       ))}
+      <Route
+        path="/AgentPortal"
+        element={
+          <AgentLayout currentPageName="AgentPortal">
+            <AgentPortal />
+          </AgentLayout>
+        }
+      />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

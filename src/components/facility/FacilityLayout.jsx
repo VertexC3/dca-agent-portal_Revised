@@ -144,6 +144,19 @@ export default function FacilityLayout({ children, currentPageName }) {
                       </div>
                     </a>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <a href={createPageUrl('AgentPortal')} className="flex items-center gap-3 cursor-pointer py-3">
+                      <img 
+                        src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/user_68b4602065e9569078753897/50e1878da_DCA_Logo_Updated.png" 
+                        alt="DCA Pharmacy" 
+                        className="h-8"
+                      />
+                      <div>
+                        <p className="font-semibold text-gray-900">Agent Portal</p>
+                        <p className="text-xs text-gray-500">DCA Pharmacy — Customer Service</p>
+                      </div>
+                    </a>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>

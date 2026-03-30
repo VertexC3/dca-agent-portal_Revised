@@ -47,6 +47,7 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
+import AgentPortal from './pages/AgentPortal';
 import AITraining from './pages/AITraining';
 import Analytics from './pages/Analytics';
 import Automation from './pages/Automation';
@@ -80,6 +81,7 @@ import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "AgentPortal": AgentPortal,
     "AITraining": AITraining,
     "Analytics": Analytics,
     "Automation": Automation,
