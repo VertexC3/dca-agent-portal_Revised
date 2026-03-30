@@ -9,13 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import FloatingWidget from './FloatingWidget';
 
-const priorityQueue = [
-  { id: 1, type: 'refill', text: 'Refill request pending — Johnson, Robert', urgency: 'high', time: '2m ago' },
-  { id: 2, type: 'payment', text: 'Failed payment — Smith, Jane (INV-2026-002)', urgency: 'high', time: '15m ago' },
-  { id: 3, type: 'callback', text: 'Callback requested — Davis, Karen', urgency: 'medium', time: '45m ago' },
-  { id: 4, type: 'delivery', text: 'Delivery delay — Martinez, Carlos', urgency: 'medium', time: '1h ago' },
-  { id: 5, type: 'general', text: 'New message — Williams, Tom', urgency: 'low', time: '2h ago' },
-];
+
 
 const kbArticles = [
   { id: 1, title: 'How to use Semaglutide injections', category: 'medication_inquiry' },
@@ -67,7 +61,7 @@ function SectionHeader({ icon: Icon, title, color = 'bg-[#8B1F1F]', badge, extra
 
 export default function AgentRightPanel({ patient }) {
   const [kbSearch, setKbSearch] = useState('');
-  const [completedTasks, setCompletedTasks] = useState([]);
+  const [viewedMessages, setViewedMessages] = useState([]);
   const [kbExpanded, setKbExpanded] = useState(false);
 
   // Pop-out state
@@ -75,35 +69,42 @@ export default function AgentRightPanel({ patient }) {
   const popOut = (key) => setFloats(f => ({ ...f, [key]: true }));
   const popIn  = (key) => setFloats(f => ({ ...f, [key]: false }));
 
-  const activeTasks = priorityQueue.filter(t => !completedTasks.includes(t.id));
   const filteredKb = kbArticles.filter(a =>
     !kbSearch || a.title.toLowerCase().includes(kbSearch.toLowerCase())
   );
 
+  // Patient-specific messages
+  const patientMessages = patient?.communications || [];
+  const unviewedMessages = patientMessages.filter(m => !viewedMessages.includes(m.id));
+
   // ---- Reusable section content ----
   const PriorityContent = () => (
     <div className="divide-y divide-gray-100 max-h-56 overflow-y-auto">
-      {activeTasks.length === 0 ? (
+      {!patient ? (
+        <div className="p-4 text-center text-xs text-gray-500">
+          <CheckCircle2 className="w-6 h-6 mx-auto mb-1 text-gray-300" />
+          Select a patient to view messages
+        </div>
+      ) : patientMessages.length === 0 ? (
         <div className="p-4 text-center text-xs text-gray-500">
           <CheckCircle2 className="w-6 h-6 mx-auto mb-1 text-green-400" />
-          All caught up!
+          No messages
         </div>
       ) : (
-        activeTasks.map(task => (
-          <div key={task.id} className="flex items-start gap-2 p-2.5 hover:bg-gray-50 transition-colors">
+        patientMessages.map(msg => (
+          <div key={msg.id} className="flex items-start gap-2 p-2.5 hover:bg-gray-50 transition-colors">
             <button
-              onClick={() => setCompletedTasks(prev => [...prev, task.id])}
-              className="mt-0.5 w-4 h-4 flex-shrink-0 rounded border-2 border-gray-300 hover:border-green-500 hover:bg-green-50 transition-colors"
-              title="Mark complete"
+              onClick={() => setViewedMessages(prev => [...prev, msg.id])}
+              className="mt-0.5 w-4 h-4 flex-shrink-0 rounded border-2 border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition-colors"
+              title="Mark as read"
             />
             <div className="flex-1 min-w-0">
-              <p className="text-xs text-gray-800 leading-snug">{task.text}</p>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className={`text-xs px-1.5 py-0 rounded-full font-medium ${urgencyClasses[task.urgency]}`}>
-                  {task.urgency}
-                </span>
-                <span className="text-xs text-gray-400 flex items-center gap-0.5">
-                  <Clock className="w-2.5 h-2.5" />{task.time}
+              <p className="text-xs font-medium text-gray-900">{msg.subject}</p>
+              <p className="text-xs text-gray-600 leading-snug mt-0.5">{msg.summary}</p>
+              <div className="flex items-center gap-1.5 mt-0.5 text-xs text-gray-400">
+                <span>{msg.agent}</span>
+                <span className="flex items-center gap-0.5">
+                  <Clock className="w-2.5 h-2.5" />{msg.date}
                 </span>
               </div>
             </div>
@@ -183,12 +184,12 @@ export default function AgentRightPanel({ patient }) {
   return (
     <div className="flex flex-col gap-3 overflow-y-auto h-full">
 
-      {/* Priority Queue */}
+      {/* Patient Messages */}
       {!floats.priority && (
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
           <SectionHeader
-            icon={ArrowUpCircle} title="Priority Queue"
-            badge={<Badge className="bg-white text-[#8B1F1F] text-xs px-1.5 font-bold">{activeTasks.length}</Badge>}
+            icon={ArrowUpCircle} title="Patient Messages"
+            badge={patient && <Badge className="bg-white text-[#8B1F1F] text-xs px-1.5 font-bold">{patientMessages.length}</Badge>}
             onPopOut={() => popOut('priority')}
           />
           <PriorityContent />
@@ -197,9 +198,9 @@ export default function AgentRightPanel({ patient }) {
       {floats.priority && (
         <>
           <div className="bg-white border border-dashed border-gray-300 rounded-lg p-3 text-center text-xs text-gray-400">
-            Priority Queue — popped out
+            Patient Messages — popped out
           </div>
-          <FloatingWidget title="Priority Queue" onClose={() => popIn('priority')} defaultPos={{ x: 80, y: 120 }}>
+          <FloatingWidget title="Patient Messages" onClose={() => popIn('priority')} defaultPos={{ x: 80, y: 120 }}>
             <PriorityContent />
           </FloatingWidget>
         </>
