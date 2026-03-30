@@ -7,7 +7,7 @@ import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import AgentPortal from './pages/AgentPortal';
-import AgentLayout from './Layout';
+import AgentPortalLayout from './components/agent/AgentPortalLayout';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -65,9 +65,9 @@ const AuthenticatedApp = () => {
       <Route
         path="/AgentPortal"
         element={
-          <AgentLayout currentPageName="AgentPortal">
+          <AgentPortalLayout currentPageName="AgentPortal">
             <AgentPortal />
-          </AgentLayout>
+          </AgentPortalLayout>
         }
       />
       <Route path="*" element={<PageNotFound />} />
