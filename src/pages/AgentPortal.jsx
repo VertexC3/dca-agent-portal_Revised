@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import AgentPatientSearch from '../components/agent/AgentPatientSearch';
 import AgentWorkspaceTabs from '../components/agent/AgentWorkspaceTabs';
 import AgentRightPanel from '../components/agent/AgentRightPanel';
@@ -101,21 +101,88 @@ export const mockPatients = [
   }
 ];
 
-export default function AgentPortal() {
-  const [selectedPatient, setSelectedPatient] = useState(null);
+// Drag-to-resize divider
+function ResizeDivider({ onDrag }) {
+  const dragging = useRef(false);
+  const lastX = useRef(0);
+
+  const onMouseDown = (e) => {
+    dragging.current = true;
+    lastX.current = e.clientX;
+    e.preventDefault();
+  };
+
+  React.useEffect(() => {
+    const onMove = (e) => {
+      if (!dragging.current) return;
+      const delta = e.clientX - lastX.current;
+      lastX.current = e.clientX;
+      onDrag(delta);
+    };
+    const onUp = () => { dragging.current = false; };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+  }, [onDrag]);
 
   return (
     <div
-      className="flex gap-3 -mx-6 px-3"
+      onMouseDown={onMouseDown}
+      className="w-1.5 flex-shrink-0 cursor-col-resize hover:bg-[#8B1F1F]/40 bg-gray-200 rounded-full transition-colors group relative"
+      title="Drag to resize"
+    >
+      <div className="absolute inset-y-0 -left-1 -right-1" />
+    </div>
+  );
+}
+
+export default function AgentPortal() {
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  // Column widths in px; middle is flex-1 (takes remaining space)
+  const [leftW, setLeftW] = useState(260);
+  const [rightW, setRightW] = useState(272);
+
+  const MIN = 180;
+  const MAX = 500;
+
+  const dragLeft = useCallback((delta) => {
+    setLeftW(w => Math.min(MAX, Math.max(MIN, w + delta)));
+  }, []);
+
+  const dragRight = useCallback((delta) => {
+    setRightW(w => Math.min(MAX, Math.max(MIN, w - delta)));
+  }, []);
+
+  return (
+    <div
+      className="flex gap-0 -mx-6 px-3"
       style={{ height: 'calc(100vh - 88px)' }}
     >
-      <AgentPatientSearch
-        patients={mockPatients}
-        selectedPatient={selectedPatient}
-        onSelect={setSelectedPatient}
-      />
-      <AgentWorkspaceTabs patient={selectedPatient} />
-      <AgentRightPanel patient={selectedPatient} />
+      {/* Left: Patient Search */}
+      <div style={{ width: leftW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden">
+        <AgentPatientSearch
+          patients={mockPatients}
+          selectedPatient={selectedPatient}
+          onSelect={setSelectedPatient}
+        />
+      </div>
+
+      <ResizeDivider onDrag={dragLeft} />
+
+      {/* Middle: Workspace */}
+      <div className="flex-1 min-w-0 overflow-hidden mx-1.5">
+        <AgentWorkspaceTabs patient={selectedPatient} />
+      </div>
+
+      <ResizeDivider onDrag={dragRight} />
+
+      {/* Right: Panel */}
+      <div style={{ width: rightW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden">
+        <AgentRightPanel patient={selectedPatient} />
+      </div>
     </div>
   );
 }
