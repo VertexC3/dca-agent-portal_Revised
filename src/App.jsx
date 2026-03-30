@@ -47,9 +47,9 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route path="/" element={
-        <LayoutWrapper currentPageName={mainPageKey}>
-          <MainPage />
-        </LayoutWrapper>
+        <AgentPortalLayout currentPageName="AgentPortal">
+          <AgentPortal />
+        </AgentPortalLayout>
       } />
       {Object.entries(Pages).map(([path, Page]) => (
         <Route
