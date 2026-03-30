@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
+import { ChevronDown } from 'lucide-react';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
+import AgentWorkspaceTabs from '../components/agent/AgentWorkspaceTabs';
 import AgentRightPanel from '../components/agent/AgentRightPanel';
 
 export const mockPatients = [
@@ -102,8 +104,54 @@ export const mockPatients = [
   }
 ];
 
+// Drag-to-resize divider
+function ResizeDivider({ onDrag }) {
+  const dragging = useRef(false);
+  const lastX = useRef(0);
+
+  const onMouseDown = (e) => {
+    dragging.current = true;
+    lastX.current = e.clientX;
+    e.preventDefault();
+  };
+
+  React.useEffect(() => {
+    const onMove = (e) => {
+      if (!dragging.current) return;
+      const delta = e.clientX - lastX.current;
+      lastX.current = e.clientX;
+      onDrag(delta);
+    };
+    const onUp = () => { dragging.current = false; };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+  }, [onDrag]);
+
+  return (
+    <div
+      onMouseDown={onMouseDown}
+      className="w-1.5 flex-shrink-0 cursor-col-resize hover:bg-[#8B1F1F]/40 bg-gray-200 rounded-full transition-colors group relative"
+      title="Drag to resize"
+    >
+      <div className="absolute inset-y-0 -left-1 -right-1" />
+    </div>
+  );
+}
+
 export default function AgentPortal() {
   const [selectedPatient, setSelectedPatient] = useState(null);
+  const [middleW, setMiddleW] = useState(700);
+
+  const MIN = 400;
+  const MAX = 1000;
+
+  const dragMiddle = useCallback((delta) => {
+    setMiddleW(w => Math.min(MAX, Math.max(MIN, w + delta)));
+  }, []);
 
   return (
     <div className="flex flex-col h-full bg-gray-50">
@@ -129,9 +177,21 @@ export default function AgentPortal() {
         </div>
       </div>
 
-      {/* Main Content - Right Panel Only */}
-      <div className="flex-1 overflow-hidden">
-        <AgentRightPanel patient={selectedPatient} />
+      {/* Main Content */}
+      <div
+        className="flex gap-0 flex-1 overflow-hidden"
+      >
+        {/* Middle: Workspace with Patient Info + Tabs */}
+        <div style={{ width: middleW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden flex flex-col border-r border-gray-200">
+          <AgentWorkspaceTabs patient={selectedPatient} />
+        </div>
+
+        <ResizeDivider onDrag={dragMiddle} />
+
+        {/* Right: Right Panel */}
+        <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
+          <AgentRightPanel patient={selectedPatient} />
+        </div>
       </div>
     </div>
   );
