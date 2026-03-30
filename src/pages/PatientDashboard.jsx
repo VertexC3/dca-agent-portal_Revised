@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pill, MessageSquare, User, Package, Filter, Calendar, FileText, CreditCard, Edit } from 'lucide-react';
+import { Pill, MessageSquare, User, Package, Filter, Calendar, FileText, CreditCard, Edit, CheckCircle2, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import { format } from 'date-fns';
@@ -31,6 +31,10 @@ export default function PatientDashboard() {
   const [showEditActions, setShowEditActions] = useState(false);
   const [showSurveyAlert, setShowSurveyAlert] = useState(true);
   const [quickActions, setQuickActions] = useState(mockUser.quick_actions);
+  const [showRenewalDialog, setShowRenewalDialog] = useState(false);
+  const [renewalSubmitted, setRenewalSubmitted] = useState(false);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
+  const [showOrdersDialog, setShowOrdersDialog] = useState(false);
   
   const user = mockUser;
 
@@ -39,9 +43,9 @@ export default function PatientDashboard() {
     { id: 'profile', label: 'Update Profile', icon: User, action: () => window.location.href = createPageUrl('PatientProfile') },
     { id: 'communication', label: 'Communication', icon: MessageSquare, action: () => window.location.href = createPageUrl('PatientMessages') },
     { id: 'refill', label: 'Request Refill', icon: Pill, action: () => setShowQuickRefill(true) },
-    { id: 'renewal', label: 'Request Renewal', icon: FileText, action: () => alert('Renewal request will be sent to your prescriber') },
-    { id: 'orders', label: 'View Orders', icon: Package, action: () => window.location.href = createPageUrl('PatientProfile#orders') },
-    { id: 'payment', label: 'Payment Methods', icon: CreditCard, action: () => alert('Payment management coming soon') }
+    { id: 'renewal', label: 'Request Renewal', icon: FileText, action: () => { setRenewalSubmitted(false); setShowRenewalDialog(true); } },
+    { id: 'orders', label: 'View Orders', icon: Package, action: () => setShowOrdersDialog(true) },
+    { id: 'payment', label: 'Payment Methods', icon: CreditCard, action: () => setShowPaymentDialog(true) }
   ];
 
   // Default quick actions (first 3)
@@ -355,6 +359,108 @@ export default function PatientDashboard() {
         onClose={() => setShowQuickRefill(false)}
         prescription={prescriptions[0]}
       />
+
+      {/* Request Renewal Dialog */}
+      <Dialog open={showRenewalDialog} onOpenChange={setShowRenewalDialog}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-[#8B1F1F]" />
+              Request Prescription Renewal
+            </DialogTitle>
+          </DialogHeader>
+          {renewalSubmitted ? (
+            <div className="flex flex-col items-center py-6 gap-3">
+              <CheckCircle2 className="w-14 h-14 text-green-500" />
+              <p className="text-lg font-bold text-gray-800">Renewal Request Sent!</p>
+              <p className="text-sm text-gray-600 text-center">Your renewal request has been forwarded to your prescriber. You'll be notified once approved.</p>
+              <Button className="mt-2 bg-[#8B1F1F] hover:bg-[#721919] text-white w-full" onClick={() => setShowRenewalDialog(false)}>Done</Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">Select the prescription you'd like to renew:</p>
+              <div className="space-y-2">
+                {allPrescriptions.filter(p => p.category === 'Inactive').map(rx => (
+                  <div key={rx.id} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg bg-gray-50">
+                    <Pill className="w-4 h-4 text-[#8B1F1F] flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-gray-800">{rx.name}</p>
+                      <p className="text-xs text-gray-500">{rx.prescriber}</p>
+                    </div>
+                    <Badge className="bg-gray-200 text-gray-700 text-xs">{rx.status}</Badge>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2 pt-2">
+                <Button variant="outline" className="flex-1" onClick={() => setShowRenewalDialog(false)}>Cancel</Button>
+                <Button className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white" onClick={() => setRenewalSubmitted(true)}>Submit Request</Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Payment Methods Dialog */}
+      <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CreditCard className="w-5 h-5 text-[#8B1F1F]" />
+              Payment Methods
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            {[
+              { brand: 'Visa', last4: '4242', expiry: '12/27', isDefault: true },
+              { brand: 'Mastercard', last4: '8888', expiry: '09/26', isDefault: false },
+            ].map((card, i) => (
+              <div key={i} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                <CreditCard className="w-6 h-6 text-gray-500" />
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-gray-800">{card.brand} •••• {card.last4}</p>
+                  <p className="text-xs text-gray-500">Expires {card.expiry}</p>
+                </div>
+                {card.isDefault && <Badge className="bg-green-100 text-green-700 text-xs">Default</Badge>}
+              </div>
+            ))}
+            <Button className="w-full mt-2 bg-[#8B1F1F] hover:bg-[#721919] text-white">+ Add New Card</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Orders Dialog */}
+      <Dialog open={showOrdersDialog} onOpenChange={setShowOrdersDialog}>
+        <DialogContent className="max-w-lg bg-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Package className="w-5 h-5 text-[#8B1F1F]" />
+              Recent Orders
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 max-h-[400px] overflow-y-auto">
+            {[
+              { id: 'ORD-1001', medication: 'Lisinopril 10mg', date: 'Nov 1, 2025', amount: 45.00, status: 'Delivered', tracking: '1Z999AA10123456784' },
+              { id: 'ORD-1002', medication: 'Metformin 500mg', date: 'Oct 25, 2025', amount: 32.00, status: 'Shipped', tracking: '1Z999AA10987654321' },
+              { id: 'ORD-1003', medication: 'Atorvastatin 20mg', date: 'Oct 20, 2025', amount: 28.00, status: 'Delivered', tracking: '1Z999AA10111111111' },
+              { id: 'ORD-1004', medication: 'Aspirin 81mg', date: 'Sep 5, 2025', amount: 12.00, status: 'Delivered', tracking: '1Z999AA10222222222' },
+            ].map(order => (
+              <div key={order.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                <Package className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-gray-800">{order.medication}</p>
+                  <p className="text-xs text-gray-500">{order.id} · {order.date}</p>
+                  <p className="text-xs text-gray-400">Tracking: {order.tracking}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-bold text-gray-800">${order.amount.toFixed(2)}</p>
+                  <Badge className={order.status === 'Delivered' ? 'bg-green-100 text-green-700 text-xs' : 'bg-blue-100 text-blue-700 text-xs'}>{order.status}</Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+          <Button variant="outline" className="w-full mt-2" onClick={() => setShowOrdersDialog(false)}>Close</Button>
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Quick Actions Dialog */}
       <Dialog open={showEditActions} onOpenChange={setShowEditActions}>
