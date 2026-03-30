@@ -141,19 +141,13 @@ function ResizeDivider({ onDrag }) {
 
 export default function AgentPortal() {
   const [selectedPatient, setSelectedPatient] = useState(null);
-  // Column widths in px; middle is flex-1 (takes remaining space)
-  const [leftW, setLeftW] = useState(260);
-  const [rightW, setRightW] = useState(272);
+  const [middleW, setMiddleW] = useState(600);
 
-  const MIN = 180;
-  const MAX = 500;
+  const MIN = 300;
+  const MAX = 900;
 
-  const dragLeft = useCallback((delta) => {
-    setLeftW(w => Math.min(MAX, Math.max(MIN, w + delta)));
-  }, []);
-
-  const dragRight = useCallback((delta) => {
-    setRightW(w => Math.min(MAX, Math.max(MIN, w - delta)));
+  const dragMiddle = useCallback((delta) => {
+    setMiddleW(w => Math.min(MAX, Math.max(MIN, w + delta)));
   }, []);
 
   return (
@@ -161,8 +155,8 @@ export default function AgentPortal() {
       className="flex gap-0 -mx-6 px-3"
       style={{ height: 'calc(100vh - 88px)' }}
     >
-      {/* Left: Patient Search */}
-      <div style={{ width: leftW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden">
+      {/* Patient Search - Always visible on left, collapsible dropdown inside */}
+      <div className="flex-shrink-0 w-full md:w-72 md:border-r md:border-gray-200 overflow-hidden">
         <AgentPatientSearch
           patients={mockPatients}
           selectedPatient={selectedPatient}
@@ -170,17 +164,17 @@ export default function AgentPortal() {
         />
       </div>
 
-      <ResizeDivider onDrag={dragLeft} />
+      <ResizeDivider onDrag={dragMiddle} />
 
-      {/* Middle: Workspace */}
-      <div className="flex-1 min-w-0 overflow-hidden mx-1.5">
+      {/* Middle: Workspace with Patient Info + Tabs */}
+      <div style={{ width: middleW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden">
         <AgentWorkspaceTabs patient={selectedPatient} />
       </div>
 
-      <ResizeDivider onDrag={dragRight} />
+      <ResizeDivider onDrag={dragMiddle} />
 
-      {/* Right: Panel */}
-      <div style={{ width: rightW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden">
+      {/* Right: Right Panel */}
+      <div className="flex-1 min-w-0 overflow-hidden">
         <AgentRightPanel patient={selectedPatient} />
       </div>
     </div>

@@ -26,8 +26,7 @@ export default function AgentWorkspaceTabs({ patient }) {
       <div className="flex-1 flex items-center justify-center bg-white border border-gray-200 rounded-lg shadow-sm">
         <div className="text-center text-gray-400 p-8">
           <LayoutDashboard className="w-14 h-14 mx-auto mb-3 opacity-20" />
-          <p className="font-semibold text-gray-500">Select a patient to begin</p>
-          <p className="text-sm text-gray-400 mt-1">Search for a patient in the left panel</p>
+          <p className="font-semibold text-gray-500">No patient selected</p>
         </div>
       </div>
     );
@@ -35,17 +34,64 @@ export default function AgentWorkspaceTabs({ patient }) {
 
   return (
     <div className="flex-1 flex flex-col bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm min-w-0">
-      {/* Patient Header Bar */}
-      <div className="px-4 py-2 bg-gray-900 text-white flex items-center gap-4 text-xs flex-wrap">
-        <span className="font-bold text-sm">{patient.name}</span>
-        <span className="text-gray-400">|</span>
-        <span>DOB: {format(new Date(patient.dob), 'MM/dd/yyyy')}</span>
-        <span className="text-gray-400">|</span>
-        <span>{patient.phone}</span>
-        <span className="text-gray-400">|</span>
-        <span className="truncate">{patient.physician}</span>
-        <span className="text-gray-400">|</span>
-        <span>{patient.insurance}</span>
+      {/* Patient Profile Card */}
+      <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+        <div className="flex items-start gap-4">
+          {/* Profile Picture */}
+          <div className="flex-shrink-0">
+            {patient.profile_picture ? (
+              <img 
+                src={patient.profile_picture} 
+                alt={patient.name}
+                className="w-16 h-16 rounded-lg object-cover border-2 border-white shadow-sm"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-lg bg-[#8B1F1F] flex items-center justify-center text-white font-bold text-lg border-2 border-white shadow-sm">
+                {patient.name?.charAt(0) || 'P'}
+              </div>
+            )}
+          </div>
+          
+          {/* Patient Info Grid */}
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg font-bold text-gray-900">{patient.name}</h2>
+            <p className="text-xs text-gray-500 mt-0.5">ID: {patient.id}</p>
+            
+            <div className="grid grid-cols-3 gap-3 mt-2 text-xs">
+              <div>
+                <p className="text-gray-500">DOB</p>
+                <p className="font-semibold text-gray-800">{format(new Date(patient.dob), 'MM/dd/yyyy')}</p>
+              </div>
+              <div>
+                <p className="text-gray-500">Phone</p>
+                <p className="font-semibold text-gray-800">{patient.phone}</p>
+              </div>
+              <div>
+                <p className="text-gray-500">Email</p>
+                <p className="font-semibold text-gray-800 truncate">{patient.email}</p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-gray-500">Address</p>
+                <p className="font-semibold text-gray-800 text-xs">{patient.address}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 mt-2 text-xs border-t border-gray-200 pt-2">
+              <div>
+                <p className="text-gray-500">Physician</p>
+                <p className="font-semibold text-gray-800">{patient.physician}</p>
+              </div>
+              <div>
+                <p className="text-gray-500">Insurance</p>
+                <p className="font-semibold text-gray-800">{patient.insurance}</p>
+              </div>
+              <div>
+                <p className="text-gray-500">Allergies</p>
+                <p className="font-semibold text-red-700">{patient.allergies}</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Tab Bar */}
