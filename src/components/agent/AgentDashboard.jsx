@@ -3,7 +3,7 @@ import { AlertTriangle, Package, CreditCard, Clock, ChevronRight, CheckCircle2, 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { format, differenceInDays } from 'date-fns';
-import { mockPatients } from '../../pages/AgentPortal';
+import { mockPatients } from '../../data/mockPatients';
 
 // ─── Derive priority data from mock patients ───────────────────────────────
 

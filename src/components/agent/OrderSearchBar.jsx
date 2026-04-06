@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, X, Package } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { mockPatients } from '../../pages/AgentPortal';
+import { mockPatients } from '../../data/mockPatients';
 import { format } from 'date-fns';
 
 function buildOrderIndex() {
