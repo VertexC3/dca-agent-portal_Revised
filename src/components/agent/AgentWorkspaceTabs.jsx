@@ -24,41 +24,109 @@ const TABS = [
   { id: 'billing', label: 'Billing', icon: CreditCard },
 ];
 
-function AddressDropdown({ address }) {
+function AddressField({ address, onChange }) {
   const [open, setOpen] = useState(false);
-  const addresses = [
-    { label: 'Main', value: address },
-    { label: 'Work', value: '123 Business Park Dr, Suite 400, Columbia, SC 29201' },
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState('');
+  const [editingType, setEditingType] = useState(null); // 'main' | 'work'
+
+  const ADDRESS_TYPES = [
+    { key: 'main', label: 'Main', badgeClass: 'bg-blue-100 text-blue-700' },
+    { key: 'work', label: 'Work', badgeClass: 'bg-green-100 text-green-700' },
   ];
-  const [selected, setSelected] = useState(0);
+
+  const [addresses, setAddresses] = useState({
+    main: address,
+    work: '123 Business Park Dr, Suite 400, Columbia, SC 29201',
+  });
+  const [activeType, setActiveType] = useState('main');
+
+  const activeConfig = ADDRESS_TYPES.find(t => t.key === activeType);
+
+  const handleSwitch = (key) => {
+    setActiveType(key);
+    onChange(addresses[key]);
+    setOpen(false);
+  };
+
+  const handleStartEdit = (key, e) => {
+    e.stopPropagation();
+    setEditingType(key);
+    setDraft(addresses[key]);
+    setEditing(true);
+    setOpen(false);
+  };
+
+  const handleSaveEdit = () => {
+    const updated = { ...addresses, [editingType]: draft };
+    setAddresses(updated);
+    if (editingType === activeType) onChange(draft);
+    setEditing(false);
+    setEditingType(null);
+  };
+
+  const handleCancelEdit = () => { setEditing(false); setEditingType(null); };
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-1 mt-0.5">
+        <Input
+          value={draft}
+          onChange={e => setDraft(e.target.value)}
+          className="h-6 text-xs px-1.5 py-0 border-[#8B1F1F]/50 focus:border-[#8B1F1F]"
+          autoFocus
+          onKeyDown={e => { if (e.key === 'Enter') handleSaveEdit(); if (e.key === 'Escape') handleCancelEdit(); }}
+        />
+        <button onClick={handleSaveEdit} className="text-green-600 hover:text-green-700 flex-shrink-0"><Check className="w-3.5 h-3.5" /></button>
+        <button onClick={handleCancelEdit} className="text-gray-400 hover:text-red-500 flex-shrink-0"><X className="w-3.5 h-3.5" /></button>
+      </div>
+    );
+  }
 
   return (
-    <div className="relative inline-block">
+    <div className="relative">
       <button
         onClick={() => setOpen(v => !v)}
-        className="flex items-center gap-1 font-semibold text-gray-800 text-xs hover:text-[#8B1F1F] transition-colors"
+        className="flex items-center gap-1 font-semibold text-gray-800 text-xs hover:text-[#8B1F1F] transition-colors group text-left"
       >
-        <span>{addresses[selected].value}</span>
-        <span className={`px-1.5 py-0 rounded-full text-xs font-bold ${selected === 0 ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
-          {addresses[selected].label}
+        <span className={`px-1.5 py-0 rounded-full text-xs font-bold flex-shrink-0 ${activeConfig.badgeClass}`}>
+          {activeConfig.label}
         </span>
-        <svg className={`w-3 h-3 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+        <span className="truncate max-w-[160px]">{addresses[activeType]}</span>
+        <Pencil className="w-2.5 h-2.5 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
       </button>
+
       {open && (
-        <div className="absolute left-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-lg shadow-lg w-72 py-1">
-          {addresses.map((addr, i) => (
-            <button
-              key={i}
-              onClick={() => { setSelected(i); setOpen(false); }}
-              className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 flex items-start gap-2 ${selected === i ? 'bg-red-50' : ''}`}
-            >
-              <span className={`mt-0.5 px-1.5 py-0 rounded-full text-xs font-bold flex-shrink-0 ${i === 0 ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
-                {addr.label}
-              </span>
-              <span className="text-gray-800">{addr.value}</span>
-            </button>
-          ))}
-        </div>
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute left-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-lg shadow-xl w-80 overflow-hidden">
+            <div className="px-3 py-2 bg-gray-50 border-b border-gray-100">
+              <p className="text-xs font-bold text-gray-600 uppercase tracking-wide">Addresses on File</p>
+            </div>
+            {ADDRESS_TYPES.map(({ key, label, badgeClass }) => (
+              <div
+                key={key}
+                className={`flex items-start gap-2 px-3 py-2.5 hover:bg-gray-50 transition-colors ${activeType === key ? 'bg-red-50' : ''}`}
+              >
+                <button
+                  onClick={() => handleSwitch(key)}
+                  className="flex items-start gap-2 flex-1 text-left min-w-0"
+                >
+                  <span className={`mt-0.5 px-1.5 py-0 rounded-full text-xs font-bold flex-shrink-0 ${badgeClass}`}>{label}</span>
+                  <span className="text-xs text-gray-800 leading-relaxed">{addresses[key]}</span>
+                  {activeType === key && <Check className="w-3.5 h-3.5 text-[#8B1F1F] flex-shrink-0 mt-0.5 ml-auto" />}
+                </button>
+                <button
+                  onClick={(e) => handleStartEdit(key, e)}
+                  className="flex-shrink-0 p-1 rounded hover:bg-gray-200 text-gray-400 hover:text-gray-700 transition-colors"
+                  title={`Edit ${label} address`}
+                >
+                  <Pencil className="w-3 h-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
@@ -197,11 +265,7 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient }) {
               </div>
               <div className="col-span-2">
                 <p className="text-gray-500">Address</p>
-                <InlineEdit
-                  value={editedAddress}
-                  onSave={setEditedAddress}
-                  className="font-semibold text-gray-800 text-xs hover:text-[#8B1F1F] transition-colors"
-                />
+                <AddressField address={editedAddress} onChange={setEditedAddress} />
               </div>
             </div>
 
