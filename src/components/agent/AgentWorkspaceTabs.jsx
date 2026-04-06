@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Textarea } from '@/components/ui/textarea';
 import {
   LayoutDashboard, Pill, ShoppingCart, MessageSquare, CreditCard,
-  RefreshCw, Phone, Mail, Send, AlertTriangle, Bot, ExternalLink, Clock
+  RefreshCw, Phone, Mail, Send, AlertTriangle, Bot, ExternalLink, Clock, IdCard
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -16,6 +16,32 @@ const TABS = [
   { id: 'communications', label: 'Communications', icon: MessageSquare },
   { id: 'billing', label: 'Billing', icon: CreditCard },
 ];
+
+function InsuranceCardPopover() {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="relative inline-block">
+      <button
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+        onClick={() => setShow(v => !v)}
+        className="p-0.5 rounded hover:bg-gray-200 transition-colors"
+        title="View insurance card"
+      >
+        <IdCard className="w-3.5 h-3.5 text-[#8B1F1F]" />
+      </button>
+      {show && (
+        <div className="absolute left-6 top-0 z-50 bg-white border border-gray-200 rounded-lg shadow-xl p-2 w-64">
+          <img
+            src="https://media.base44.com/images/public/695285fc94e8ef46bde70e16/50e86ad64_InsuranceCard.png"
+            alt="Insurance Card"
+            className="w-full rounded"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function AgentWorkspaceTabs({ patient }) {
   const [activeTab, setActiveTab] = useState('overview');
@@ -83,7 +109,10 @@ export default function AgentWorkspaceTabs({ patient }) {
               </div>
               <div>
                 <p className="text-gray-500">Insurance</p>
-                <p className="font-semibold text-gray-800">{patient.insurance}</p>
+                <div className="flex items-center gap-1">
+                  <p className="font-semibold text-gray-800">{patient.insurance}</p>
+                  <InsuranceCardPopover />
+                </div>
               </div>
               <div>
                 <p className="text-gray-500">Allergies</p>
