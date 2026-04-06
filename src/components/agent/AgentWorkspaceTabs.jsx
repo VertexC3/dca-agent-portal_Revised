@@ -17,6 +17,46 @@ const TABS = [
   { id: 'billing', label: 'Billing', icon: CreditCard },
 ];
 
+function AddressDropdown({ address }) {
+  const [open, setOpen] = useState(false);
+  const addresses = [
+    { label: 'Main', value: address },
+    { label: 'Work', value: '123 Business Park Dr, Suite 400, Columbia, SC 29201' },
+  ];
+  const [selected, setSelected] = useState(0);
+
+  return (
+    <div className="relative inline-block">
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="flex items-center gap-1 font-semibold text-gray-800 text-xs hover:text-[#8B1F1F] transition-colors"
+      >
+        <span>{addresses[selected].value}</span>
+        <span className={`px-1.5 py-0 rounded-full text-xs font-bold ${selected === 0 ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
+          {addresses[selected].label}
+        </span>
+        <svg className={`w-3 h-3 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-lg shadow-lg w-72 py-1">
+          {addresses.map((addr, i) => (
+            <button
+              key={i}
+              onClick={() => { setSelected(i); setOpen(false); }}
+              className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 flex items-start gap-2 ${selected === i ? 'bg-red-50' : ''}`}
+            >
+              <span className={`mt-0.5 px-1.5 py-0 rounded-full text-xs font-bold flex-shrink-0 ${i === 0 ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
+                {addr.label}
+              </span>
+              <span className="text-gray-800">{addr.value}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function InsuranceCardPopover() {
   const [show, setShow] = useState(false);
   return (
@@ -98,7 +138,7 @@ export default function AgentWorkspaceTabs({ patient }) {
               </div>
               <div className="col-span-2">
                 <p className="text-gray-500">Address</p>
-                <p className="font-semibold text-gray-800 text-xs">{patient.address}</p>
+                <AddressDropdown address={patient.address} />
               </div>
             </div>
 
