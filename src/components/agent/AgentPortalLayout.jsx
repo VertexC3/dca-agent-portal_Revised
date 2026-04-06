@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { createPageUrl } from '../../utils';
-import { User, LogOut, ChevronDown, Bell, LayoutDashboard, Users, FileText, Stethoscope, ChevronLeft, ChevronRight, Headphones } from 'lucide-react';
+import { LogOut, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,21 +9,14 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from '@/components/ui/badge';
-import { motion } from 'framer-motion';
-
 const getMockUser = () => {
   const stored = localStorage.getItem('facilityUser');
   if (stored) return JSON.parse(stored);
   return { full_name: "Agent User", email: "agent@dcapharmacy.com", role: "representative", profile_picture: null };
 };
 
-const navItems = [
-  { name: 'Agent Portal', page: 'AgentPortal', icon: Headphones },
-];
-
 export default function AgentPortalLayout({ children, currentPageName }) {
   const [showPlatformSwitcher, setShowPlatformSwitcher] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [mockUser, setMockUser] = useState(getMockUser);
 
   React.useEffect(() => {
@@ -141,44 +133,8 @@ export default function AgentPortalLayout({ children, currentPageName }) {
         </div>
       </header>
 
-      {/* Sidebar */}
-      <motion.div
-        initial={false}
-        animate={{ width: isSidebarCollapsed ? 80 : 240 }}
-        className="fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 shadow-sm z-40 flex flex-col"
-      >
-        <button
-          onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          className="absolute -right-3 top-6 bg-white border border-gray-200 rounded-full p-1 hover:bg-gray-50 shadow-md"
-        >
-          {isSidebarCollapsed ? <ChevronRight className="w-4 h-4 text-gray-600" /> : <ChevronLeft className="w-4 h-4 text-gray-600" />}
-        </button>
-
-        <nav className="flex-1 pt-8 px-3 space-y-2">
-          {navItems.map(item => {
-            const Icon = item.icon;
-            const isActive = currentPageName === item.page;
-            return (
-              <Link
-                key={item.page}
-                to={createPageUrl(item.page)}
-                className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-all ${
-                  isActive ? 'bg-[#8B1F1F] text-white shadow-md' : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <Icon className="w-5 h-5 flex-shrink-0" />
-                {!isSidebarCollapsed && <span className="font-medium whitespace-nowrap">{item.name}</span>}
-              </Link>
-            );
-          })}
-        </nav>
-      </motion.div>
-
       {/* Main Content */}
-      <main
-        className="pt-20 px-6 pb-8 transition-all duration-300"
-        style={{ marginLeft: isSidebarCollapsed ? '80px' : '240px' }}
-      >
+      <main className="pt-20 px-6 pb-8">
         <div className="max-w-full">
           {children}
         </div>
