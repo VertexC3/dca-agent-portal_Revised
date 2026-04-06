@@ -26,9 +26,9 @@ export const mockPatients = [
       { id: 'RX-002', name: 'Metformin 500mg', dosage: '500mg', frequency: 'Twice daily', refills: 5, last_filled: '2026-01-10', status: 'active', prescriber: 'Dr. Sarah Johnson', rx_number: '924315' },
     ],
     orders: [
-      { id: 'ORD-1001', receipt: '883659', date: '2026-01-15', medication: 'Semaglutide 2.4mg', amount: 250.00, status: 'Delivered', tracking: '144RCQ7IMNAA1' },
-      { id: 'ORD-1002', receipt: '883660', date: '2026-01-10', medication: 'Metformin 500mg', amount: 45.00, status: 'Delivered', tracking: '144RCQ7IMNAA2' },
-      { id: 'ORD-1003', receipt: '883661', date: '2025-12-20', medication: 'Semaglutide 2.4mg', amount: 250.00, status: 'Delivered', tracking: '144RCQ7IMNAA3' },
+      { id: 'ORD-1001', receipt: '883659', date: '2026-01-15', medication: 'Semaglutide 2.4mg', amount: 250.00, status: 'Delivered', tracking: '144RCQ7IMNAA1', delivered_at: '2026-01-17 @ 2:14 PM', delivered_to: '123 Main St, Franklin, TN 37064' },
+      { id: 'ORD-1002', receipt: '883660', date: '2026-04-05', medication: 'Metformin 500mg', amount: 45.00, status: 'In Progress', tracking: '144RCQ7IMNAA2', est_delivery: '2026-04-08', delivery_window: '10:00 AM – 2:00 PM' },
+      { id: 'ORD-1003', receipt: '883661', date: '2025-12-20', medication: 'Semaglutide 2.4mg', amount: 250.00, status: 'Delivered', tracking: '144RCQ7IMNAA3', delivered_at: '2025-12-22 @ 11:47 AM', delivered_to: '123 Main St, Franklin, TN 37064' },
     ],
     communications: [
       { id: 'COM-001', date: '2026-01-20', type: 'phone', subject: 'Refill inquiry', summary: 'Patient called about refill for Semaglutide. Approved and processed.', agent: 'Sarah K.', duration: '4m 32s' },

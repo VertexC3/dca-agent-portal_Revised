@@ -263,16 +263,29 @@ function OverviewTab({ patient }) {
           <p className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Recent Orders</p>
           <div className="space-y-1.5">
             {patient.orders.slice(0, 3).map(o => (
-              <div key={o.id} className="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200 text-xs">
-                <div>
+              <div key={o.id} className="p-2 bg-gray-50 rounded border border-gray-200 text-xs">
+                <div className="flex items-center justify-between gap-2">
                   <p className="font-semibold text-gray-800 truncate max-w-[120px]">{o.medication}</p>
-                  <p className="text-gray-500">{format(new Date(o.date), 'MM/dd/yy')} • #{o.receipt}</p>
+                  <Badge className={`text-xs flex-shrink-0 ${
+                    o.status === 'Delivered' ? 'bg-green-100 text-green-800' :
+                    o.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
+                    o.status === 'In Transit' ? 'bg-blue-100 text-blue-800' :
+                    'bg-yellow-100 text-yellow-800'
+                  }`}>{o.status}</Badge>
                 </div>
-                <Badge className={`text-xs ${
-                  o.status === 'Delivered' ? 'bg-green-100 text-green-800' :
-                  o.status === 'In Transit' ? 'bg-blue-100 text-blue-800' :
-                  'bg-yellow-100 text-yellow-800'
-                }`}>{o.status}</Badge>
+                <p className="text-gray-500 mt-0.5">{format(new Date(o.date), 'MM/dd/yy')} • #{o.receipt}</p>
+                {o.status === 'Delivered' && o.delivered_at && (
+                  <div className="mt-1 pt-1 border-t border-gray-200 space-y-0.5">
+                    <p className="text-green-700"><span className="font-semibold">Delivered:</span> {o.delivered_at}</p>
+                    <p className="text-gray-500"><span className="font-semibold">To:</span> {o.delivered_to}</p>
+                  </div>
+                )}
+                {o.status === 'In Progress' && o.est_delivery && (
+                  <div className="mt-1 pt-1 border-t border-gray-200 space-y-0.5">
+                    <p className="text-blue-700"><span className="font-semibold">Est. Delivery:</span> {format(new Date(o.est_delivery), 'MMM d, yyyy')}</p>
+                    <p className="text-gray-500"><span className="font-semibold">Window:</span> {o.delivery_window}</p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
