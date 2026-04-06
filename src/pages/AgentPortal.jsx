@@ -88,8 +88,10 @@ export default function AgentPortal() {
               ))}
             </SelectContent>
           </Select>
-          <div className="w-px h-6 bg-gray-200 flex-shrink-0" />
-          <OrderSearchBar onSelectPatient={setSelectedPatient} />
+          <div className="ml-auto flex items-center gap-4">
+            <div className="w-px h-6 bg-gray-200 flex-shrink-0" />
+            <OrderSearchBar onSelectPatient={setSelectedPatient} />
+          </div>
         </div>
       </div>
 
