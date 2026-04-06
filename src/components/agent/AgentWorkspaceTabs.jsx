@@ -5,8 +5,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Textarea } from '@/components/ui/textarea';
 import {
   LayoutDashboard, Pill, ShoppingCart, MessageSquare, CreditCard,
-  RefreshCw, Phone, Mail, Send, AlertTriangle, Bot, ExternalLink, Clock, IdCard, ChevronRight, CheckCircle2
+  RefreshCw, Phone, Mail, Send, AlertTriangle, Bot, ExternalLink, Clock, IdCard, ChevronRight, CheckCircle2,
+  Pencil, Check, X
 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
 import OrderDetailModal from './OrderDetailModal';
 import PhysicianContextPopup from './PhysicianContextPopup';
@@ -87,9 +89,50 @@ function InsuranceCardPopover() {
   );
 }
 
+function InlineEdit({ value, onSave, className = '' }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+
+  const handleSave = () => { onSave(draft); setEditing(false); };
+  const handleCancel = () => { setDraft(value); setEditing(false); };
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-1 mt-0.5">
+        <Input
+          value={draft}
+          onChange={e => setDraft(e.target.value)}
+          className="h-6 text-xs px-1.5 py-0 border-[#8B1F1F]/50 focus:border-[#8B1F1F]"
+          autoFocus
+          onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') handleCancel(); }}
+        />
+        <button onClick={handleSave} className="text-green-600 hover:text-green-700 flex-shrink-0"><Check className="w-3.5 h-3.5" /></button>
+        <button onClick={handleCancel} className="text-gray-400 hover:text-red-500 flex-shrink-0"><X className="w-3.5 h-3.5" /></button>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={() => { setDraft(value); setEditing(true); }}
+      className={`flex items-center gap-1 group text-left ${className}`}
+    >
+      <span>{value}</span>
+      <Pencil className="w-2.5 h-2.5 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+    </button>
+  );
+}
+
 export default function AgentWorkspaceTabs({ patient, onSwitchPatient }) {
   const [activeTab, setActiveTab] = useState('overview');
   const [newNote, setNewNote] = useState('');
+  const [editedAllergies, setEditedAllergies] = useState(patient?.allergies || '');
+  const [editedAddress, setEditedAddress] = useState(patient?.address || '');
+
+  React.useEffect(() => {
+    setEditedAllergies(patient?.allergies || '');
+    setEditedAddress(patient?.address || '');
+  }, [patient?.id]);
 
   if (!patient) {
     return (
@@ -142,7 +185,11 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient }) {
               </div>
               <div className="col-span-2">
                 <p className="text-gray-500">Address</p>
-                <AddressDropdown address={patient.address} />
+                <InlineEdit
+                  value={editedAddress}
+                  onSave={setEditedAddress}
+                  className="font-semibold text-gray-800 text-xs hover:text-[#8B1F1F] transition-colors"
+                />
               </div>
             </div>
 
@@ -160,7 +207,11 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient }) {
               </div>
               <div>
                 <p className="text-gray-500">Allergies</p>
-                <p className="font-semibold text-red-700">{patient.allergies}</p>
+                <InlineEdit
+                  value={editedAllergies}
+                  onSave={setEditedAllergies}
+                  className="font-semibold text-red-700 text-xs hover:text-red-500 transition-colors"
+                />
               </div>
             </div>
           </div>
