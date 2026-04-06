@@ -5,6 +5,7 @@ import {
 } from '@/components/ui/select';
 import AgentWorkspaceTabs from '../components/agent/AgentWorkspaceTabs';
 import AgentRightPanel from '../components/agent/AgentRightPanel';
+import OrderSearchBar from '../components/agent/OrderSearchBar';
 
 export const mockPatients = [
   {
@@ -179,15 +180,15 @@ export default function AgentPortal() {
 
   return (
     <div className="flex flex-col h-full bg-gray-50">
-      {/* Top Bar: Patient Selection */}
+      {/* Top Bar: Patient Selection + Order Search */}
       <div className="px-4 py-3 bg-white border-b border-gray-200 shadow-sm">
-        <div className="flex items-center gap-3">
-          <label className="text-xs font-bold text-gray-700 uppercase tracking-wide">Select Patient:</label>
+        <div className="flex items-center gap-4">
+          <label className="text-xs font-bold text-gray-700 uppercase tracking-wide whitespace-nowrap">Select Patient:</label>
           <Select value={selectedPatient?.id || ''} onValueChange={(id) => {
             const patient = mockPatients.find(p => p.id === id);
             setSelectedPatient(patient || null);
           }}>
-            <SelectTrigger className="w-80">
+            <SelectTrigger className="w-72">
               <SelectValue placeholder="Choose a patient..." />
             </SelectTrigger>
             <SelectContent>
@@ -198,6 +199,8 @@ export default function AgentPortal() {
               ))}
             </SelectContent>
           </Select>
+          <div className="w-px h-6 bg-gray-200 flex-shrink-0" />
+          <OrderSearchBar onSelectPatient={setSelectedPatient} />
         </div>
       </div>
 
