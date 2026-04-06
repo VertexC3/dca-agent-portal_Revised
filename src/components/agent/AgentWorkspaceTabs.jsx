@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import OrderDetailModal from './OrderDetailModal';
+import PhysicianContextPopup from './PhysicianContextPopup';
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -335,10 +336,16 @@ function OverviewTab({ patient }) {
   const [openModal, setOpenModal] = useState(null);
   const [selectedOrderId, setSelectedOrderId] = useState(patient.orders[0]?.id || null);
   const [detailOrder, setDetailOrder] = useState(null);
+  const [showPhysicianContext, setShowPhysicianContext] = useState(false);
 
   React.useEffect(() => {
     setSelectedOrderId(patient.orders[0]?.id || null);
   }, [patient.id]);
+
+  const handlePhysicianCall = () => {
+    window.dispatchEvent(new CustomEvent('softphone:dial', { detail: { number: patient.physician_phone } }));
+    setShowPhysicianContext(true);
+  };
   const unpaid = patient.invoices.filter(i => i.status !== 'paid');
   const lowRefills = patient.prescriptions.filter(p => p.refills <= 1);
   const filteredComms = selectedOrderId
@@ -349,6 +356,7 @@ function OverviewTab({ patient }) {
     <div className="space-y-4">
       {openModal && <StatCardModal stat={openModal} patient={patient} onClose={() => setOpenModal(null)} />}
       {detailOrder && <OrderDetailModal order={detailOrder} patient={patient} onClose={() => setDetailOrder(null)} />}
+      {showPhysicianContext && <PhysicianContextPopup patient={patient} onClose={() => setShowPhysicianContext(false)} />}
       {/* Quick Stats */}
       <div className="grid grid-cols-4 gap-3">
         {[
@@ -501,7 +509,17 @@ function OverviewTab({ patient }) {
         <div className="grid grid-cols-3 gap-2 text-xs">
           <div><p className="text-gray-500">Name</p><p className="font-semibold text-gray-800">{patient.physician}</p></div>
           <div><p className="text-gray-500">NPI</p><p className="font-semibold text-gray-800">{patient.physician_npi}</p></div>
-          <div><p className="text-gray-500">Phone</p><p className="font-semibold text-gray-800">{patient.physician_phone}</p></div>
+          <div>
+            <p className="text-gray-500">Phone</p>
+            <button
+              onClick={handlePhysicianCall}
+              className="font-semibold text-[#8B1F1F] hover:underline flex items-center gap-1 group"
+              title="Click to call physician"
+            >
+              <Phone className="w-3 h-3 group-hover:animate-pulse" />
+              {patient.physician_phone}
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -17,6 +17,19 @@ export default function SoftPhone() {
   const [speakerOff, setSpeakerOff] = useState(false);
   const timerRef = React.useRef(null);
 
+  // Listen for external dial requests (e.g. physician phone click)
+  React.useEffect(() => {
+    const handler = (e) => {
+      const number = e.detail?.number;
+      if (number) {
+        setDialInput(number);
+        setOpen(true);
+      }
+    };
+    window.addEventListener('softphone:dial', handler);
+    return () => window.removeEventListener('softphone:dial', handler);
+  }, []);
+
   const handleDial = (key) => setDialInput(v => v + key);
   const handleDelete = () => setDialInput(v => v.slice(0, -1));
 
