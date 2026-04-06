@@ -205,26 +205,156 @@ export default function AgentWorkspaceTabs({ patient }) {
   );
 }
 
+function StatCardModal({ stat, patient, onClose }) {
+  const unpaid = patient.invoices.filter(i => i.status !== 'paid');
+  const lowRefills = patient.prescriptions.filter(p => p.refills <= 1);
+
+  const renderContent = () => {
+    if (stat === 'rx') return (
+      <div className="space-y-2">
+        {patient.prescriptions.map(rx => (
+          <div key={rx.id} className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-xs">
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-bold text-gray-900">{rx.name}</span>
+              <Badge className={rx.refills === 0 ? 'bg-red-100 text-red-800' : rx.refills <= 1 ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}>
+                {rx.refills} refill{rx.refills !== 1 ? 's' : ''} left
+              </Badge>
+            </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-gray-600">
+              <span>Rx #: <strong>{rx.rx_number}</strong></span>
+              <span>Dosage: <strong>{rx.dosage}</strong></span>
+              <span>Frequency: <strong>{rx.frequency}</strong></span>
+              <span>Last Filled: <strong>{format(new Date(rx.last_filled), 'MM/dd/yyyy')}</strong></span>
+              <span className="col-span-2">Prescriber: <strong>{rx.prescriber}</strong></span>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+    if (stat === 'orders') return (
+      <div className="space-y-2">
+        {patient.orders.map(o => (
+          <div key={o.id} className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-xs">
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-bold text-gray-900">{o.medication}</span>
+              <Badge className={o.status === 'Delivered' ? 'bg-green-100 text-green-800' : o.status === 'In Progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}>
+                {o.status}
+              </Badge>
+            </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-gray-600">
+              <span>Order: <strong>{o.id}</strong></span>
+              <span>Receipt: <strong>#{o.receipt}</strong></span>
+              <span>Date: <strong>{format(new Date(o.date), 'MM/dd/yyyy')}</strong></span>
+              <span>Amount: <strong>${o.amount.toFixed(2)}</strong></span>
+              <span className="col-span-2">Tracking: <strong className="font-mono">{o.tracking}</strong></span>
+            </div>
+            {o.status === 'Delivered' && o.delivered_at && (
+              <div className="mt-1.5 pt-1.5 border-t border-gray-200 space-y-0.5">
+                <p className="text-green-700"><span className="font-semibold">Delivered:</span> {o.delivered_at}</p>
+                <p className="text-gray-500"><span className="font-semibold">To:</span> {o.delivered_to}</p>
+              </div>
+            )}
+            {o.status === 'In Progress' && o.est_delivery && (
+              <div className="mt-1.5 pt-1.5 border-t border-gray-200 space-y-0.5">
+                <p className="text-blue-700"><span className="font-semibold">Est. Delivery:</span> {format(new Date(o.est_delivery), 'MMM d, yyyy')}</p>
+                <p className="text-gray-500"><span className="font-semibold">Window:</span> {o.delivery_window}</p>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+    if (stat === 'invoices') return (
+      <div className="space-y-2">
+        {unpaid.length === 0 ? (
+          <p className="text-xs text-gray-400 text-center py-4">No open invoices</p>
+        ) : unpaid.map(inv => (
+          <div key={inv.id} className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs">
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-bold text-gray-900">{inv.number}</span>
+              <Badge className="bg-red-100 text-red-800">{inv.status}</Badge>
+            </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-gray-600">
+              <span>Date: <strong>{format(new Date(inv.date), 'MM/dd/yyyy')}</strong></span>
+              <span>Total: <strong>${inv.amount.toFixed(2)}</strong></span>
+              <span>Paid: <strong>${inv.paid.toFixed(2)}</strong></span>
+              <span>Outstanding: <strong className="text-red-700">${(inv.amount - inv.paid).toFixed(2)}</strong></span>
+            </div>
+            <Button size="sm" className="mt-2 h-7 text-xs bg-green-600 hover:bg-green-700 w-full">Pay Now</Button>
+          </div>
+        ))}
+      </div>
+    );
+    if (stat === 'lowrefills') return (
+      <div className="space-y-2">
+        {lowRefills.length === 0 ? (
+          <p className="text-xs text-gray-400 text-center py-4">No low-refill prescriptions</p>
+        ) : lowRefills.map(rx => (
+          <div key={rx.id} className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-xs">
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-bold text-gray-900">{rx.name}</span>
+              <Badge className={rx.refills === 0 ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}>
+                {rx.refills === 0 ? 'No refills' : `${rx.refills} left`}
+              </Badge>
+            </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-gray-600">
+              <span>Rx #: <strong>{rx.rx_number}</strong></span>
+              <span>Dosage: <strong>{rx.dosage}</strong></span>
+              <span>Frequency: <strong>{rx.frequency}</strong></span>
+              <span>Last Filled: <strong>{format(new Date(rx.last_filled), 'MM/dd/yyyy')}</strong></span>
+              <span className="col-span-2">Prescriber: <strong>{rx.prescriber}</strong></span>
+            </div>
+            <Button size="sm" className="mt-2 h-7 text-xs bg-[#8B1F1F] hover:bg-[#721919] w-full">
+              <RefreshCw className="w-3 h-3 mr-1" />Request Refill
+            </Button>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const titles = { rx: 'Active Prescriptions', orders: 'All Orders', invoices: 'Open Invoices', lowrefills: 'Low Refill Alerts' };
+
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center" onClick={onClose}>
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+          <h3 className="font-bold text-sm text-gray-900">{titles[stat]}</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-700 text-lg leading-none">✕</button>
+        </div>
+        <div className="p-4 max-h-[70vh] overflow-y-auto">
+          {renderContent()}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function OverviewTab({ patient }) {
+  const [openModal, setOpenModal] = useState(null);
   const unpaid = patient.invoices.filter(i => i.status !== 'paid');
   const lowRefills = patient.prescriptions.filter(p => p.refills <= 1);
 
   return (
     <div className="space-y-4">
+      {openModal && <StatCardModal stat={openModal} patient={patient} onClose={() => setOpenModal(null)} />}
       {/* Quick Stats */}
       <div className="grid grid-cols-4 gap-3">
         {[
-          { label: 'Active Rx', value: patient.prescriptions.length, color: 'blue' },
-          { label: 'Orders', value: patient.orders.length, color: 'gray' },
-          { label: 'Open Invoices', value: unpaid.length, color: unpaid.length > 0 ? 'red' : 'gray' },
-          { label: 'Low Refills', value: lowRefills.length, color: lowRefills.length > 0 ? 'yellow' : 'gray' },
+          { key: 'rx', label: 'Active Rx', value: patient.prescriptions.length, color: 'blue' },
+          { key: 'orders', label: 'Orders', value: patient.orders.length, color: 'gray' },
+          { key: 'invoices', label: 'Open Invoices', value: unpaid.length, color: unpaid.length > 0 ? 'red' : 'gray' },
+          { key: 'lowrefills', label: 'Low Refills', value: lowRefills.length, color: lowRefills.length > 0 ? 'yellow' : 'gray' },
         ].map(stat => (
-          <div key={stat.label} className={`text-center p-3 rounded-lg border ${
-            stat.color === 'blue' ? 'bg-blue-50 border-blue-100' :
-            stat.color === 'red' ? 'bg-red-50 border-red-100' :
-            stat.color === 'yellow' ? 'bg-yellow-50 border-yellow-100' :
-            'bg-gray-50 border-gray-200'
-          }`}>
+          <button
+            key={stat.label}
+            onClick={() => setOpenModal(stat.key)}
+            className={`text-center p-3 rounded-lg border cursor-pointer transition-all hover:shadow-md hover:scale-105 active:scale-95 ${
+              stat.color === 'blue' ? 'bg-blue-50 border-blue-100 hover:border-blue-300' :
+              stat.color === 'red' ? 'bg-red-50 border-red-100 hover:border-red-300' :
+              stat.color === 'yellow' ? 'bg-yellow-50 border-yellow-100 hover:border-yellow-300' :
+              'bg-gray-50 border-gray-200 hover:border-gray-400'
+            }`}>
             <p className={`text-2xl font-bold ${
               stat.color === 'blue' ? 'text-blue-700' :
               stat.color === 'red' ? 'text-red-600' :
@@ -232,7 +362,7 @@ function OverviewTab({ patient }) {
               'text-gray-600'
             }`}>{stat.value}</p>
             <p className="text-xs text-gray-600 mt-0.5">{stat.label}</p>
-          </div>
+          </button>
         ))}
       </div>
 
