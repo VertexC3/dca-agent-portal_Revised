@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-  { id: 'prescriptions', label: 'Prescriptions', icon: Pill },
+  { id: 'prescriptions', label: 'Rx', icon: Pill },
   { id: 'orders', label: 'Orders', icon: ShoppingCart },
   { id: 'communications', label: 'Communications', icon: MessageSquare },
   { id: 'billing', label: 'Billing', icon: CreditCard },
@@ -312,18 +312,55 @@ function OverviewTab({ patient }) {
 }
 
 function PrescriptionsTab({ patient }) {
+  const [filter, setFilter] = useState('active');
+
+  // Mock: treat prescriptions with 0 refills as inactive, rest as active
+  const activePrescriptions = patient.prescriptions.filter(rx => rx.refills > 0);
+  const inactivePrescriptions = patient.prescriptions.filter(rx => rx.refills === 0);
+  const displayed = filter === 'active' ? activePrescriptions : inactivePrescriptions;
+
   return (
     <div className="space-y-3">
-      {patient.prescriptions.map(rx => (
+      {/* Toggle */}
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-bold text-gray-700 uppercase tracking-wide">
+          {filter === 'active' ? activePrescriptions.length : inactivePrescriptions.length} Prescription{displayed.length !== 1 ? 's' : ''}
+        </p>
+        <div className="flex items-center bg-gray-100 rounded-lg p-0.5 text-xs font-semibold">
+          <button
+            onClick={() => setFilter('active')}
+            className={`px-3 py-1 rounded-md transition-colors ${filter === 'active' ? 'bg-white text-[#8B1F1F] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            Active
+          </button>
+          <button
+            onClick={() => setFilter('inactive')}
+            className={`px-3 py-1 rounded-md transition-colors ${filter === 'inactive' ? 'bg-white text-gray-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            Inactive
+          </button>
+        </div>
+      </div>
+
+      {displayed.length === 0 && (
+        <div className="p-6 text-center text-xs text-gray-400 border border-dashed border-gray-200 rounded-lg">
+          No {filter} prescriptions
+        </div>
+      )}
+
+      {displayed.map(rx => (
         <div key={rx.id} className={`p-3 rounded-lg border ${
-          rx.refills === 0 ? 'border-red-300 bg-red-50' :
+          filter === 'inactive' ? 'border-gray-200 bg-gray-50 opacity-75' :
           rx.refills <= 1 ? 'border-yellow-200 bg-yellow-50' :
           'border-gray-200 bg-white'
         }`}>
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <p className="font-bold text-sm text-gray-900">{rx.name}</p>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 mt-1 text-xs text-gray-600">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-[#8B1F1F] bg-red-50 border border-red-200 px-1.5 py-0.5 rounded">Rx</span>
+                <p className="font-bold text-sm text-gray-900">{rx.name}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 mt-1.5 text-xs text-gray-600">
                 <span>Rx #: <strong>{rx.rx_number}</strong></span>
                 <span>Dosage: <strong>{rx.dosage}</strong></span>
                 <span>Frequency: <strong>{rx.frequency}</strong></span>
@@ -339,10 +376,12 @@ function PrescriptionsTab({ patient }) {
               }>
                 {rx.refills} refill{rx.refills !== 1 ? 's' : ''} left
               </Badge>
-              <Button size="sm" className="h-7 text-xs bg-[#8B1F1F] hover:bg-[#721919] px-3">
-                <RefreshCw className="w-3 h-3 mr-1" />
-                Request Refill
-              </Button>
+              {filter === 'active' && (
+                <Button size="sm" className="h-7 text-xs bg-[#8B1F1F] hover:bg-[#721919] px-3">
+                  <RefreshCw className="w-3 h-3 mr-1" />
+                  Request Refill
+                </Button>
+              )}
             </div>
           </div>
         </div>
