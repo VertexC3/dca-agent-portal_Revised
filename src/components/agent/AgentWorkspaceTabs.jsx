@@ -14,6 +14,7 @@ import OrderDetailModal from './OrderDetailModal';
 import PhysicianContextPopup from './PhysicianContextPopup';
 import InvoicePaymentModal from './InvoicePaymentModal';
 import FamilyMemberBar from './FamilyMemberBar';
+import PhysicianPickerModal from './PhysicianPickerModal';
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -128,10 +129,13 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient }) {
   const [newNote, setNewNote] = useState('');
   const [editedAllergies, setEditedAllergies] = useState(patient?.allergies || '');
   const [editedAddress, setEditedAddress] = useState(patient?.address || '');
+  const [editedPhysician, setEditedPhysician] = useState(patient ? { name: patient.physician, npi: patient.physician_npi, phone: patient.physician_phone } : null);
+  const [showPhysicianPicker, setShowPhysicianPicker] = useState(false);
 
   React.useEffect(() => {
     setEditedAllergies(patient?.allergies || '');
     setEditedAddress(patient?.address || '');
+    setEditedPhysician(patient ? { name: patient.physician, npi: patient.physician_npi, phone: patient.physician_phone } : null);
   }, [patient?.id]);
 
   if (!patient) {
@@ -147,6 +151,13 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient }) {
 
   return (
     <div className="flex-1 flex flex-col bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm min-w-0">
+      {showPhysicianPicker && (
+        <PhysicianPickerModal
+          currentPhysician={editedPhysician?.name || patient.physician}
+          onSelect={(p) => { setEditedPhysician(p); setShowPhysicianPicker(false); }}
+          onClose={() => setShowPhysicianPicker(false)}
+        />
+      )}
       {/* Patient Profile Card */}
       <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
         <div className="flex items-start gap-4">
@@ -196,7 +207,13 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient }) {
             <div className="grid grid-cols-3 gap-3 mt-2 text-xs border-t border-gray-200 pt-2">
               <div>
                 <p className="text-gray-500">Physician</p>
-                <p className="font-semibold text-gray-800">{patient.physician}</p>
+                <button
+                  onClick={() => setShowPhysicianPicker(true)}
+                  className="flex items-center gap-1 group text-left font-semibold text-gray-800 hover:text-[#8B1F1F] transition-colors"
+                >
+                  <span>{editedPhysician?.name || patient.physician}</span>
+                  <Pencil className="w-2.5 h-2.5 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                </button>
               </div>
               <div>
                 <p className="text-gray-500">Insurance</p>
@@ -255,7 +272,7 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient }) {
 
       {/* Tab Content */}
       <div className="flex-1 overflow-y-auto p-4">
-        {activeTab === 'overview' && <OverviewTab patient={patient} />}
+        {activeTab === 'overview' && <OverviewTab patient={patient} editedPhysician={editedPhysician} onChangePhysician={() => setShowPhysicianPicker(true)} />}
         {activeTab === 'prescriptions' && <PrescriptionsTab patient={patient} />}
         {activeTab === 'orders' && <OrdersTab patient={patient} />}
         {activeTab === 'communications' && <CommunicationsTab patient={patient} newNote={newNote} setNewNote={setNewNote} />}
@@ -390,7 +407,7 @@ function StatCardModal({ stat, patient, onClose }) {
   );
 }
 
-function OverviewTab({ patient }) {
+function OverviewTab({ patient, editedPhysician, onChangePhysician }) {
   const [openModal, setOpenModal] = useState(null);
   const [selectedOrderId, setSelectedOrderId] = useState(patient.orders[0]?.id || null);
   const [detailOrder, setDetailOrder] = useState(null);
@@ -563,10 +580,18 @@ function OverviewTab({ patient }) {
 
       {/* Physician Card */}
       <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-        <p className="text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Prescribing Physician</p>
+        <div className="flex items-center justify-between mb-1.5">
+          <p className="text-xs font-bold text-gray-700 uppercase tracking-wide">Prescribing Physician</p>
+          <button
+            onClick={onChangePhysician}
+            className="text-xs text-[#8B1F1F] hover:underline font-semibold flex items-center gap-1"
+          >
+            <Pencil className="w-3 h-3" />Change
+          </button>
+        </div>
         <div className="grid grid-cols-3 gap-2 text-xs">
-          <div><p className="text-gray-500">Name</p><p className="font-semibold text-gray-800">{patient.physician}</p></div>
-          <div><p className="text-gray-500">NPI</p><p className="font-semibold text-gray-800">{patient.physician_npi}</p></div>
+          <div><p className="text-gray-500">Name</p><p className="font-semibold text-gray-800">{editedPhysician?.name || patient.physician}</p></div>
+          <div><p className="text-gray-500">NPI</p><p className="font-semibold text-gray-800">{editedPhysician?.npi || patient.physician_npi}</p></div>
           <div>
             <p className="text-gray-500">Phone</p>
             <button
@@ -575,7 +600,7 @@ function OverviewTab({ patient }) {
               title="Click to call physician"
             >
               <Phone className="w-3 h-3 group-hover:animate-pulse" />
-              {patient.physician_phone}
+              {editedPhysician?.phone || patient.physician_phone}
             </button>
           </div>
         </div>
