@@ -66,7 +66,11 @@ export const mockPatients = [
       { id: 'COM-003', date: '2026-01-18', type: 'text', subject: 'Side effects question', summary: 'Patient texted about nausea side effects from Tirzepatide. Advised to eat small meals before injection.', agent: 'AI Agent' },
     ],
     invoices: [
-      { id: 'INV-003', number: 'INV-2026-002', date: '2026-01-31', amount: 350.00, paid: 0, status: 'open' },
+      { id: 'INV-003', number: 'INV-2026-002', date: '2026-01-31', amount: 350.00, paid: 0, status: 'open',
+        line_items: [
+          { name: 'Tirzepatide 5mg', dosage: '5mg', frequency: 'Weekly injection', rx_number: '924316', qty: 1, amount: 350.00 },
+        ]
+      },
     ],
     cards: [{ id: 'CARD-002', last4: '1234', brand: 'Mastercard', expiry: '08/26', is_default: true }]
   },
@@ -99,7 +103,13 @@ export const mockPatients = [
       { id: 'COM-005', date: '2025-12-20', type: 'email', subject: 'Lisinopril dosage question', summary: 'Patient emailed asking about Lisinopril dosage instructions. Advised to take in the morning with water.', agent: 'AI Agent' },
     ],
     invoices: [
-      { id: 'INV-004', number: 'INV-2026-003', date: '2026-01-31', amount: 260.00, paid: 0, status: 'open' },
+      { id: 'INV-004', number: 'INV-2026-003', date: '2026-01-31', amount: 260.00, paid: 100.00, status: 'partially_paid',
+        line_items: [
+          { name: 'Semaglutide 1mg', dosage: '1mg', frequency: 'Weekly injection', rx_number: '924317', qty: 1, amount: 200.00 },
+          { name: 'Atorvastatin 20mg', dosage: '20mg', frequency: 'Once daily', rx_number: '924318', qty: 1, amount: 35.00 },
+          { name: 'Lisinopril 10mg', dosage: '10mg', frequency: 'Once daily', rx_number: '924319', qty: 1, amount: 25.00 },
+        ]
+      },
     ],
     cards: []
   }

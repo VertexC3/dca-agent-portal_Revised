@@ -5,11 +5,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Textarea } from '@/components/ui/textarea';
 import {
   LayoutDashboard, Pill, ShoppingCart, MessageSquare, CreditCard,
-  RefreshCw, Phone, Mail, Send, AlertTriangle, Bot, ExternalLink, Clock, IdCard, ChevronRight
+  RefreshCw, Phone, Mail, Send, AlertTriangle, Bot, ExternalLink, Clock, IdCard, ChevronRight, CheckCircle2
 } from 'lucide-react';
 import { format } from 'date-fns';
 import OrderDetailModal from './OrderDetailModal';
 import PhysicianContextPopup from './PhysicianContextPopup';
+import InvoicePaymentModal from './InvoicePaymentModal';
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -719,8 +720,101 @@ function CommunicationsTab({ patient, newNote, setNewNote }) {
 }
 
 function BillingTab({ patient }) {
+  const [payInvoice, setPayInvoice] = useState(null);
+  const [paidIds, setPaidIds] = useState([]);
+
+  const handlePaid = (id) => setPaidIds(prev => [...prev, id]);
+
+  const openInvoices = patient.invoices.filter(i => i.status !== 'paid' && !paidIds.includes(i.id));
+  const closedInvoices = patient.invoices.filter(i => i.status === 'paid' || paidIds.includes(i.id));
+
   return (
     <div className="space-y-4">
+      {payInvoice && (
+        <InvoicePaymentModal
+          invoice={payInvoice}
+          patient={patient}
+          onClose={() => setPayInvoice(null)}
+          onPaid={(id) => { handlePaid(id); setPayInvoice(null); }}
+        />
+      )}
+
+      {/* Open Invoices */}
+      {openInvoices.length > 0 && (
+        <div>
+          <p className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide flex items-center gap-1.5">
+            <AlertTriangle className="w-3.5 h-3.5 text-red-500" /> Open Invoices
+          </p>
+          <div className="space-y-3">
+            {openInvoices.map(inv => {
+              const outstanding = inv.amount - inv.paid;
+              return (
+                <div key={inv.id} className="border border-red-200 rounded-xl overflow-hidden bg-red-50/40">
+                  {/* Invoice Header */}
+                  <div className="px-4 py-3 bg-red-50 border-b border-red-200 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-bold text-red-800">{inv.number}</p>
+                      <p className="text-xs text-red-600">{format(new Date(inv.date), 'MMMM d, yyyy')}</p>
+                    </div>
+                    <Badge className={`text-xs font-bold ${inv.status === 'partially_paid' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
+                      {inv.status === 'partially_paid' ? 'Partially Paid' : 'Unpaid'}
+                    </Badge>
+                  </div>
+
+                  {/* Line Items */}
+                  <div className="px-4 py-3">
+                    {inv.line_items?.map((item, i) => (
+                      <div key={i} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0 text-xs">
+                        <div className="flex items-start gap-2">
+                          <Pill className="w-3.5 h-3.5 text-[#8B1F1F] mt-0.5 flex-shrink-0" />
+                          <div>
+                            <p className="font-semibold text-gray-900">{item.name}</p>
+                            <p className="text-gray-500">{item.dosage} · {item.frequency}</p>
+                            <p className="text-gray-400 font-mono">Rx #{item.rx_number}</p>
+                          </div>
+                        </div>
+                        <p className="font-bold text-gray-900">${item.amount.toFixed(2)}</p>
+                      </div>
+                    ))}
+
+                    {/* Totals */}
+                    <div className="mt-2 pt-2 space-y-1 text-xs">
+                      <div className="flex justify-between text-gray-600">
+                        <span>Subtotal</span><span>${inv.amount.toFixed(2)}</span>
+                      </div>
+                      {inv.paid > 0 && (
+                        <div className="flex justify-between text-green-700">
+                          <span>Previously Paid</span><span>−${inv.paid.toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between font-bold text-sm text-gray-900 border-t border-gray-200 pt-1.5">
+                        <span>Balance Due</span>
+                        <span className="text-red-700">${outstanding.toFixed(2)}</span>
+                      </div>
+                    </div>
+
+                    <Button
+                      className="w-full mt-3 h-9 bg-[#8B1F1F] hover:bg-[#721919] text-xs font-semibold"
+                      onClick={() => setPayInvoice(inv)}
+                    >
+                      <CreditCard className="w-3.5 h-3.5 mr-1.5" />
+                      Collect Payment — ${outstanding.toFixed(2)}
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {openInvoices.length === 0 && (
+        <div className="p-4 text-center text-xs text-gray-400 border border-dashed border-green-300 bg-green-50 rounded-lg">
+          <CheckCircle2 className="w-5 h-5 text-green-500 mx-auto mb-1" />
+          No open invoices — account is current
+        </div>
+      )}
+
       {/* Payment Methods */}
       <div>
         <p className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Payment Methods on File</p>
@@ -748,49 +842,38 @@ function BillingTab({ patient }) {
           </div>
         )}
         <Button size="sm" variant="outline" className="mt-2 h-7 text-xs">
-          <CreditCard className="w-3 h-3 mr-1" />
-          Add Payment Method
+          <CreditCard className="w-3 h-3 mr-1" />Add Payment Method
         </Button>
       </div>
 
-      {/* Invoice History */}
-      <div>
-        <p className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Invoice History</p>
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-gray-50">
-              <TableHead className="text-xs font-bold">Invoice #</TableHead>
-              <TableHead className="text-xs font-bold">Date</TableHead>
-              <TableHead className="text-xs font-bold">Amount</TableHead>
-              <TableHead className="text-xs font-bold">Outstanding</TableHead>
-              <TableHead className="text-xs font-bold">Status</TableHead>
-              <TableHead className="text-xs font-bold"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {patient.invoices.map(inv => (
-              <TableRow key={inv.id} className="hover:bg-gray-50">
-                <TableCell className="text-xs font-semibold text-[#8B1F1F]">{inv.number}</TableCell>
-                <TableCell className="text-xs">{format(new Date(inv.date), 'MM/dd/yyyy')}</TableCell>
-                <TableCell className="text-xs">${inv.amount.toFixed(2)}</TableCell>
-                <TableCell className="text-xs">${(inv.amount - inv.paid).toFixed(2)}</TableCell>
-                <TableCell>
-                  <Badge className={`text-xs ${inv.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                    {inv.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  {inv.status !== 'paid' && (
-                    <Button size="sm" className="h-6 text-xs bg-green-600 hover:bg-green-700 px-2">
-                      Pay Now
-                    </Button>
-                  )}
-                </TableCell>
+      {/* Paid Invoice History */}
+      {closedInvoices.length > 0 && (
+        <div>
+          <p className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Payment History</p>
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-50">
+                <TableHead className="text-xs font-bold">Invoice #</TableHead>
+                <TableHead className="text-xs font-bold">Date</TableHead>
+                <TableHead className="text-xs font-bold">Amount</TableHead>
+                <TableHead className="text-xs font-bold">Status</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+            </TableHeader>
+            <TableBody>
+              {closedInvoices.map(inv => (
+                <TableRow key={inv.id} className="hover:bg-gray-50">
+                  <TableCell className="text-xs font-semibold text-[#8B1F1F]">{inv.number}</TableCell>
+                  <TableCell className="text-xs">{format(new Date(inv.date), 'MM/dd/yyyy')}</TableCell>
+                  <TableCell className="text-xs">${inv.amount.toFixed(2)}</TableCell>
+                  <TableCell>
+                    <Badge className="text-xs bg-green-100 text-green-800">Paid</Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </div>
   );
 }
