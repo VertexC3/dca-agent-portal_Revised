@@ -39,7 +39,11 @@ export const mockPatients = [
       { id: 'INV-001', number: 'INV-2026-001', date: '2026-01-31', amount: 295.00, paid: 295.00, status: 'paid' },
       { id: 'INV-002', number: 'INV-2025-012', date: '2025-12-31', amount: 250.00, paid: 250.00, status: 'paid' },
     ],
-    cards: [{ id: 'CARD-001', last4: '4242', brand: 'Visa', expiry: '12/27', is_default: true }]
+    cards: [{ id: 'CARD-001', last4: '4242', brand: 'Visa', expiry: '12/27', is_default: true }],
+    family_members: [
+      { id: 'FM-1', name: 'Mary Doe', relation: 'Spouse', email: 'mary.doe@example.com', phone: '(555) 123-4568', profile_picture: null },
+      { id: 'FM-2', name: 'Tommy Doe', relation: 'Son', email: 'tommy.doe@example.com', phone: '(555) 123-4569', profile_picture: null },
+    ]
   },
   {
     id: '2',
@@ -194,7 +198,13 @@ export default function AgentPortal() {
       >
         {/* Middle: Workspace with Patient Info + Tabs */}
         <div style={{ width: middleW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden flex flex-col border-r border-gray-200">
-          <AgentWorkspaceTabs patient={selectedPatient} />
+          <AgentWorkspaceTabs
+            patient={selectedPatient}
+            onSwitchPatient={(member) => {
+              const found = mockPatients.find(p => p.email === member.email);
+              if (found) setSelectedPatient(found);
+            }}
+          />
         </div>
 
         <ResizeDivider onDrag={dragMiddle} />

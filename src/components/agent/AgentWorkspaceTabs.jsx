@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import OrderDetailModal from './OrderDetailModal';
 import PhysicianContextPopup from './PhysicianContextPopup';
 import InvoicePaymentModal from './InvoicePaymentModal';
+import FamilyMemberBar from './FamilyMemberBar';
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -86,7 +87,7 @@ function InsuranceCardPopover() {
   );
 }
 
-export default function AgentWorkspaceTabs({ patient }) {
+export default function AgentWorkspaceTabs({ patient, onSwitchPatient }) {
   const [activeTab, setActiveTab] = useState('overview');
   const [newNote, setNewNote] = useState('');
 
@@ -165,6 +166,11 @@ export default function AgentWorkspaceTabs({ patient }) {
           </div>
         </div>
       </div>
+
+      <FamilyMemberBar
+        familyMembers={patient.family_members}
+        onSwitchPatient={onSwitchPatient}
+      />
 
       {/* Tab Bar */}
       <div className="flex border-b border-gray-200 bg-gray-50 overflow-x-auto">
