@@ -5,9 +5,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Textarea } from '@/components/ui/textarea';
 import {
   LayoutDashboard, Pill, ShoppingCart, MessageSquare, CreditCard,
-  RefreshCw, Phone, Mail, Send, AlertTriangle, Bot, ExternalLink, Clock, IdCard
+  RefreshCw, Phone, Mail, Send, AlertTriangle, Bot, ExternalLink, Clock, IdCard, ChevronRight
 } from 'lucide-react';
 import { format } from 'date-fns';
+import OrderDetailModal from './OrderDetailModal';
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -333,6 +334,7 @@ function StatCardModal({ stat, patient, onClose }) {
 function OverviewTab({ patient }) {
   const [openModal, setOpenModal] = useState(null);
   const [selectedOrderId, setSelectedOrderId] = useState(patient.orders[0]?.id || null);
+  const [detailOrder, setDetailOrder] = useState(null);
 
   React.useEffect(() => {
     setSelectedOrderId(patient.orders[0]?.id || null);
@@ -346,6 +348,7 @@ function OverviewTab({ patient }) {
   return (
     <div className="space-y-4">
       {openModal && <StatCardModal stat={openModal} patient={patient} onClose={() => setOpenModal(null)} />}
+      {detailOrder && <OrderDetailModal order={detailOrder} patient={patient} onClose={() => setDetailOrder(null)} />}
       {/* Quick Stats */}
       <div className="grid grid-cols-4 gap-3">
         {[
@@ -440,6 +443,14 @@ function OverviewTab({ patient }) {
                       <p className="text-blue-700"><span className="font-semibold">Est. Delivery:</span> {format(new Date(o.est_delivery), 'MMM d, yyyy')}</p>
                     </div>
                   )}
+                  <div className="mt-1.5 pt-1.5 border-t border-gray-200 flex justify-end">
+                    <span
+                      onClick={e => { e.stopPropagation(); setDetailOrder(o); }}
+                      className={`text-xs font-semibold flex items-center gap-0.5 hover:underline cursor-pointer ${isSelected ? 'text-[#8B1F1F]' : 'text-gray-500'}`}
+                    >
+                      View Details <ChevronRight className="w-3 h-3" />
+                    </span>
+                  </div>
                 </button>
               );
             })}
@@ -577,10 +588,11 @@ function PrescriptionsTab({ patient }) {
 }
 
 function OrdersTab({ patient }) {
-  const [expandedOrder, setExpandedOrder] = useState(null);
+  const [detailOrder, setDetailOrder] = useState(null);
 
   return (
     <div className="space-y-2">
+      {detailOrder && <OrderDetailModal order={detailOrder} patient={patient} onClose={() => setDetailOrder(null)} />}
       <Table>
         <TableHeader>
           <TableRow className="bg-gray-50">
@@ -589,42 +601,35 @@ function OrdersTab({ patient }) {
             <TableHead className="text-xs font-bold text-gray-700">Medication</TableHead>
             <TableHead className="text-xs font-bold text-gray-700">Amount</TableHead>
             <TableHead className="text-xs font-bold text-gray-700">Status</TableHead>
-            <TableHead className="text-xs font-bold text-gray-700">Tracking</TableHead>
+            <TableHead className="text-xs font-bold text-gray-700"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {patient.orders.map(o => (
-            <React.Fragment key={o.id}>
-              <TableRow
-                className="hover:bg-gray-50 cursor-pointer"
-                onClick={() => setExpandedOrder(expandedOrder === o.id ? null : o.id)}
-              >
-                <TableCell className="text-xs font-semibold text-[#8B1F1F]">{o.receipt}</TableCell>
-                <TableCell className="text-xs">{format(new Date(o.date), 'MM/dd/yyyy')}</TableCell>
-                <TableCell className="text-xs font-medium">{o.medication}</TableCell>
-                <TableCell className="text-xs">${o.amount.toFixed(2)}</TableCell>
-                <TableCell>
-                  <Badge className={`text-xs ${
-                    o.status === 'Delivered' ? 'bg-green-100 text-green-800' :
-                    o.status === 'In Transit' ? 'bg-blue-100 text-blue-800' :
-                    o.status === 'Processing' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>{o.status}</Badge>
-                </TableCell>
-                <TableCell className="text-xs font-mono truncate max-w-[100px]">{o.tracking}</TableCell>
-              </TableRow>
-              {expandedOrder === o.id && (
-                <TableRow>
-                  <TableCell colSpan={6} className="bg-gray-50 p-3">
-                    <div className="grid grid-cols-3 gap-3 text-xs">
-                      <div><p className="text-gray-500">Order ID</p><p className="font-semibold">{o.id}</p></div>
-                      <div><p className="text-gray-500">Receipt Number</p><p className="font-semibold">{o.receipt}</p></div>
-                      <div><p className="text-gray-500">Full Tracking</p><p className="font-mono break-all">{o.tracking}</p></div>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
-            </React.Fragment>
+            <TableRow
+              key={o.id}
+              className="hover:bg-gray-50 cursor-pointer"
+              onClick={() => setDetailOrder(o)}
+            >
+              <TableCell className="text-xs font-semibold text-[#8B1F1F]">{o.receipt}</TableCell>
+              <TableCell className="text-xs">{format(new Date(o.date), 'MM/dd/yyyy')}</TableCell>
+              <TableCell className="text-xs font-medium">{o.medication}</TableCell>
+              <TableCell className="text-xs">${o.amount.toFixed(2)}</TableCell>
+              <TableCell>
+                <Badge className={`text-xs ${
+                  o.status === 'Delivered' ? 'bg-green-100 text-green-800' :
+                  o.status === 'In Transit' ? 'bg-blue-100 text-blue-800' :
+                  o.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
+                  o.status === 'Processing' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}>{o.status}</Badge>
+              </TableCell>
+              <TableCell>
+                <span className="text-xs text-[#8B1F1F] font-semibold flex items-center gap-0.5 hover:underline">
+                  Details <ChevronRight className="w-3 h-3" />
+                </span>
+              </TableCell>
+            </TableRow>
           ))}
         </TableBody>
       </Table>
