@@ -493,7 +493,7 @@ function OverviewTab({ patient, editedPhysician, onChangePhysician }) {
               return (
                 <button
                   key={o.id}
-                  onClick={() => setSelectedOrderId(isSelected ? null : o.id)}
+                  onClick={() => setSelectedOrderId(o.id)}
                   className={`w-full text-left p-2 rounded border text-xs transition-all ${
                     isSelected
                       ? 'bg-[#8B1F1F]/5 border-[#8B1F1F] ring-1 ring-[#8B1F1F]/30'
