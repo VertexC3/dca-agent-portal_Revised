@@ -1,4 +1,5 @@
 import React from 'react';
+import ShipmentVisibilityCard from './shipment/ShipmentVisibilityCard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -196,6 +197,11 @@ export default function OrderDetailModal({ order, patient, onClose }) {
                 })}
               </div>
             </div>
+          </div>
+
+          {/* Shipment Visibility */}
+          <div className="px-5 py-4 border-b border-gray-100">
+            <ShipmentVisibilityCard tracking={order.tracking} />
           </div>
 
           {/* Related Communications */}
