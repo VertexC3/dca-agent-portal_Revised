@@ -70,7 +70,10 @@ export const mockPatients = [
       { id: 'ORD-2002', receipt: '883663', date: '2025-12-15', medication: 'Tirzepatide 5mg', amount: 350.00, status: 'Delivered', tracking: '144RCQ7IMNAA5' },
     ],
     communications: [
-      { id: 'COM-003', date: '2026-01-18', type: 'text', subject: 'Side effects question', summary: 'Patient texted about nausea side effects from Tirzepatide. Advised to eat small meals before injection.', agent: 'AI Agent' },
+      { id: 'COM-003', date: '2026-01-18', type: 'text', subject: 'Side effects question', summary: 'Patient texted about nausea side effects from Tirzepatide. Advised to eat small meals before injection.', agent: 'AI Agent', order_id: 'ORD-2001' },
+      { id: 'COM-010', date: '2026-01-21', type: 'phone', subject: 'Shipping delay inquiry', summary: 'Patient called to check on delayed Tirzepatide shipment. Confirmed order is in transit, ETA 2–3 business days.', agent: 'Sarah K.', duration: '3m 12s', order_id: 'ORD-2001' },
+      { id: 'COM-011', date: '2025-12-16', type: 'email', subject: 'Delivery confirmation', summary: 'Patient emailed to confirm receipt of December Tirzepatide order. Package arrived on time.', agent: 'Mike T.', order_id: 'ORD-2002' },
+      { id: 'COM-012', date: '2025-12-17', type: 'ai_agent', subject: 'Post-delivery satisfaction', summary: 'AI Agent followed up after delivery of ORD-2002. Patient confirmed receipt and reported no issues.', agent: 'AI Agent', order_id: 'ORD-2002' },
     ],
     invoices: [
       { id: 'INV-003', number: 'INV-2026-002', date: '2026-01-31', amount: 350.00, paid: 0, status: 'open',
@@ -106,8 +109,11 @@ export const mockPatients = [
       { id: 'ORD-3003', receipt: '883666', date: '2025-12-10', medication: 'Lisinopril 10mg', amount: 25.00, status: 'Delivered', tracking: '144RCQ7IMNAA7' },
     ],
     communications: [
-      { id: 'COM-004', date: '2026-01-15', type: 'phone', subject: 'Billing dispute', summary: 'Patient called about unexpected charge on invoice. Reviewed and confirmed correct amount. Patient satisfied.', agent: 'Sarah K.', duration: '8m 15s' },
-      { id: 'COM-005', date: '2025-12-20', type: 'email', subject: 'Lisinopril dosage question', summary: 'Patient emailed asking about Lisinopril dosage instructions. Advised to take in the morning with water.', agent: 'AI Agent' },
+      { id: 'COM-004', date: '2026-01-15', type: 'phone', subject: 'Billing dispute', summary: 'Patient called about unexpected charge on invoice. Reviewed and confirmed correct amount. Patient satisfied.', agent: 'Sarah K.', duration: '8m 15s', order_id: 'ORD-3001' },
+      { id: 'COM-013', date: '2026-01-19', type: 'text', subject: 'Processing status check', summary: 'Patient texted asking why Semaglutide order is still in processing. Advised standard processing takes 2–3 days.', agent: 'AI Agent', order_id: 'ORD-3001' },
+      { id: 'COM-014', date: '2026-01-13', type: 'email', subject: 'Atorvastatin delivery', summary: 'Patient emailed confirming receipt of Atorvastatin 20mg. No issues reported with the order.', agent: 'Mike T.', order_id: 'ORD-3002' },
+      { id: 'COM-005', date: '2025-12-20', type: 'email', subject: 'Lisinopril dosage question', summary: 'Patient emailed asking about Lisinopril dosage instructions. Advised to take in the morning with water.', agent: 'AI Agent', order_id: 'ORD-3003' },
+      { id: 'COM-015', date: '2025-12-11', type: 'phone', subject: 'Lisinopril delivery issue', summary: 'Patient called saying Lisinopril package arrived damaged. Replacement order was initiated immediately.', agent: 'Sarah K.', duration: '5m 44s', order_id: 'ORD-3003' },
     ],
     invoices: [
       { id: 'INV-004', number: 'INV-2026-003', date: '2026-01-31', amount: 260.00, paid: 100.00, status: 'partially_paid',
