@@ -67,26 +67,27 @@ function AddressDropdown({ address }) {
 function InsuranceCardPopover() {
   const [show, setShow] = useState(false);
   return (
-    <div className="relative inline-block">
+    <>
       <button
         onMouseEnter={() => setShow(true)}
         onMouseLeave={() => setShow(false)}
-        onClick={() => setShow(v => !v)}
         className="p-0.5 rounded hover:bg-gray-200 transition-colors"
         title="View insurance card"
       >
         <IdCard className="w-3.5 h-3.5 text-[#8B1F1F]" />
       </button>
       {show && (
-        <div className="absolute left-6 top-0 z-50 bg-white border border-gray-200 rounded-lg shadow-xl p-2 w-64">
-          <img
-            src="https://media.base44.com/images/public/695285fc94e8ef46bde70e16/50e86ad64_InsuranceCard.png"
-            alt="Insurance Card"
-            className="w-full rounded"
-          />
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+          <div className="bg-white border border-gray-200 rounded-2xl shadow-2xl p-4 w-[520px]">
+            <img
+              src="https://media.base44.com/images/public/695285fc94e8ef46bde70e16/50e86ad64_InsuranceCard.png"
+              alt="Insurance Card"
+              className="w-full rounded-lg"
+            />
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
