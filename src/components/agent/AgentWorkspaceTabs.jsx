@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   LayoutDashboard, Pill, ShoppingCart, MessageSquare, CreditCard,
   RefreshCw, Phone, Mail, Send, AlertTriangle, Bot, ExternalLink, Clock, IdCard, ChevronRight, CheckCircle2,
-  Pencil, Check, X
+  Pencil, Check, X, StickyNote, Truck
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
@@ -753,15 +753,119 @@ function PrescriptionsTab({ patient }) {
   );
 }
 
-function OrdersTab({ patient }) {
-  const [detailOrder, setDetailOrder] = useState(null);
+function BulkActionToolbar({ selectedIds, onAction, onClear }) {
+  const count = selectedIds.length;
+  const [noteText, setNoteText] = useState('');
+  const [activeAction, setActiveAction] = useState(null);
+
+  const handleAction = (type) => {
+    if (type === 'note') { setActiveAction('note'); return; }
+    onAction(type, selectedIds);
+  };
+
+  const submitNote = () => {
+    onAction('note', selectedIds, noteText);
+    setNoteText('');
+    setActiveAction(null);
+  };
 
   return (
-    <div className="space-y-2">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2">
+      {activeAction === 'note' && (
+        <div className="bg-white border border-gray-200 rounded-xl shadow-2xl p-3 w-80">
+          <p className="text-xs font-bold text-gray-700 mb-1.5">Add Note to {count} order{count > 1 ? 's' : ''}</p>
+          <textarea
+            className="w-full text-xs border border-gray-200 rounded-lg p-2 resize-none h-16 focus:outline-none focus:border-[#8B1F1F]"
+            placeholder="Enter note..."
+            value={noteText}
+            onChange={e => setNoteText(e.target.value)}
+            autoFocus
+          />
+          <div className="flex gap-2 mt-2">
+            <Button size="sm" className="h-7 text-xs bg-[#8B1F1F] hover:bg-[#721919] flex-1" onClick={submitNote}>
+              Save Note
+            </Button>
+            <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setActiveAction(null)}>
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
+      <div className="flex items-center gap-2 bg-gray-900 text-white rounded-full px-4 py-2.5 shadow-2xl">
+        <span className="text-xs font-bold text-gray-300 mr-1">{count} selected</span>
+        <div className="w-px h-4 bg-gray-600" />
+        <button
+          onClick={() => handleAction('note')}
+          className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-white/10 transition-colors"
+        >
+          <StickyNote className="w-3.5 h-3.5" /> Add Note
+        </button>
+        <button
+          onClick={() => handleAction('refill')}
+          className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-white/10 transition-colors"
+        >
+          <RefreshCw className="w-3.5 h-3.5" /> Trigger Refill
+        </button>
+        <button
+          onClick={() => handleAction('shipment')}
+          className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-white/10 transition-colors"
+        >
+          <Truck className="w-3.5 h-3.5" /> Shipment Update
+        </button>
+        <div className="w-px h-4 bg-gray-600" />
+        <button onClick={onClear} className="p-1 rounded-full hover:bg-white/10 transition-colors" title="Clear selection">
+          <X className="w-3.5 h-3.5 text-gray-400" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function OrdersTab({ patient }) {
+  const [detailOrder, setDetailOrder] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [actionFeedback, setActionFeedback] = useState(null);
+
+  const allIds = patient.orders.map(o => o.id);
+  const allChecked = selectedIds.length === allIds.length && allIds.length > 0;
+  const someChecked = selectedIds.length > 0 && !allChecked;
+
+  const toggleAll = () => setSelectedIds(allChecked ? [] : [...allIds]);
+  const toggleOne = (id, e) => {
+    e.stopPropagation();
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  };
+
+  const handleBulkAction = (type, ids, note) => {
+    const labels = { refill: 'Refill requested', shipment: 'Shipment update requested', note: `Note saved` };
+    setActionFeedback(`${labels[type]} for ${ids.length} order${ids.length > 1 ? 's' : ''}`);
+    setSelectedIds([]);
+    setTimeout(() => setActionFeedback(null), 3000);
+  };
+
+  return (
+    <div className="space-y-2 relative">
       {detailOrder && <OrderDetailModal order={detailOrder} patient={patient} onClose={() => setDetailOrder(null)} />}
+      {selectedIds.length > 0 && (
+        <BulkActionToolbar selectedIds={selectedIds} onAction={handleBulkAction} onClear={() => setSelectedIds([])} />
+      )}
+      {actionFeedback && (
+        <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-200 rounded-lg text-xs text-green-800 font-semibold">
+          <CheckCircle2 className="w-3.5 h-3.5 text-green-500" /> {actionFeedback}
+        </div>
+      )}
       <Table>
         <TableHeader>
           <TableRow className="bg-gray-50">
+            <TableHead className="w-8 pr-0">
+              <input
+                type="checkbox"
+                checked={allChecked}
+                ref={el => { if (el) el.indeterminate = someChecked; }}
+                onChange={toggleAll}
+                className="cursor-pointer accent-[#8B1F1F]"
+              />
+            </TableHead>
             <TableHead className="text-xs font-bold text-gray-700">Receipt #</TableHead>
             <TableHead className="text-xs font-bold text-gray-700">Date</TableHead>
             <TableHead className="text-xs font-bold text-gray-700">Medication</TableHead>
@@ -771,32 +875,43 @@ function OrdersTab({ patient }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {patient.orders.map(o => (
-            <TableRow
-              key={o.id}
-              className="hover:bg-gray-50 cursor-pointer"
-              onClick={() => setDetailOrder(o)}
-            >
-              <TableCell className="text-xs font-semibold text-[#8B1F1F]">{o.receipt}</TableCell>
-              <TableCell className="text-xs">{format(new Date(o.date), 'MM/dd/yyyy')}</TableCell>
-              <TableCell className="text-xs font-medium">{o.medication}</TableCell>
-              <TableCell className="text-xs">${o.amount.toFixed(2)}</TableCell>
-              <TableCell>
-                <Badge className={`text-xs ${
-                  o.status === 'Delivered' ? 'bg-green-100 text-green-800' :
-                  o.status === 'In Transit' ? 'bg-blue-100 text-blue-800' :
-                  o.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
-                  o.status === 'Processing' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>{o.status}</Badge>
-              </TableCell>
-              <TableCell>
-                <span className="text-xs text-[#8B1F1F] font-semibold flex items-center gap-0.5 hover:underline">
-                  Details <ChevronRight className="w-3 h-3" />
-                </span>
-              </TableCell>
-            </TableRow>
-          ))}
+          {patient.orders.map(o => {
+            const isChecked = selectedIds.includes(o.id);
+            return (
+              <TableRow
+                key={o.id}
+                className={`cursor-pointer transition-colors ${isChecked ? 'bg-red-50/60' : 'hover:bg-gray-50'}`}
+                onClick={() => setDetailOrder(o)}
+              >
+                <TableCell className="w-8 pr-0" onClick={e => toggleOne(o.id, e)}>
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => {}}
+                    className="cursor-pointer accent-[#8B1F1F]"
+                  />
+                </TableCell>
+                <TableCell className="text-xs font-semibold text-[#8B1F1F]">{o.receipt}</TableCell>
+                <TableCell className="text-xs">{format(new Date(o.date), 'MM/dd/yyyy')}</TableCell>
+                <TableCell className="text-xs font-medium">{o.medication}</TableCell>
+                <TableCell className="text-xs">${o.amount.toFixed(2)}</TableCell>
+                <TableCell>
+                  <Badge className={`text-xs ${
+                    o.status === 'Delivered' ? 'bg-green-100 text-green-800' :
+                    o.status === 'In Transit' ? 'bg-blue-100 text-blue-800' :
+                    o.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
+                    o.status === 'Processing' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-gray-100 text-gray-800'
+                  }`}>{o.status}</Badge>
+                </TableCell>
+                <TableCell>
+                  <span className="text-xs text-[#8B1F1F] font-semibold flex items-center gap-0.5 hover:underline">
+                    Details <ChevronRight className="w-3 h-3" />
+                  </span>
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>
