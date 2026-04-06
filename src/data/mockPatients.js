@@ -32,6 +32,18 @@ export const mockPatients = [
     invoices: [
       { id: 'INV-001', number: 'INV-2026-001', date: '2026-01-31', amount: 295.00, paid: 295.00, status: 'paid' },
       { id: 'INV-002', number: 'INV-2025-012', date: '2025-12-31', amount: 250.00, paid: 250.00, status: 'paid' },
+      { id: 'INV-005', number: 'INV-2026-004', date: '2026-04-01', amount: 545.00, paid: 0, status: 'open',
+        line_items: [
+          { name: 'Semaglutide 2.4mg', dosage: '2.4mg', frequency: 'Weekly injection', rx_number: '924314', qty: 1, amount: 250.00 },
+          { name: 'Metformin 500mg', dosage: '500mg', frequency: 'Twice daily', rx_number: '924315', qty: 1, amount: 45.00 },
+          { name: 'Ozempic 0.5mg', dosage: '0.5mg', frequency: 'Weekly injection', rx_number: '924320', qty: 1, amount: 250.00 },
+        ]
+      },
+      { id: 'INV-006', number: 'INV-2026-005', date: '2026-03-15', amount: 180.00, paid: 100.00, status: 'partially_paid',
+        line_items: [
+          { name: 'Victoza 1.2mg', dosage: '1.2mg', frequency: 'Once daily injection', rx_number: '924321', qty: 1, amount: 180.00 },
+        ]
+      },
     ],
     cards: [{ id: 'CARD-001', last4: '4242', brand: 'Visa', expiry: '12/27', is_default: true }],
     family_members: [
