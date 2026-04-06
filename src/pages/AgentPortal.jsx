@@ -1,11 +1,12 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, LayoutDashboard } from 'lucide-react';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
 import AgentWorkspaceTabs from '../components/agent/AgentWorkspaceTabs';
 import AgentRightPanel from '../components/agent/AgentRightPanel';
 import OrderSearchBar from '../components/agent/OrderSearchBar';
+import AgentDashboard from '../components/agent/AgentDashboard';
 
 export const mockPatients = [
   {
@@ -183,6 +184,15 @@ export default function AgentPortal() {
       {/* Top Bar: Patient Selection + Order Search */}
       <div className="px-4 py-3 bg-white border-b border-gray-200 shadow-sm">
         <div className="flex items-center gap-4">
+          {selectedPatient && (
+            <button
+              onClick={() => setSelectedPatient(null)}
+              className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-[#8B1F1F] transition-colors whitespace-nowrap"
+            >
+              <LayoutDashboard className="w-3.5 h-3.5" />
+              Dashboard
+            </button>
+          )}
           <label className="text-xs font-bold text-gray-700 uppercase tracking-wide whitespace-nowrap">Select Patient:</label>
           <Select value={selectedPatient?.id || ''} onValueChange={(id) => {
             const patient = mockPatients.find(p => p.id === id);
@@ -205,27 +215,31 @@ export default function AgentPortal() {
       </div>
 
       {/* Main Content */}
-      <div
-        className="flex gap-0 flex-1 overflow-hidden"
-      >
-        {/* Middle: Workspace with Patient Info + Tabs */}
-        <div style={{ width: middleW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden flex flex-col border-r border-gray-200">
-          <AgentWorkspaceTabs
-            patient={selectedPatient}
-            onSwitchPatient={(member) => {
-              const found = mockPatients.find(p => p.email === member.email);
-              if (found) setSelectedPatient(found);
-            }}
-          />
+      {!selectedPatient ? (
+        <div className="flex-1 overflow-hidden">
+          <AgentDashboard onSelectPatient={setSelectedPatient} />
         </div>
+      ) : (
+        <div className="flex gap-0 flex-1 overflow-hidden">
+          {/* Middle: Workspace with Patient Info + Tabs */}
+          <div style={{ width: middleW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden flex flex-col border-r border-gray-200">
+            <AgentWorkspaceTabs
+              patient={selectedPatient}
+              onSwitchPatient={(member) => {
+                const found = mockPatients.find(p => p.email === member.email);
+                if (found) setSelectedPatient(found);
+              }}
+            />
+          </div>
 
-        <ResizeDivider onDrag={dragMiddle} />
+          <ResizeDivider onDrag={dragMiddle} />
 
-        {/* Right: Right Panel */}
-        <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
-          <AgentRightPanel patient={selectedPatient} />
+          {/* Right: Right Panel */}
+          <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
+            <AgentRightPanel patient={selectedPatient} />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
