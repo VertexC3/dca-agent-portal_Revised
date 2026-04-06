@@ -15,6 +15,8 @@ const getMockUser = () => {
   return { full_name: "Agent User", email: "agent@dcapharmacy.com", role: "representative", profile_picture: null };
 };
 
+import SoftPhone from './SoftPhone';
+
 export default function AgentPortalLayout({ children, currentPageName }) {
   const [showPlatformSwitcher, setShowPlatformSwitcher] = useState(false);
   const [mockUser, setMockUser] = useState(getMockUser);
@@ -139,6 +141,8 @@ export default function AgentPortalLayout({ children, currentPageName }) {
           {children}
         </div>
       </main>
+
+      <SoftPhone />
     </div>
   );
 }
