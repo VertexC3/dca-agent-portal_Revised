@@ -24,6 +24,8 @@ export const mockPatients = [
     prescriptions: [
       { id: 'RX-001', name: 'Semaglutide 2.4mg', dosage: '2.4mg', frequency: 'Weekly injection', refills: 3, last_filled: '2026-01-15', status: 'active', prescriber: 'Dr. Sarah Johnson', rx_number: '924314' },
       { id: 'RX-002', name: 'Metformin 500mg', dosage: '500mg', frequency: 'Twice daily', refills: 5, last_filled: '2026-01-10', status: 'active', prescriber: 'Dr. Sarah Johnson', rx_number: '924315' },
+      { id: 'RX-007', name: 'Ozempic 0.5mg', dosage: '0.5mg', frequency: 'Weekly injection', refills: 1, last_filled: '2026-01-05', status: 'active', prescriber: 'Dr. Sarah Johnson', rx_number: '924320' },
+      { id: 'RX-008', name: 'Victoza 1.2mg', dosage: '1.2mg', frequency: 'Once daily injection', refills: 0, last_filled: '2025-12-28', status: 'active', prescriber: 'Dr. Sarah Johnson', rx_number: '924321' },
     ],
     orders: [
       { id: 'ORD-1001', receipt: '883659', date: '2026-01-15', medication: 'Semaglutide 2.4mg', amount: 250.00, status: 'Delivered', tracking: '144RCQ7IMNAA1', delivered_at: '2026-01-17 @ 2:14 PM', delivered_to: '123 Main St, Franklin, TN 37064' },
@@ -61,6 +63,7 @@ export const mockPatients = [
     profile_picture: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/2137e6a9f_Jane.jpg',
     prescriptions: [
       { id: 'RX-003', name: 'Tirzepatide 5mg', dosage: '5mg', frequency: 'Weekly injection', refills: 2, last_filled: '2026-01-20', status: 'active', prescriber: 'Dr. Michael Chen', rx_number: '924316' },
+      { id: 'RX-009', name: 'Jardiance 10mg', dosage: '10mg', frequency: 'Once daily', refills: 0, last_filled: '2025-12-10', status: 'active', prescriber: 'Dr. Michael Chen', rx_number: '924322' },
     ],
     orders: [
       { id: 'ORD-2001', receipt: '883662', date: '2026-01-20', medication: 'Tirzepatide 5mg', amount: 350.00, status: 'In Transit', tracking: '144RCQ7IMNAA4' },
