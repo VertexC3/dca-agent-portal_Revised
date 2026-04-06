@@ -273,7 +273,7 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient }) {
 
       {/* Tab Content */}
       <div className="flex-1 overflow-y-auto p-4">
-        {activeTab === 'overview' && <OverviewTab patient={patient} editedPhysician={editedPhysician} onChangePhysician={() => setShowPhysicianPicker(true)} />}
+        {activeTab === 'overview' && <OverviewTab patient={patient} editedPhysician={editedPhysician} onChangePhysician={() => setShowPhysicianPicker(true)} onSwitchTab={setActiveTab} />}
         {activeTab === 'prescriptions' && <PrescriptionsTab patient={patient} />}
         {activeTab === 'orders' && <OrdersTab patient={patient} />}
         {activeTab === 'communications' && <CommunicationsTab patient={patient} newNote={newNote} setNewNote={setNewNote} />}
@@ -283,7 +283,7 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient }) {
   );
 }
 
-function StatCardModal({ stat, patient, onClose }) {
+function StatCardModal({ stat, patient, onClose, onGoToOrders }) {
   const unpaid = patient.invoices.filter(i => i.status !== 'paid');
   const lowRefills = patient.prescriptions.filter(p => p.refills <= 1);
 
@@ -312,7 +312,7 @@ function StatCardModal({ stat, patient, onClose }) {
     if (stat === 'orders') return (
       <div className="space-y-2">
         {patient.orders.map(o => (
-          <div key={o.id} className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-xs">
+          <div key={o.id} onClick={onGoToOrders} className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-xs cursor-pointer hover:bg-gray-100 hover:border-gray-300 transition-colors">
             <div className="flex items-center justify-between mb-1">
               <span className="font-bold text-gray-900">{o.medication}</span>
               <Badge className={o.status === 'Delivered' ? 'bg-green-100 text-green-800' : o.status === 'In Progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}>
@@ -408,7 +408,7 @@ function StatCardModal({ stat, patient, onClose }) {
   );
 }
 
-function OverviewTab({ patient, editedPhysician, onChangePhysician }) {
+function OverviewTab({ patient, editedPhysician, onChangePhysician, onSwitchTab }) {
   const [openModal, setOpenModal] = useState(null);
   const [selectedOrderId, setSelectedOrderId] = useState(patient.orders[0]?.id || null);
   const [detailOrder, setDetailOrder] = useState(null);
@@ -430,7 +430,7 @@ function OverviewTab({ patient, editedPhysician, onChangePhysician }) {
 
   return (
     <div className="space-y-4">
-      {openModal && <StatCardModal stat={openModal} patient={patient} onClose={() => setOpenModal(null)} />}
+      {openModal && <StatCardModal stat={openModal} patient={patient} onClose={() => setOpenModal(null)} onGoToOrders={() => { setOpenModal(null); onSwitchTab('orders'); }} />}
       {detailOrder && <OrderDetailModal order={detailOrder} patient={patient} onClose={() => setDetailOrder(null)} />}
       {showPhysicianContext && <PhysicianContextPopup patient={patient} onClose={() => setShowPhysicianContext(false)} />}
       {/* Quick Stats */}
