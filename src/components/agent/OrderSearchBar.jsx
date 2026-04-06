@@ -14,7 +14,11 @@ function buildOrderIndex() {
   return results;
 }
 
-const ALL_ORDERS = buildOrderIndex();
+let ALL_ORDERS = null;
+function getOrderIndex() {
+  if (!ALL_ORDERS) ALL_ORDERS = buildOrderIndex();
+  return ALL_ORDERS;
+}
 
 export default function OrderSearchBar({ onSelectPatient }) {
   const [query, setQuery] = useState('');
@@ -23,7 +27,7 @@ export default function OrderSearchBar({ onSelectPatient }) {
   const containerRef = useRef(null);
 
   const q = query.trim().toLowerCase();
-  const matches = q.length < 2 ? [] : ALL_ORDERS.filter(({ patient, order }) =>
+  const matches = q.length < 2 ? [] : getOrderIndex().filter(({ patient, order }) =>
     order.id.toLowerCase().includes(q) ||
     order.tracking.toLowerCase().includes(q) ||
     order.receipt.toLowerCase().includes(q) ||
