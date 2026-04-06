@@ -31,8 +31,9 @@ export const mockPatients = [
       { id: 'ORD-1003', receipt: '883661', date: '2025-12-20', medication: 'Semaglutide 2.4mg', amount: 250.00, status: 'Delivered', tracking: '144RCQ7IMNAA3', delivered_at: '2025-12-22 @ 11:47 AM', delivered_to: '123 Main St, Franklin, TN 37064' },
     ],
     communications: [
-      { id: 'COM-001', date: '2026-01-20', type: 'phone', subject: 'Refill inquiry', summary: 'Patient called about refill for Semaglutide. Approved and processed.', agent: 'Sarah K.', duration: '4m 32s' },
-      { id: 'COM-002', date: '2026-01-10', type: 'email', subject: 'Delivery question', summary: 'Patient emailed asking about expected delivery timeline for recent order.', agent: 'Mike T.' },
+      { id: 'COM-001', date: '2026-01-20', type: 'phone', subject: 'Refill inquiry', summary: 'Patient called about refill for Semaglutide. Approved and processed.', agent: 'Sarah K.', duration: '4m 32s', order_id: 'ORD-1001' },
+      { id: 'COM-002', date: '2026-01-10', type: 'email', subject: 'Delivery question', summary: 'Patient emailed asking about expected delivery timeline for ORD-1001 Semaglutide order.', agent: 'Mike T.', order_id: 'ORD-1001' },
+      { id: 'COM-006', date: '2026-04-05', type: 'text', subject: 'Order confirmation', summary: 'Patient texted confirming order for Metformin 500mg. Estimated delivery April 8th.', agent: 'AI Agent', order_id: 'ORD-1002' },
     ],
     invoices: [
       { id: 'INV-001', number: 'INV-2026-001', date: '2026-01-31', amount: 295.00, paid: 295.00, status: 'paid' },

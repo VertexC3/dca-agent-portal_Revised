@@ -332,8 +332,16 @@ function StatCardModal({ stat, patient, onClose }) {
 
 function OverviewTab({ patient }) {
   const [openModal, setOpenModal] = useState(null);
+  const [selectedOrderId, setSelectedOrderId] = useState(patient.orders[0]?.id || null);
+
+  React.useEffect(() => {
+    setSelectedOrderId(patient.orders[0]?.id || null);
+  }, [patient.id]);
   const unpaid = patient.invoices.filter(i => i.status !== 'paid');
   const lowRefills = patient.prescriptions.filter(p => p.refills <= 1);
+  const filteredComms = selectedOrderId
+    ? patient.communications.filter(c => c.order_id === selectedOrderId)
+    : patient.communications;
 
   return (
     <div className="space-y-4">
@@ -392,39 +400,74 @@ function OverviewTab({ patient }) {
         <div>
           <p className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Recent Orders</p>
           <div className="space-y-1.5">
-            {patient.orders.slice(0, 3).map(o => (
-              <div key={o.id} className="p-2 bg-gray-50 rounded border border-gray-200 text-xs">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="font-semibold text-gray-800 truncate max-w-[120px]">{o.medication}</p>
-                  <Badge className={`text-xs flex-shrink-0 ${
-                    o.status === 'Delivered' ? 'bg-green-100 text-green-800' :
-                    o.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
-                    o.status === 'In Transit' ? 'bg-blue-100 text-blue-800' :
-                    'bg-yellow-100 text-yellow-800'
-                  }`}>{o.status}</Badge>
-                </div>
-                <p className="text-gray-500 mt-0.5">{format(new Date(o.date), 'MM/dd/yy')} • #{o.receipt}</p>
-                {o.status === 'Delivered' && o.delivered_at && (
-                  <div className="mt-1 pt-1 border-t border-gray-200 space-y-0.5">
-                    <p className="text-green-700"><span className="font-semibold">Delivered:</span> {o.delivered_at}</p>
-                    <p className="text-gray-500"><span className="font-semibold">To:</span> {o.delivered_to}</p>
+            {patient.orders.slice(0, 3).map(o => {
+              const isSelected = selectedOrderId === o.id;
+              const commCount = patient.communications.filter(c => c.order_id === o.id).length;
+              return (
+                <button
+                  key={o.id}
+                  onClick={() => setSelectedOrderId(isSelected ? null : o.id)}
+                  className={`w-full text-left p-2 rounded border text-xs transition-all ${
+                    isSelected
+                      ? 'bg-[#8B1F1F]/5 border-[#8B1F1F] ring-1 ring-[#8B1F1F]/30'
+                      : 'bg-gray-50 border-gray-200 hover:border-gray-300 hover:bg-gray-100'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <p className={`font-semibold truncate max-w-[110px] ${isSelected ? 'text-[#8B1F1F]' : 'text-gray-800'}`}>{o.medication}</p>
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      {commCount > 0 && (
+                        <span className={`text-xs px-1.5 py-0 rounded-full font-bold ${isSelected ? 'bg-[#8B1F1F] text-white' : 'bg-gray-200 text-gray-600'}`}>
+                          {commCount}
+                        </span>
+                      )}
+                      <Badge className={`text-xs ${
+                        o.status === 'Delivered' ? 'bg-green-100 text-green-800' :
+                        o.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
+                        o.status === 'In Transit' ? 'bg-blue-100 text-blue-800' :
+                        'bg-yellow-100 text-yellow-800'
+                      }`}>{o.status}</Badge>
+                    </div>
                   </div>
-                )}
-                {o.status === 'In Progress' && o.est_delivery && (
-                  <div className="mt-1 pt-1 border-t border-gray-200 space-y-0.5">
-                    <p className="text-blue-700"><span className="font-semibold">Est. Delivery:</span> {format(new Date(o.est_delivery), 'MMM d, yyyy')}</p>
-                    <p className="text-gray-500"><span className="font-semibold">Window:</span> {o.delivery_window}</p>
-                  </div>
-                )}
-              </div>
-            ))}
+                  <p className="text-gray-500 mt-0.5">{format(new Date(o.date), 'MM/dd/yy')} • #{o.receipt}</p>
+                  {o.status === 'Delivered' && o.delivered_at && (
+                    <div className="mt-1 pt-1 border-t border-gray-200 space-y-0.5">
+                      <p className="text-green-700"><span className="font-semibold">Delivered:</span> {o.delivered_at}</p>
+                    </div>
+                  )}
+                  {o.status === 'In Progress' && o.est_delivery && (
+                    <div className="mt-1 pt-1 border-t border-gray-200 space-y-0.5">
+                      <p className="text-blue-700"><span className="font-semibold">Est. Delivery:</span> {format(new Date(o.est_delivery), 'MMM d, yyyy')}</p>
+                    </div>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
         <div>
-          <p className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Recent Communications</p>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs font-bold text-gray-700 uppercase tracking-wide">
+              {selectedOrderId ? 'Order Communications' : 'Recent Communications'}
+            </p>
+            {selectedOrderId && (
+              <button
+                onClick={() => setSelectedOrderId(null)}
+                className="text-xs text-[#8B1F1F] hover:underline font-semibold"
+              >
+                Show all
+              </button>
+            )}
+          </div>
           <div className="space-y-1.5">
-            {patient.communications.slice(0, 3).map(c => (
-              <div key={c.id} className="p-2 bg-gray-50 rounded border border-gray-200 text-xs">
+            {filteredComms.length === 0 ? (
+              <div className="p-3 text-center text-xs text-gray-400 border border-dashed border-gray-200 rounded-lg">
+                No communications for this order
+              </div>
+            ) : filteredComms.slice(0, 3).map(c => (
+              <div key={c.id} className={`p-2 rounded border text-xs transition-all ${
+                selectedOrderId ? 'bg-blue-50 border-blue-100' : 'bg-gray-50 border-gray-200'
+              }`}>
                 <div className="flex items-center gap-1 mb-0.5">
                   <span className={`font-semibold ${
                     c.type === 'phone' ? 'text-blue-700' :
