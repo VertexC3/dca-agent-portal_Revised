@@ -9,25 +9,6 @@ import ExportShareButtons from '../components/communication/ExportShareButtons';
 import AdvancedFilters from '../components/search/AdvancedFilters';
 import CommunicationItem from '../components/communication/CommunicationItem';
 
-const channelIcons = {
-  phone: Phone,
-  email: Mail,
-  text: MessageSquare,
-  ai_agent: Bot
-};
-
-const channelColors = {
-  phone: 'bg-blue-50 text-blue-700 border-blue-200',
-  email: 'bg-[#8B1F1F]/10 text-[#8B1F1F] border-[#8B1F1F]/30',
-  text: 'bg-green-50 text-green-700 border-green-200',
-  ai_agent: 'bg-purple-50 text-purple-700 border-purple-200'
-};
-
-const statusColors = {
-  pending: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-  in_progress: 'bg-blue-50 text-blue-700 border-blue-200',
-  resolved: 'bg-green-50 text-green-700 border-green-200'
-};
 
 export default function Communications() {
   const urlParams = new URLSearchParams(window.location.search);
