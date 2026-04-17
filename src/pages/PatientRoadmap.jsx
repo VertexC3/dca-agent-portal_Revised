@@ -291,11 +291,7 @@ export default function PatientRoadmap() {
                       <ArrowUpDown className="w-3 h-3" />
                     </button>
                   </th>
-                  {isAdmin && (
-                    <th className="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase">
-                      Actions
-                    </th>
-                  )}
+
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
