@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { createPageUrl } from '../../utils';
-import { LogOut, ChevronDown } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,7 +7,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from '@/components/ui/badge';
 const getMockUser = () => {
   const stored = localStorage.getItem('facilityUser');
   if (stored) return JSON.parse(stored);
@@ -18,7 +16,6 @@ const getMockUser = () => {
 import SoftPhone from './SoftPhone';
 
 export default function AgentPortalLayout({ children, currentPageName }) {
-  const [showPlatformSwitcher, setShowPlatformSwitcher] = useState(false);
   const [mockUser, setMockUser] = useState(getMockUser);
 
   React.useEffect(() => {
@@ -41,67 +38,17 @@ export default function AgentPortalLayout({ children, currentPageName }) {
       <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/90 border-b border-gray-200 shadow-sm">
         <div className="px-6 py-3">
           <div className="flex items-center justify-between">
-            {/* Logo + Platform Switcher */}
-            <div className="relative">
-              <DropdownMenu open={showPlatformSwitcher} onOpenChange={setShowPlatformSwitcher}>
-                <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-2 hover:opacity-80 transition-all group">
-                    <img
-                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/user_68b4602065e9569078753897/50e1878da_DCA_Logo_Updated.png"
-                      alt="DCA Pharmacy"
-                      className="h-10"
-                    />
-                    <div className="hidden md:block text-left">
-                      <p className="text-xs font-bold text-[#8B1F1F] leading-tight">Agent Portal</p>
-                      <p className="text-xs text-gray-500 leading-tight">Customer Service</p>
-                    </div>
-                    <ChevronDown className="w-4 h-4 text-gray-600 group-hover:text-gray-900" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-64 bg-white border-gray-200">
-                  <div className="px-3 py-2 border-b border-gray-100">
-                    <p className="text-xs font-semibold text-gray-500 uppercase">Switch Platform</p>
-                  </div>
-                  {/* Current: Agent Portal */}
-                  <DropdownMenuItem className="flex items-center gap-3 bg-red-50 border-l-4 border-[#8B1F1F] py-3">
-                    <img
-                      src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/user_68b4602065e9569078753897/50e1878da_DCA_Logo_Updated.png"
-                      alt="DCA Pharmacy"
-                      className="h-8"
-                    />
-                    <div>
-                      <p className="font-semibold text-[#8B1F1F]">Agent Portal</p>
-                      <p className="text-xs text-gray-600">DCA Pharmacy (Current)</p>
-                    </div>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <a href={createPageUrl('PatientDashboard')} className="flex items-center gap-3 cursor-pointer py-3">
-                      <img
-                        src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/user_68b4602065e9569078753897/50e1878da_DCA_Logo_Updated.png"
-                        alt="DCA Pharmacy"
-                        className="h-8"
-                      />
-                      <div>
-                        <p className="font-semibold text-gray-900">Patient Portal</p>
-                        <p className="text-xs text-gray-500">DCA Pharmacy</p>
-                      </div>
-                    </a>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <a href={createPageUrl('FacilityDashboard')} className="flex items-center gap-3 cursor-pointer py-3">
-                      <img
-                        src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/695285fc94e8ef46bde70e16/6281fe319_MochiHealth.png"
-                        alt="Mochi Health"
-                        className="h-8"
-                      />
-                      <div>
-                        <p className="font-semibold text-gray-900">Facility Portal</p>
-                        <p className="text-xs text-gray-500">Mochi Health</p>
-                      </div>
-                    </a>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            {/* Logo */}
+            <div className="flex items-center gap-2">
+              <img
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/user_68b4602065e9569078753897/50e1878da_DCA_Logo_Updated.png"
+                alt="DCA Pharmacy"
+                className="h-10"
+              />
+              <div className="hidden md:block text-left">
+                <p className="text-xs font-bold text-[#8B1F1F] leading-tight">Agent Portal</p>
+                <p className="text-xs text-gray-500 leading-tight">Customer Service</p>
+              </div>
             </div>
 
             {/* Right: user */}
