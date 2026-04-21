@@ -15,6 +15,9 @@ import PhysicianContextPopup from './PhysicianContextPopup';
 import InvoicePaymentModal from './InvoicePaymentModal';
 import FamilyMemberBar from './FamilyMemberBar';
 import PhysicianPickerModal from './PhysicianPickerModal';
+import AgentEngagementLog from './AgentEngagementLog';
+import KBSuggestions from './KBSuggestions';
+import QuickActionMacros from './QuickActionMacros';
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -919,15 +922,38 @@ function OrdersTab({ patient }) {
 }
 
 function CommunicationsTab({ patient, newNote, setNewNote }) {
+  const [channelFilter, setChannelFilter] = useState('all');
+
   const channelConfig = {
-    phone: { label: 'Call', color: 'text-blue-700 bg-blue-50', icon: Phone },
-    email: { label: 'Email', color: 'text-purple-700 bg-purple-50', icon: Mail },
-    text: { label: 'Text', color: 'text-green-700 bg-green-50', icon: Send },
+    phone:    { label: 'Call',     color: 'text-blue-700 bg-blue-50',   icon: Phone },
+    email:    { label: 'Email',    color: 'text-purple-700 bg-purple-50', icon: Mail },
+    text:     { label: 'Text',     color: 'text-green-700 bg-green-50',  icon: Send },
     ai_agent: { label: 'AI Agent', color: 'text-orange-700 bg-orange-50', icon: Bot },
   };
 
+  const CHANNEL_FILTERS = [
+    { key: 'all',      label: 'All',      icon: MessageSquare },
+    { key: 'phone',    label: 'Phone',    icon: Phone },
+    { key: 'email',    label: 'Email',    icon: Mail },
+    { key: 'text',     label: 'SMS/Text', icon: Send },
+    { key: 'ai_agent', label: 'AI Agent', icon: Bot },
+  ];
+
+  const filtered = channelFilter === 'all'
+    ? patient.communications
+    : patient.communications.filter(c => c.type === channelFilter);
+
   return (
     <div className="space-y-4">
+      {/* Agent Engagement Log */}
+      <AgentEngagementLog communications={patient.communications} />
+
+      {/* KB Suggestions */}
+      <KBSuggestions communications={patient.communications} />
+
+      {/* Quick Action Macros */}
+      <QuickActionMacros patient={patient} />
+
       {/* Log New Interaction */}
       <div className="p-3 border border-gray-200 rounded-lg bg-gray-50">
         <p className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Log New Interaction</p>
@@ -950,32 +976,71 @@ function CommunicationsTab({ patient, newNote, setNewNote }) {
         </div>
       </div>
 
-      {/* History */}
+      {/* Channel Filter Tabs */}
       <div>
-        <p className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">Communication History</p>
-        <div className="space-y-2">
-          {patient.communications.map(c => {
-            const cfg = channelConfig[c.type] || channelConfig.phone;
-            const Icon = cfg.icon;
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs font-bold text-gray-700 uppercase tracking-wide">
+            Communication History
+            {channelFilter !== 'all' && (
+              <span className="ml-1 font-normal text-gray-500">({filtered.length} of {patient.communications.length})</span>
+            )}
+          </p>
+        </div>
+        <div className="flex gap-1 flex-wrap mb-3">
+          {CHANNEL_FILTERS.map(cf => {
+            const Icon = cf.icon;
+            const count = cf.key === 'all'
+              ? patient.communications.length
+              : patient.communications.filter(c => c.type === cf.key).length;
+            if (count === 0 && cf.key !== 'all') return null;
             return (
-              <div key={c.id} className="p-3 bg-white border border-gray-200 rounded-lg">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className={`flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${cfg.color}`}>
-                    <Icon className="w-3 h-3" />{cfg.label}
-                  </span>
-                  <span className="text-xs font-semibold text-gray-800">{c.subject}</span>
-                  <span className="ml-auto text-xs text-gray-400 flex items-center gap-1">
-                    <Clock className="w-3 h-3" />{format(new Date(c.date), 'MM/dd/yyyy')}
-                  </span>
-                </div>
-                <p className="text-xs text-gray-600">{c.summary}</p>
-                <p className="text-xs text-gray-400 mt-1">
-                  Agent: {c.agent}{c.duration ? ` • Duration: ${c.duration}` : ''}
-                </p>
-              </div>
+              <button
+                key={cf.key}
+                onClick={() => setChannelFilter(cf.key)}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-semibold transition-all ${
+                  channelFilter === cf.key
+                    ? 'bg-[#8B1F1F] text-white border-[#8B1F1F]'
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-gray-800'
+                }`}
+              >
+                <Icon className="w-3 h-3" />
+                {cf.label}
+                <span className={`rounded-full px-1 text-xs ${channelFilter === cf.key ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'}`}>{count}</span>
+              </button>
             );
           })}
         </div>
+
+        {filtered.length === 0 ? (
+          <div className="p-4 text-center text-xs text-gray-400 border border-dashed border-gray-200 rounded-lg">
+            No {channelFilter !== 'all' ? channelConfig[channelFilter]?.label : ''} communications found
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {filtered.map(c => {
+              const cfg = channelConfig[c.type] || channelConfig.phone;
+              const Icon = cfg.icon;
+              return (
+                <div key={c.id} className="p-3 bg-white border border-gray-200 rounded-lg">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className={`flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${cfg.color}`}>
+                      <Icon className="w-3 h-3" />{cfg.label}
+                    </span>
+                    <span className="text-xs font-semibold text-gray-800">{c.subject}</span>
+                    <span className="ml-auto text-xs text-gray-400 flex items-center gap-1">
+                      <Clock className="w-3 h-3" />{format(new Date(c.date), 'MM/dd/yyyy')}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-600">{c.summary}</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Agent: <span className="font-semibold text-gray-600">{c.agent}</span>
+                    {c.duration ? ` • Duration: ${c.duration}` : ''}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
