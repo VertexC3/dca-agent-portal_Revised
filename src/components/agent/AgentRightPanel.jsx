@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import {
   AlertTriangle, CheckCircle2, Zap, Search, BookOpen,
   Phone, Mail, Send, RefreshCw, UserPlus, FileText,
-  ChevronDown, ChevronUp, Clock, ArrowUpCircle, ExternalLink
+  ChevronDown, ChevronUp, Clock, ArrowUpCircle, ExternalLink, Bot, MessageSquare
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import FloatingWidget from './FloatingWidget';
+import CommunicationDetailModal from './CommunicationDetailModal';
 
 const kbArticles = [
   { id: 1, title: 'How to use Semaglutide injections', category: 'medication_inquiry' },
@@ -57,10 +58,42 @@ const ActionModal = ({ isOpen, onClose, title, children }) => {
   );
 };
 
+const CHANNEL_ICON = { phone: Phone, email: Mail, text: Send, ai_agent: Bot };
+const CHANNEL_LABEL = { phone: 'Phone', email: 'Email', text: 'SMS', ai_agent: 'AI Agent' };
+const CHANNEL_COLOR = {
+  phone:    'text-blue-700 bg-blue-50',
+  email:    'text-purple-700 bg-purple-50',
+  text:     'text-green-700 bg-green-50',
+  ai_agent: 'text-orange-700 bg-orange-50',
+};
+
+const MEDS = ['Semaglutide 2.4mg', 'Metformin 500mg', 'Ozempic 0.5mg'];
+
+// Pad messages to at least 10 for demo
+function padMessages(msgs, patient) {
+  const extras = [
+    { id: 'X-1', date: '2026-03-01', type: 'email',    subject: 'Refill confirmation',       summary: 'Confirmed refill for Semaglutide 2.4mg. Ready for pickup.',          agent: 'AI Agent',  order_id: null, medication: 'Semaglutide 2.4mg' },
+    { id: 'X-2', date: '2026-02-20', type: 'text',     subject: 'Delivery on the way',        summary: 'Shipment is out for delivery. Expected by 5 PM.',                    agent: 'Sarah K.',  order_id: null, medication: 'Metformin 500mg' },
+    { id: 'X-3', date: '2026-02-10', type: 'phone',    subject: 'Side effects question',      summary: 'Patient asked about nausea. Advised to take with food.',              agent: 'Mike T.',   order_id: null, medication: 'Ozempic 0.5mg' },
+    { id: 'X-4', date: '2026-01-28', type: 'email',    subject: 'Insurance pre-auth update',  summary: 'Insurance pre-authorization approved for next 3 months.',             agent: 'Sarah K.',  order_id: null, medication: 'Semaglutide 2.4mg' },
+    { id: 'X-5', date: '2026-01-22', type: 'ai_agent', subject: 'Post-delivery follow-up',    summary: 'AI followed up on last delivery. Patient confirmed no issues.',       agent: 'AI Agent',  order_id: null, medication: 'Metformin 500mg' },
+    { id: 'X-6', date: '2025-12-30', type: 'text',     subject: 'Holiday schedule notice',    summary: 'Informed patient pharmacy closes Dec 31. Order placed in advance.',   agent: 'Mike T.',   order_id: null, medication: 'Ozempic 0.5mg' },
+    { id: 'X-7', date: '2025-12-15', type: 'phone',    subject: 'Dosage adjustment query',    summary: 'Doctor changed dosage to 2.4mg. Patient informed and acknowledged.', agent: 'Sarah K.',  order_id: null, medication: 'Semaglutide 2.4mg' },
+  ];
+  const combined = [...(msgs || [])];
+  for (const e of extras) {
+    if (combined.length >= 10) break;
+    combined.push(e);
+  }
+  return combined;
+}
+
 export default function AgentRightPanel({ patient }) {
   const [kbSearch, setKbSearch] = useState('');
-  const [viewedMessages, setViewedMessages] = useState([]);
   const [kbExpanded, setKbExpanded] = useState(false);
+  const [selectedMsg, setSelectedMsg] = useState(null);
+  const [sortBy, setSortBy] = useState('latest');
+  const [showSortMenu, setShowSortMenu] = useState(false);
   
   // Modal states
   const [showRefillModal, setShowRefillModal] = useState(false);
@@ -80,43 +113,67 @@ export default function AgentRightPanel({ patient }) {
     !kbSearch || a.title.toLowerCase().includes(kbSearch.toLowerCase())
   );
 
-  // Patient-specific messages
-  const patientMessages = patient?.communications || [];
-  const unviewedMessages = patientMessages.filter(m => !viewedMessages.includes(m.id));
+  const allMessages = padMessages(patient?.communications, patient);
+
+  const sortedMessages = [...allMessages].sort((a, b) => {
+    if (sortBy === 'latest') return new Date(b.date) - new Date(a.date);
+    if (sortBy === 'channel') return (a.type || '').localeCompare(b.type || '');
+    if (MEDS.includes(sortBy)) {
+      const aMatch = (a.medication || '') === sortBy ? -1 : 1;
+      const bMatch = (b.medication || '') === sortBy ? -1 : 1;
+      return aMatch - bMatch;
+    }
+    return 0;
+  });
+
+  const SORT_OPTIONS = [
+    { key: 'latest',   label: 'Latest' },
+    { key: 'channel',  label: 'By Channel' },
+    ...MEDS.map(m => ({ key: m, label: m })),
+  ];
+
+  const currentSortLabel = SORT_OPTIONS.find(o => o.key === sortBy)?.label || 'Latest';
 
   // ---- Reusable section content ----
   const PriorityContent = () => (
-    <div className="divide-y divide-gray-100 max-h-56 overflow-y-auto">
+    <div className="divide-y divide-gray-100 max-h-64 overflow-y-auto">
       {!patient ? (
         <div className="p-4 text-center text-xs text-gray-500">
           <CheckCircle2 className="w-6 h-6 mx-auto mb-1 text-gray-300" />
           Select a patient to view messages
         </div>
-      ) : patientMessages.length === 0 ? (
+      ) : sortedMessages.length === 0 ? (
         <div className="p-4 text-center text-xs text-gray-500">
           <CheckCircle2 className="w-6 h-6 mx-auto mb-1 text-green-400" />
           No messages
         </div>
       ) : (
-        patientMessages.map(msg => (
-          <div key={msg.id} className="flex items-start gap-2 p-2.5 hover:bg-gray-50 transition-colors">
+        sortedMessages.map(msg => {
+          const Icon = CHANNEL_ICON[msg.type] || MessageSquare;
+          return (
             <button
-              onClick={() => setViewedMessages(prev => [...prev, msg.id])}
-              className="mt-0.5 w-4 h-4 flex-shrink-0 rounded border-2 border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition-colors"
-              title="Mark as read"
-            />
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-gray-900">{msg.subject}</p>
-              <p className="text-xs text-gray-600 leading-snug mt-0.5">{msg.summary}</p>
-              <div className="flex items-center gap-1.5 mt-0.5 text-xs text-gray-400">
-                <span>{msg.agent}</span>
-                <span className="flex items-center gap-0.5">
-                  <Clock className="w-2.5 h-2.5" />{msg.date}
-                </span>
+              key={msg.id}
+              onClick={() => setSelectedMsg(msg)}
+              className="w-full text-left flex items-start gap-2 p-2.5 hover:bg-red-50/50 transition-colors group"
+            >
+              <span className={`mt-0.5 flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full ${CHANNEL_COLOR[msg.type] || 'bg-gray-100 text-gray-500'}`}>
+                <Icon className="w-3 h-3" />
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-gray-900 group-hover:text-[#8B1F1F] transition-colors truncate">{msg.subject}</p>
+                <p className="text-xs text-gray-500 leading-snug mt-0.5 truncate">{msg.summary}</p>
+                <div className="flex items-center gap-1.5 mt-0.5 text-xs text-gray-400">
+                  <span className="font-medium">{CHANNEL_LABEL[msg.type] || msg.type}</span>
+                  <span>·</span>
+                  <span>{msg.agent}</span>
+                  <span className="flex items-center gap-0.5 ml-auto">
+                    <Clock className="w-2.5 h-2.5" />{msg.date}
+                  </span>
+                </div>
               </div>
-            </div>
-          </div>
-        ))
+            </button>
+          );
+        })
       )}
     </div>
   );
@@ -210,16 +267,60 @@ export default function AgentRightPanel({ patient }) {
 
   return (
     <>
+      {selectedMsg && patient && (
+        <CommunicationDetailModal
+          comm={selectedMsg}
+          patient={patient}
+          onClose={() => setSelectedMsg(null)}
+        />
+      )}
       <div className="flex flex-col gap-3 overflow-y-auto h-full p-3">
 
         {/* Patient Messages */}
         {!floats.priority && (
           <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-            <SectionHeader
-              icon={ArrowUpCircle} title="Patient Messages"
-              badge={patient && <Badge className="bg-white text-[#8B1F1F] text-xs px-1.5 font-bold">{patientMessages.length}</Badge>}
-              onPopOut={() => popOut('priority')}
-            />
+            {/* Custom header with sort dropdown */}
+            <div className="px-3 py-2 bg-[#8B1F1F] text-white flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <ArrowUpCircle className="w-3.5 h-3.5" />
+                <h3 className="font-bold text-xs uppercase tracking-wider">Patient Messages</h3>
+                {patient && <Badge className="bg-white text-[#8B1F1F] text-xs px-1.5 font-bold ml-1">{allMessages.length}</Badge>}
+              </div>
+              <div className="flex items-center gap-1.5">
+                {/* Sort dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowSortMenu(v => !v)}
+                    className="flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white text-xs font-semibold px-2 py-0.5 rounded transition-colors"
+                  >
+                    {currentSortLabel} <ChevronDown className="w-3 h-3" />
+                  </button>
+                  {showSortMenu && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setShowSortMenu(false)} />
+                      <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-lg shadow-xl w-44 overflow-hidden">
+                        {SORT_OPTIONS.map(opt => (
+                          <button
+                            key={opt.key}
+                            onClick={() => { setSortBy(opt.key); setShowSortMenu(false); }}
+                            className={`w-full text-left px-3 py-2 text-xs hover:bg-red-50 transition-colors ${sortBy === opt.key ? 'text-[#8B1F1F] font-bold bg-red-50' : 'text-gray-700'}`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+                <button
+                  onClick={() => popOut('priority')}
+                  className="p-0.5 rounded hover:bg-white/20 transition-colors"
+                  title="Pop out"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
             <PriorityContent />
           </div>
         )}
