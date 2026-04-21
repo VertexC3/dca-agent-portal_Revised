@@ -18,6 +18,7 @@ import PhysicianPickerModal from './PhysicianPickerModal';
 import AgentEngagementLog from './AgentEngagementLog';
 import KBSuggestions from './KBSuggestions';
 import QuickActionMacros from './QuickActionMacros';
+import CommunicationDetailModal from './CommunicationDetailModal';
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -923,6 +924,7 @@ function OrdersTab({ patient }) {
 
 function CommunicationsTab({ patient, newNote, setNewNote }) {
   const [channelFilter, setChannelFilter] = useState('all');
+  const [selectedComm, setSelectedComm] = useState(null);
 
   const channelConfig = {
     phone:    { label: 'Call',     color: 'text-blue-700 bg-blue-50',   icon: Phone },
@@ -945,6 +947,13 @@ function CommunicationsTab({ patient, newNote, setNewNote }) {
 
   return (
     <div className="space-y-4">
+      {selectedComm && (
+        <CommunicationDetailModal
+          comm={selectedComm}
+          patient={patient}
+          onClose={() => setSelectedComm(null)}
+        />
+      )}
       {/* Agent Engagement Log */}
       <AgentEngagementLog communications={patient.communications} />
 
@@ -1021,22 +1030,27 @@ function CommunicationsTab({ patient, newNote, setNewNote }) {
               const cfg = channelConfig[c.type] || channelConfig.phone;
               const Icon = cfg.icon;
               return (
-                <div key={c.id} className="p-3 bg-white border border-gray-200 rounded-lg">
+                <button
+                  key={c.id}
+                  onClick={() => setSelectedComm(c)}
+                  className="w-full text-left p-3 bg-white border border-gray-200 rounded-lg hover:border-[#8B1F1F]/40 hover:bg-red-50/30 hover:shadow-sm transition-all group cursor-pointer"
+                >
                   <div className="flex items-center gap-2 mb-1.5">
                     <span className={`flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${cfg.color}`}>
                       <Icon className="w-3 h-3" />{cfg.label}
                     </span>
-                    <span className="text-xs font-semibold text-gray-800">{c.subject}</span>
+                    <span className="text-xs font-semibold text-gray-800 group-hover:text-[#8B1F1F] transition-colors">{c.subject}</span>
                     <span className="ml-auto text-xs text-gray-400 flex items-center gap-1">
                       <Clock className="w-3 h-3" />{format(new Date(c.date), 'MM/dd/yyyy')}
                     </span>
+                    <ChevronRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-[#8B1F1F] transition-colors flex-shrink-0" />
                   </div>
                   <p className="text-xs text-gray-600">{c.summary}</p>
                   <p className="text-xs text-gray-400 mt-1">
                     Agent: <span className="font-semibold text-gray-600">{c.agent}</span>
                     {c.duration ? ` • Duration: ${c.duration}` : ''}
                   </p>
-                </div>
+                </button>
               );
             })}
           </div>
