@@ -47,8 +47,8 @@ export const mockPatients = [
     ],
     cards: [{ id: 'CARD-001', last4: '4242', brand: 'Visa', expiry: '12/27', is_default: true }],
     family_members: [
-      { id: 'FM-1', name: 'Mary Doe', relation: 'Spouse', email: 'mary.doe@example.com', phone: '(555) 123-4568', profile_picture: null },
-      { id: 'FM-2', name: 'Tommy Doe', relation: 'Son', email: 'tommy.doe@example.com', phone: '(555) 123-4569', profile_picture: null },
+      { id: 'FM-1', name: 'Mary Doe', relation: 'Spouse', email: 'mary.doe@example.com', phone: '(555) 123-4568', profile_picture: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=face' },
+      { id: 'FM-2', name: 'Tommy Doe', relation: 'Son', email: 'tommy.doe@example.com', phone: '(555) 123-4569', profile_picture: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=200&h=200&fit=crop&crop=face' },
     ]
   },
   {
