@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { CreditCard, ChevronLeft, Check, Lock } from 'lucide-react';
-import WorkflowProgressBar from '../workflows/WorkflowProgressBar';
+import WorkflowProgressBar from './WorkflowProgressBar';
 
 const STEPS = ['Select Payment Method', 'Enter Card Details', 'Confirm Payment'];
 

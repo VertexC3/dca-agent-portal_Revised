@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Pill, ChevronLeft, Check } from 'lucide-react';
-import WorkflowProgressBar from '../workflows/WorkflowProgressBar';
+import WorkflowProgressBar from './WorkflowProgressBar';
 
 const STEPS = ['Select Prescriptions', 'Verify Details', 'Confirm & Submit'];
 

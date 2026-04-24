@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { format } from 'date-fns';
 import {
   X, Phone, Mail, Send, Bot, Clock, User, Pill, Package,
-  MessageSquare, ChevronRight, AlertTriangle, Mic, FileText, RefreshCw
+  MessageSquare, ChevronRight, AlertTriangle, Mic, FileText, RefreshCw, Forward
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import ColleaguePicker from './ColleaguePicker';
 
 const CHANNEL_CONFIG = {
   phone:    { label: 'Phone Call',  icon: Phone,        bg: 'bg-blue-50',   border: 'border-blue-200',   badge: 'bg-blue-100 text-blue-800',   dot: 'bg-blue-500' },
@@ -65,8 +66,16 @@ function buildThread(comm, patient) {
 
 export default function CommunicationDetailModal({ comm, patient, onClose }) {
   const [replyText, setReplyText] = useState('');
+  const [showColleaguePicker, setShowColleaguePicker] = useState(false);
+  const [forwardFeedback, setForwardFeedback] = useState(null);
   const cfg = CHANNEL_CONFIG[comm.type] || CHANNEL_CONFIG.phone;
   const Icon = cfg.icon;
+
+  const handleForward = (colleague) => {
+    setForwardFeedback(`Forwarded to ${colleague.name}`);
+    setShowColleaguePicker(false);
+    setTimeout(() => setForwardFeedback(null), 3000);
+  };
 
   // Find linked order and prescription
   const linkedOrder = patient.orders.find(o => o.id === comm.order_id);
@@ -220,6 +229,11 @@ export default function CommunicationDetailModal({ comm, patient, onClose }) {
 
         {/* Footer: reply bar */}
         <div className="px-5 py-3 border-t border-gray-200 bg-gray-50">
+          {forwardFeedback && (
+            <div className="mb-2 p-2 text-xs bg-green-50 border border-green-200 rounded-lg text-green-700 font-semibold text-center">
+              ✓ {forwardFeedback}
+            </div>
+          )}
           <div className="flex gap-2">
             <Textarea
               value={replyText}
@@ -231,12 +245,24 @@ export default function CommunicationDetailModal({ comm, patient, onClose }) {
               <Button size="sm" className="h-5 text-xs bg-[#8B1F1F] hover:bg-[#721919] px-3 whitespace-nowrap">
                 <Send className="w-3 h-3 mr-1" />Reply
               </Button>
-              <Button size="sm" variant="outline" className="h-5 text-xs px-3 whitespace-nowrap">
-                <RefreshCw className="w-3 h-3 mr-1" />Refill
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowColleaguePicker(true)}
+                className="h-5 text-xs px-3 whitespace-nowrap hover:bg-red-50 hover:text-[#8B1F1F] hover:border-[#8B1F1F]"
+              >
+                <Forward className="w-3 h-3 mr-1" />Forward
               </Button>
             </div>
           </div>
         </div>
+
+        {showColleaguePicker && (
+          <ColleaguePicker
+            onSelect={handleForward}
+            onClose={() => setShowColleaguePicker(false)}
+          />
+        )}
       </div>
     </div>
   );

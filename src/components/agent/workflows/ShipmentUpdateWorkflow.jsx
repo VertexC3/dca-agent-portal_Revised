@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Truck, ChevronLeft, Check, ExternalLink } from 'lucide-react';
-import WorkflowProgressBar from '../workflows/WorkflowProgressBar';
+import WorkflowProgressBar from './WorkflowProgressBar';
 
 const STEPS = ['Review Order', 'Update Status', 'Notify Patient'];
 
