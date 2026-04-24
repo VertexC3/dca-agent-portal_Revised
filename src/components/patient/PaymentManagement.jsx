@@ -267,23 +267,22 @@ export default function PaymentManagement({ user }) {
             </div>
 
             {!editingCard && (
-              <div>
-                <Label>Card Number</Label>
-                <Input
-                  value={cardData.card_number}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\s/g, '');
-                    if (/^\d*$/.test(value) && value.length <= 16) {
-                      setCardData({ ...cardData, card_number: value });
-                    }
-                  }}
-                  placeholder="1234 5678 9012 3456"
-                  value={formatCardNumber(cardData.card_number)}
-                  maxLength={19}
-                  className="mt-1"
-                />
-              </div>
-            )}
+               <div>
+                 <Label>Card Number</Label>
+                 <Input
+                   onChange={(e) => {
+                     const value = e.target.value.replace(/\s/g, '');
+                     if (/^\d*$/.test(value) && value.length <= 16) {
+                       setCardData({ ...cardData, card_number: value });
+                     }
+                   }}
+                   placeholder="1234 5678 9012 3456"
+                   value={formatCardNumber(cardData.card_number)}
+                   maxLength={19}
+                   className="mt-1"
+                 />
+               </div>
+             )}
 
             {!editingCard && (
               <div>

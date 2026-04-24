@@ -88,7 +88,7 @@ function padMessages(msgs, patient) {
   return combined;
 }
 
-export default function AgentRightPanel({ patient, onOpenMessage }) {
+export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflow }) {
   const [kbSearch, setKbSearch] = useState('');
   const [kbExpanded, setKbExpanded] = useState(false);
   const [selectedMsg, setSelectedMsg] = useState(null);
@@ -180,7 +180,7 @@ export default function AgentRightPanel({ patient, onOpenMessage }) {
 
   const QuickContent = () => (
     <div className="p-2 grid grid-cols-2 gap-1.5">
-      <Button size="sm" variant="outline" onClick={() => setShowRefillModal(true)}
+      <Button size="sm" variant="outline" onClick={() => onStartWorkflow?.('refill', { selectedRx: [] })}
         className={`h-8 text-xs justify-start gap-1.5 border-gray-200 hover:bg-blue-50`}>
         <RefreshCw className={`w-3.5 h-3.5 text-blue-600`} />
         Refill Rx

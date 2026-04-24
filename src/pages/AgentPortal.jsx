@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { ChevronDown, LayoutDashboard, MessageSquare, ArrowLeftRight } from 'lucide-react';
+import { ChevronDown, LayoutDashboard, MessageSquare, ArrowLeftRight, Eye, EyeOff } from 'lucide-react';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
@@ -9,6 +9,9 @@ import OrderSearchBar from '../components/agent/OrderSearchBar';
 import AgentDashboard from '../components/agent/AgentDashboard';
 import InlineMessageBox from '../components/agent/InlineMessageBox';
 import CoachMarks from '../components/agent/CoachMarks';
+import PrescriptionRefillWorkflow from '../components/agent/workflows/PrescriptionRefillWorkflow';
+import ShipmentUpdateWorkflow from '../components/agent/workflows/ShipmentUpdateWorkflow';
+import PaymentWorkflow from '../components/agent/workflows/PaymentWorkflow';
 import { mockPatients } from '../data/mockPatients';
 
 // Drag-to-resize divider with swap button
@@ -69,6 +72,9 @@ export default function AgentPortal() {
   // When true: left=RightPanel, right=WorkspaceTabs (swapped)
   const [panelSwapped, setPanelSwapped] = useState(false);
   const [showCoachMarks, setShowCoachMarks] = useState(false);
+  const [activeWorkflow, setActiveWorkflow] = useState(null);
+  const [workflowData, setWorkflowData] = useState(null);
+  const [rightPanelVisible, setRightPanelVisible] = useState(true);
 
   const MIN = 400;
   const MAX = 1000;
@@ -146,50 +152,142 @@ export default function AgentPortal() {
       ) : (
        <>
          <div className="flex gap-0 flex-1 overflow-hidden">
-           {!panelSwapped ? (
+           {/* Active Workflow Takes Over Left Side */}
+           {activeWorkflow ? (
+             <div style={{ width: middleW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden flex flex-col border-r border-gray-200">
+               {activeWorkflow === 'refill' && (
+                 <PrescriptionRefillWorkflow
+                   patient={selectedPatient}
+                   selectedRx={workflowData?.selectedRx}
+                   onBack={() => setActiveWorkflow(null)}
+                   onComplete={() => setActiveWorkflow(null)}
+                 />
+               )}
+               {activeWorkflow === 'shipment' && (
+                 <ShipmentUpdateWorkflow
+                   patient={selectedPatient}
+                   selectedOrder={workflowData?.selectedOrder}
+                   onBack={() => setActiveWorkflow(null)}
+                   onComplete={() => setActiveWorkflow(null)}
+                 />
+               )}
+               {activeWorkflow === 'payment' && (
+                 <PaymentWorkflow
+                   patient={selectedPatient}
+                   cartTotal={workflowData?.cartTotal}
+                   onBack={() => setActiveWorkflow(null)}
+                   onComplete={() => setActiveWorkflow(null)}
+                 />
+               )}
+             </div>
+           ) : (
              <>
-               {/* Left: Workspace Tabs */}
-               <div style={{ width: middleW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden flex flex-col border-r border-gray-200">
-                 <AgentWorkspaceTabs
-                   patient={selectedPatient}
-                   onSwitchPatient={(member) => {
-                     const found = mockPatients.find(p => p.email === member.email);
-                     if (found) setSelectedPatient(found);
-                   }}
-                   data-coach="workspace-tabs"
-                 />
-               </div>
-               <ResizeDivider onDrag={dragMiddle} onSwap={() => setPanelSwapped(v => !v)} />
-               {/* Right: Right Panel */}
-               <div data-coach="right-panel" className="flex-1 min-w-0 overflow-hidden flex flex-col">
-                 <AgentRightPanel
-                   patient={selectedPatient}
-                   onOpenMessage={(msg) => { setActiveComm(msg); setShowMessageBox(true); }}
-                 />
-               </div>
-              </>
-            ) : (
-               <>
-                 {/* Swapped: Right Panel on left */}
-                 <div data-coach="right-panel" style={{ width: middleW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden flex flex-col border-r border-gray-200">
-                   <AgentRightPanel
-                     patient={selectedPatient}
-                     onOpenMessage={(msg) => { setActiveComm(msg); setShowMessageBox(true); }}
-                   />
-                 </div>
-                 <ResizeDivider onDrag={dragMiddle} onSwap={() => setPanelSwapped(v => !v)} />
-                 {/* Workspace Tabs on right */}
-                 <div data-coach="workspace-tabs" className="flex-1 min-w-0 overflow-hidden flex flex-col">
-                   <AgentWorkspaceTabs
-                     patient={selectedPatient}
-                     onSwitchPatient={(member) => {
-                       const found = mockPatients.find(p => p.email === member.email);
-                       if (found) setSelectedPatient(found);
-                     }}
-                   />
-                 </div>
-               </>
-             )}
+               {!panelSwapped ? (
+                 <>
+                   {/* Left: Workspace Tabs */}
+                   <div style={{ width: middleW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden flex flex-col border-r border-gray-200">
+                     <AgentWorkspaceTabs
+                       patient={selectedPatient}
+                       onSwitchPatient={(member) => {
+                         const found = mockPatients.find(p => p.email === member.email);
+                         if (found) setSelectedPatient(found);
+                       }}
+                       onStartWorkflow={(workflow, data) => {
+                         setActiveWorkflow(workflow);
+                         setWorkflowData(data);
+                       }}
+                       data-coach="workspace-tabs"
+                     />
+                   </div>
+                   <ResizeDivider onDrag={dragMiddle} onSwap={() => setPanelSwapped(v => !v)} />
+                   {/* Right: Right Panel with Visibility Toggle */}
+                   {rightPanelVisible && (
+                     <div data-coach="right-panel" className="flex-1 min-w-0 overflow-hidden flex flex-col">
+                       <div className="absolute top-[92px] right-4 z-40">
+                         <button
+                           onClick={() => setRightPanelVisible(false)}
+                           className="p-2 rounded-lg bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
+                           title="Hide right panel"
+                         >
+                           <EyeOff className="w-4 h-4 text-gray-600" />
+                         </button>
+                       </div>
+                       <AgentRightPanel
+                         patient={selectedPatient}
+                         onOpenMessage={(msg) => { setActiveComm(msg); setShowMessageBox(true); }}
+                         onStartWorkflow={(workflow, data) => {
+                           setActiveWorkflow(workflow);
+                           setWorkflowData(data);
+                         }}
+                       />
+                     </div>
+                   )}
+                   {!rightPanelVisible && (
+                     <div className="absolute top-[92px] right-4 z-40">
+                       <button
+                         onClick={() => setRightPanelVisible(true)}
+                         className="p-2 rounded-lg bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
+                         title="Show right panel"
+                       >
+                         <Eye className="w-4 h-4 text-gray-600" />
+                       </button>
+                     </div>
+                   )}
+                  </>
+                ) : (
+                   <>
+                     {/* Swapped: Right Panel on left with Visibility Toggle */}
+                     {rightPanelVisible && (
+                       <div data-coach="right-panel" style={{ width: middleW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden flex flex-col border-r border-gray-200">
+                         <div className="absolute top-[92px] left-4 z-40">
+                           <button
+                             onClick={() => setRightPanelVisible(false)}
+                             className="p-2 rounded-lg bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
+                             title="Hide right panel"
+                           >
+                             <EyeOff className="w-4 h-4 text-gray-600" />
+                           </button>
+                         </div>
+                         <AgentRightPanel
+                           patient={selectedPatient}
+                           onOpenMessage={(msg) => { setActiveComm(msg); setShowMessageBox(true); }}
+                           onStartWorkflow={(workflow, data) => {
+                             setActiveWorkflow(workflow);
+                             setWorkflowData(data);
+                           }}
+                         />
+                       </div>
+                     )}
+                     {!rightPanelVisible && (
+                       <div className="absolute top-[92px] left-4 z-40">
+                         <button
+                           onClick={() => setRightPanelVisible(true)}
+                           className="p-2 rounded-lg bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
+                           title="Show right panel"
+                         >
+                           <Eye className="w-4 h-4 text-gray-600" />
+                         </button>
+                       </div>
+                     )}
+                     <ResizeDivider onDrag={dragMiddle} onSwap={() => setPanelSwapped(v => !v)} />
+                     {/* Workspace Tabs on right */}
+                     <div data-coach="workspace-tabs" className="flex-1 min-w-0 overflow-hidden flex flex-col">
+                       <AgentWorkspaceTabs
+                         patient={selectedPatient}
+                         onSwitchPatient={(member) => {
+                           const found = mockPatients.find(p => p.email === member.email);
+                           if (found) setSelectedPatient(found);
+                         }}
+                         onStartWorkflow={(workflow, data) => {
+                           setActiveWorkflow(workflow);
+                           setWorkflowData(data);
+                         }}
+                       />
+                     </div>
+                   </>
+                 )}
+             </>
+           )}
           </div>
 
           {/* Floating Inline Message Box */}

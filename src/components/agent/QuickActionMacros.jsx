@@ -54,7 +54,7 @@ const MACROS = [
   },
 ];
 
-export default function QuickActionMacros({ patient }) {
+export default function QuickActionMacros({ patient, onStartWorkflow }) {
   const [expanded, setExpanded] = useState(true);
   const [firedMacros, setFiredMacros] = useState({});
   const [previewMacro, setPreviewMacro] = useState(null);
@@ -63,6 +63,16 @@ export default function QuickActionMacros({ patient }) {
     setFiredMacros(prev => ({ ...prev, [macro.id]: true }));
     setPreviewMacro(null);
     setTimeout(() => setFiredMacros(prev => ({ ...prev, [macro.id]: false })), 3000);
+  };
+
+  const handleWorkflowClick = (workflowType) => {
+    if (workflowType === 'refill_approved') {
+      onStartWorkflow?.('refill', { selectedRx: [] });
+    } else if (workflowType === 'order_in_transit') {
+      onStartWorkflow?.('shipment', { selectedOrder: patient?.orders?.[0] });
+    } else if (workflowType === 'billing_followup') {
+      onStartWorkflow?.('payment', { cartTotal: 0 });
+    }
   };
 
   return (
@@ -87,10 +97,11 @@ export default function QuickActionMacros({ patient }) {
               const Icon = macro.icon;
               const fired = firedMacros[macro.id];
               const isPreviewing = previewMacro?.id === macro.id;
+              const isWorkflowMacro = ['refill_approved', 'order_in_transit', 'billing_followup'].includes(macro.id);
               return (
                 <button
                   key={macro.id}
-                  onClick={() => setPreviewMacro(isPreviewing ? null : macro)}
+                  onClick={() => isWorkflowMacro ? handleWorkflowClick(macro.id) : setPreviewMacro(isPreviewing ? null : macro)}
                   className={`flex items-center gap-2 px-2.5 py-2 rounded-lg border text-left transition-all text-xs font-semibold ${macro.color} ${isPreviewing ? 'ring-2 ring-offset-1 ring-[#8B1F1F]' : ''}`}
                 >
                   {fired ? (

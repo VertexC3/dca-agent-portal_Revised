@@ -200,7 +200,7 @@ function InlineEdit({ value, onSave, className = '' }) {
   );
 }
 
-export default function AgentWorkspaceTabs({ patient, onSwitchPatient }) {
+export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWorkflow }) {
   const [activeTab, setActiveTab] = useState('overview');
   const [newNote, setNewNote] = useState('');
   const [editedAllergies, setEditedAllergies] = useState(patient?.allergies || '');
@@ -367,6 +367,11 @@ function StatCardModal({ stat, patient, onClose, onGoToOrders }) {
     setSelectedRx(prev => prev.includes(rx.id) ? prev.filter(id => id !== rx.id) : [...prev, rx.id]);
   };
 
+  const handleGoToCart = () => {
+    onGoToOrders?.();
+    onClose?.();
+  };
+
   const renderContent = () => {
     if (stat === 'rx') return (
       <div className="space-y-2">
@@ -501,6 +506,17 @@ function StatCardModal({ stat, patient, onClose, onGoToOrders }) {
         <div className="p-4 max-h-[70vh] overflow-y-auto">
           {renderContent()}
         </div>
+        {stat === 'rx' && selectedRx.length > 0 && (
+          <div className="px-4 py-3 bg-blue-50 border-t border-blue-200 flex gap-2">
+            <button
+              onClick={handleGoToCart}
+              className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <ShoppingCart className="w-3.5 h-3.5" />
+              Go to Cart ({selectedRx.length})
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
