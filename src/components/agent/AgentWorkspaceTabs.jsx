@@ -135,13 +135,15 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWo
   const [activeTab, setActiveTab] = useState('overview');
   const [newNote, setNewNote] = useState('');
   const [editedAllergies, setEditedAllergies] = useState(patient?.allergies || '');
-  const [editedAddress, setEditedAddress] = useState(patient?.address || '');
+  const [editedPrimaryAddress, setEditedPrimaryAddress] = useState(patient?.primary_address || '');
+  const [editedShippingAddress, setEditedShippingAddress] = useState(patient?.shipping_address || '');
   const [editedPhysician, setEditedPhysician] = useState(patient ? { name: patient.physician, npi: patient.physician_npi, phone: patient.physician_phone } : null);
   const [showPhysicianPicker, setShowPhysicianPicker] = useState(false);
 
   React.useEffect(() => {
     setEditedAllergies(patient?.allergies || '');
-    setEditedAddress(patient?.address || '');
+    setEditedPrimaryAddress(patient?.primary_address || '');
+    setEditedShippingAddress(patient?.shipping_address || '');
     setEditedPhysician(patient ? { name: patient.physician, npi: patient.physician_npi, phone: patient.physician_phone } : null);
   }, [patient?.id]);
 
@@ -203,9 +205,15 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWo
                </div>
              </div>
 
-             <div className="mt-2 text-xs">
-               <p className="text-gray-500">Shipping</p>
-               <AddressField address={editedAddress} onChange={setEditedAddress} />
+             <div className="grid grid-cols-2 gap-3 mt-2 text-xs">
+               <div>
+                 <p className="text-gray-500">Primary Address</p>
+                 <AddressField address={editedPrimaryAddress} onChange={setEditedPrimaryAddress} />
+               </div>
+               <div>
+                 <p className="text-gray-500">Shipping Address</p>
+                 <AddressField address={editedShippingAddress} onChange={setEditedShippingAddress} />
+               </div>
              </div>
 
             <div className="grid grid-cols-3 gap-3 mt-2 text-xs border-t border-gray-200 pt-2">
