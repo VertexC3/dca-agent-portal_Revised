@@ -39,6 +39,7 @@ export default function DraggablePanelGrid({ panels, onReorder }) {
           {/* Panel header with drag handle */}
           <div className="flex items-center gap-2 px-3 py-2 border-b border-gray-100 bg-gray-50 rounded-t-lg">
             <div
+              data-coach="drag-icon"
               className="cursor-grab active:cursor-grabbing text-gray-300 group-hover:text-gray-500 transition-colors flex-shrink-0"
               title="Drag to reorder"
             >

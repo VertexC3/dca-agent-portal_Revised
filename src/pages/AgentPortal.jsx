@@ -8,6 +8,7 @@ import AgentRightPanel from '../components/agent/AgentRightPanel';
 import OrderSearchBar from '../components/agent/OrderSearchBar';
 import AgentDashboard from '../components/agent/AgentDashboard';
 import InlineMessageBox from '../components/agent/InlineMessageBox';
+import CoachMarks from '../components/agent/CoachMarks';
 import { mockPatients } from '../data/mockPatients';
 
 // Drag-to-resize divider with swap button
@@ -47,6 +48,7 @@ function ResizeDivider({ onDrag, onSwap }) {
       <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-gray-200 group-hover:bg-[#8B1F1F]/30 transition-colors" />
       {/* Swap button — positioned near top */}
       <button
+        data-coach="swap-button"
         onMouseDown={e => e.stopPropagation()}
         onClick={onSwap}
         title="Swap panels"
@@ -66,6 +68,7 @@ export default function AgentPortal() {
   const [activeComm, setActiveComm] = useState(null);
   // When true: left=RightPanel, right=WorkspaceTabs (swapped)
   const [panelSwapped, setPanelSwapped] = useState(false);
+  const [showCoachMarks, setShowCoachMarks] = useState(false);
 
   const MIN = 400;
   const MAX = 1000;
@@ -73,6 +76,14 @@ export default function AgentPortal() {
   const dragMiddle = useCallback((delta) => {
     setMiddleW(w => Math.min(MAX, Math.max(MIN, w + delta)));
   }, []);
+
+  React.useEffect(() => {
+    if (window.__agentOnboardingActive && selectedPatient) {
+      setShowCoachMarks(true);
+      localStorage.setItem('agentOnboardingComplete', 'true');
+      window.__agentOnboardingActive = false;
+    }
+  }, [selectedPatient]);
 
   return (
     <div className="flex flex-col h-full bg-gray-50">
@@ -129,55 +140,56 @@ export default function AgentPortal() {
 
       {/* Main Content */}
       {!selectedPatient ? (
-        <div className="flex-1 overflow-hidden">
-          <AgentDashboard onSelectPatient={setSelectedPatient} />
-        </div>
+       <div className="flex-1 overflow-hidden">
+         <AgentDashboard onSelectPatient={setSelectedPatient} />
+       </div>
       ) : (
-        <>
-          <div className="flex gap-0 flex-1 overflow-hidden">
-            {!panelSwapped ? (
-              <>
-                {/* Left: Workspace Tabs */}
-                <div style={{ width: middleW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden flex flex-col border-r border-gray-200">
-                  <AgentWorkspaceTabs
-                    patient={selectedPatient}
-                    onSwitchPatient={(member) => {
-                      const found = mockPatients.find(p => p.email === member.email);
-                      if (found) setSelectedPatient(found);
-                    }}
-                  />
-                </div>
-                <ResizeDivider onDrag={dragMiddle} onSwap={() => setPanelSwapped(v => !v)} />
-                {/* Right: Right Panel */}
-                <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
-                  <AgentRightPanel
-                    patient={selectedPatient}
-                    onOpenMessage={(msg) => { setActiveComm(msg); setShowMessageBox(true); }}
-                  />
-                </div>
+       <>
+         <div className="flex gap-0 flex-1 overflow-hidden">
+           {!panelSwapped ? (
+             <>
+               {/* Left: Workspace Tabs */}
+               <div style={{ width: middleW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden flex flex-col border-r border-gray-200">
+                 <AgentWorkspaceTabs
+                   patient={selectedPatient}
+                   onSwitchPatient={(member) => {
+                     const found = mockPatients.find(p => p.email === member.email);
+                     if (found) setSelectedPatient(found);
+                   }}
+                   data-coach="workspace-tabs"
+                 />
+               </div>
+               <ResizeDivider onDrag={dragMiddle} onSwap={() => setPanelSwapped(v => !v)} />
+               {/* Right: Right Panel */}
+               <div data-coach="right-panel" className="flex-1 min-w-0 overflow-hidden flex flex-col">
+                 <AgentRightPanel
+                   patient={selectedPatient}
+                   onOpenMessage={(msg) => { setActiveComm(msg); setShowMessageBox(true); }}
+                 />
+               </div>
               </>
             ) : (
-              <>
-                {/* Swapped: Right Panel on left */}
-                <div style={{ width: middleW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden flex flex-col border-r border-gray-200">
-                  <AgentRightPanel
-                    patient={selectedPatient}
-                    onOpenMessage={(msg) => { setActiveComm(msg); setShowMessageBox(true); }}
-                  />
-                </div>
-                <ResizeDivider onDrag={dragMiddle} onSwap={() => setPanelSwapped(v => !v)} />
-                {/* Workspace Tabs on right */}
-                <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
-                  <AgentWorkspaceTabs
-                    patient={selectedPatient}
-                    onSwitchPatient={(member) => {
-                      const found = mockPatients.find(p => p.email === member.email);
-                      if (found) setSelectedPatient(found);
-                    }}
-                  />
-                </div>
-              </>
-            )}
+               <>
+                 {/* Swapped: Right Panel on left */}
+                 <div data-coach="right-panel" style={{ width: middleW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden flex flex-col border-r border-gray-200">
+                   <AgentRightPanel
+                     patient={selectedPatient}
+                     onOpenMessage={(msg) => { setActiveComm(msg); setShowMessageBox(true); }}
+                   />
+                 </div>
+                 <ResizeDivider onDrag={dragMiddle} onSwap={() => setPanelSwapped(v => !v)} />
+                 {/* Workspace Tabs on right */}
+                 <div data-coach="workspace-tabs" className="flex-1 min-w-0 overflow-hidden flex flex-col">
+                   <AgentWorkspaceTabs
+                     patient={selectedPatient}
+                     onSwitchPatient={(member) => {
+                       const found = mockPatients.find(p => p.email === member.email);
+                       if (found) setSelectedPatient(found);
+                     }}
+                   />
+                 </div>
+               </>
+             )}
           </div>
 
           {/* Floating Inline Message Box */}
@@ -189,8 +201,11 @@ export default function AgentPortal() {
               onClose={() => { setShowMessageBox(false); setActiveComm(null); }}
             />
           )}
-        </>
-      )}
-    </div>
-  );
-}
+
+          {/* Coach Marks */}
+          <CoachMarks isActive={showCoachMarks} onComplete={() => setShowCoachMarks(false)} />
+          </>
+          )}
+          </div>
+          );
+          }

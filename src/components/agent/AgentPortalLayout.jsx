@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LogOut } from 'lucide-react';
+import { LogOut, BookOpen } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,16 +7,22 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import ProfileEditDialog from './ProfileEditDialog';
+import SoftPhone from './SoftPhone';
+
 const getMockUser = () => {
   const stored = localStorage.getItem('facilityUser');
   if (stored) return JSON.parse(stored);
   return { full_name: "Agent User", email: "agent@dcapharmacy.com", role: "representative", profile_picture: null };
 };
 
-import SoftPhone from './SoftPhone';
-
 export default function AgentPortalLayout({ children, currentPageName }) {
   const [mockUser, setMockUser] = useState(getMockUser);
+  const [showProfileEdit, setShowProfileEdit] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    const stored = localStorage.getItem('agentOnboardingComplete');
+    return !stored;
+  });
 
   React.useEffect(() => {
     document.title = "DCA Pharmacy - Agent Portal";
@@ -31,6 +37,11 @@ export default function AgentPortalLayout({ children, currentPageName }) {
       window.removeEventListener('storage', handleProfileUpdate);
     };
   }, []);
+
+  const handleOnboarding = () => {
+    window.__agentOnboardingActive = true;
+    setShowOnboarding(true);
+  };
 
   return (
     <div className="min-h-screen relative bg-gray-50">
@@ -71,6 +82,20 @@ export default function AgentPortalLayout({ children, currentPageName }) {
                     <p className="text-xs text-gray-500 truncate">{mockUser.email}</p>
                   </div>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={() => setShowProfileEdit(true)}
+                    className="cursor-pointer flex items-center"
+                  >
+                    👤 Edit Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={handleOnboarding}
+                    className="cursor-pointer flex items-center"
+                  >
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    Onboard
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem className="text-red-600 cursor-pointer">
                     <LogOut className="w-4 h-4 mr-2" />
                     Log Out
@@ -90,6 +115,13 @@ export default function AgentPortalLayout({ children, currentPageName }) {
       </main>
 
       <SoftPhone />
+
+      <ProfileEditDialog open={showProfileEdit} onClose={() => setShowProfileEdit(false)} />
+
+      {/* Pass onboarding state to children via window */}
+      {showOnboarding && (
+        <script dangerouslySetInnerHTML={{__html: `window.__agentOnboardingActive = true;`}} />
+      )}
     </div>
   );
 }
