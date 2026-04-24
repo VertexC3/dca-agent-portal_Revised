@@ -10,8 +10,8 @@ import AgentDashboard from '../components/agent/AgentDashboard';
 import InlineMessageBox from '../components/agent/InlineMessageBox';
 import { mockPatients } from '../data/mockPatients';
 
-// Drag-to-resize divider
-function ResizeDivider({ onDrag }) {
+// Drag-to-resize divider with swap button
+function ResizeDivider({ onDrag, onSwap }) {
   const dragging = useRef(false);
   const lastX = useRef(0);
 
@@ -40,10 +40,20 @@ function ResizeDivider({ onDrag }) {
   return (
     <div
       onMouseDown={onMouseDown}
-      className="w-1.5 flex-shrink-0 cursor-col-resize hover:bg-[#8B1F1F]/40 bg-gray-200 rounded-full transition-colors group relative"
+      className="w-5 flex-shrink-0 cursor-col-resize hover:bg-[#8B1F1F]/10 bg-gray-100 transition-colors group relative flex items-center justify-center"
       title="Drag to resize"
     >
-      <div className="absolute inset-y-0 -left-1 -right-1" />
+      {/* Vertical line */}
+      <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-gray-200 group-hover:bg-[#8B1F1F]/30 transition-colors" />
+      {/* Swap button */}
+      <button
+        onMouseDown={e => e.stopPropagation()}
+        onClick={onSwap}
+        title="Swap panels"
+        className="relative z-10 w-6 h-6 rounded-full bg-white border border-gray-300 shadow-sm flex items-center justify-center hover:bg-[#8B1F1F] hover:border-[#8B1F1F] hover:text-white text-gray-500 transition-all"
+      >
+        <ArrowLeftRight className="w-3 h-3" />
+      </button>
     </div>
   );
 }
@@ -100,19 +110,6 @@ export default function AgentPortal() {
               <>
                 <div className="w-px h-6 bg-gray-200 flex-shrink-0" />
                 <button
-                  onClick={() => setPanelSwapped(v => !v)}
-                  title="Swap left/right panels"
-                  className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
-                    panelSwapped
-                      ? 'bg-[#8B1F1F] text-white border-[#8B1F1F]'
-                      : 'bg-white text-gray-600 border-gray-200 hover:border-[#8B1F1F] hover:text-[#8B1F1F]'
-                  }`}
-                >
-                  <ArrowLeftRight className="w-3.5 h-3.5" />
-                  Swap Panels
-                </button>
-                <div className="w-px h-6 bg-gray-200 flex-shrink-0" />
-                <button
                   onClick={() => setShowMessageBox(v => !v)}
                   className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
                     showMessageBox
@@ -149,7 +146,7 @@ export default function AgentPortal() {
                     }}
                   />
                 </div>
-                <ResizeDivider onDrag={dragMiddle} />
+                <ResizeDivider onDrag={dragMiddle} onSwap={() => setPanelSwapped(v => !v)} />
                 {/* Right: Right Panel */}
                 <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
                   <AgentRightPanel
@@ -167,7 +164,7 @@ export default function AgentPortal() {
                     onOpenMessage={(msg) => { setActiveComm(msg); setShowMessageBox(true); }}
                   />
                 </div>
-                <ResizeDivider onDrag={dragMiddle} />
+                <ResizeDivider onDrag={dragMiddle} onSwap={() => setPanelSwapped(v => !v)} />
                 {/* Workspace Tabs on right */}
                 <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
                   <AgentWorkspaceTabs
