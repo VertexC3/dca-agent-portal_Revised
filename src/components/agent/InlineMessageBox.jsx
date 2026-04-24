@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, Send, Phone, Mail, Bot, ChevronDown, GripVertical } from 'lucide-react';
+import { MessageSquare, Send, Phone, Mail, Bot, GripVertical, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
@@ -14,29 +14,49 @@ const CHANNELS = [
 function getMockThread(patient) {
   const name = patient?.name || 'Patient';
   return [
-    { id: 1, from: name,         text: 'Hi, I wanted to check on my refill status.',          time: '10:02 AM', mine: false },
-    { id: 2, from: 'You',        text: 'Hi! Your refill is processing and will ship tomorrow.', time: '10:04 AM', mine: true  },
-    { id: 3, from: name,         text: 'Great, thank you! Any side effects I should watch for?', time: '10:05 AM', mine: false },
-    { id: 4, from: 'You',        text: 'Common ones are mild nausea and fatigue. Drink plenty of water.', time: '10:07 AM', mine: true  },
-    { id: 5, from: name,         text: 'Got it. And when will I get the tracking number?',    time: '10:09 AM', mine: false },
+    { id: 1, from: name,  text: 'Hi, I wanted to check on my refill status.',           time: '10:02 AM', mine: false },
+    { id: 2, from: 'You', text: 'Hi! Your refill is processing and will ship tomorrow.', time: '10:04 AM', mine: true  },
+    { id: 3, from: name,  text: 'Great, thank you! Any side effects I should watch for?',time: '10:05 AM', mine: false },
+    { id: 4, from: 'You', text: 'Common ones are mild nausea and fatigue. Drink plenty of water.', time: '10:07 AM', mine: true },
+    { id: 5, from: name,  text: 'Got it. And when will I get the tracking number?',      time: '10:09 AM', mine: false },
   ];
 }
 
-export default function InlineMessageBox({ patient }) {
+// Build a context summary from a comm record or fallback to patient history
+function buildContext(patient, activeComm) {
+  if (activeComm) {
+    return `Re: "${activeComm.subject}" (${activeComm.type?.toUpperCase()}, ${activeComm.date}) — ${activeComm.summary || 'No summary available.'}`;
+  }
+  if (!patient) return null;
+  const rxNames = (patient.prescriptions || []).slice(0, 2).map(r => r.name).join(', ');
+  const lastComm = (patient.communications || [])[0];
+  return `${patient.name}'s last contact: ${lastComm ? `"${lastComm.subject}" on ${lastComm.date}` : 'none on record'}. Active Rx: ${rxNames || 'none'}.`;
+}
+
+export default function InlineMessageBox({ patient, activeComm, onClose }) {
   const [pos, setPos] = useState({ x: window.innerWidth - 360, y: 70 });
   const [channel, setChannel] = useState('text');
-  const [showChannelMenu, setShowChannelMenu] = useState(false);
   const [input, setInput] = useState('');
   const [thread, setThread] = useState([]);
+  const [contextOpen, setContextOpen] = useState(true);
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
   const boxRef = useRef(null);
   const bottomRef = useRef(null);
   const textareaRef = useRef(null);
 
+  // Reset thread when patient changes
   useEffect(() => {
     setThread(getMockThread(patient));
   }, [patient?.id]);
+
+  // When a specific comm is loaded, switch channel and prepend context message
+  useEffect(() => {
+    if (!activeComm) return;
+    const channelMap = { phone: 'phone', email: 'email', text: 'text', ai_agent: 'ai' };
+    setChannel(channelMap[activeComm.type] || 'text');
+    setContextOpen(true);
+  }, [activeComm]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -78,12 +98,12 @@ export default function InlineMessageBox({ patient }) {
   };
 
   const activeChannel = CHANNELS.find(c => c.key === channel);
-  const ActiveIcon = activeChannel?.icon || MessageSquare;
+  const contextSummary = buildContext(patient, activeComm);
 
   return (
     <div
       ref={boxRef}
-      style={{ position: 'fixed', left: pos.x, top: pos.y, zIndex: 300, width: 320 }}
+      style={{ position: 'fixed', left: pos.x, top: pos.y, zIndex: 300, width: 340 }}
       className="rounded-xl shadow-2xl border border-gray-200 overflow-hidden bg-white flex flex-col"
     >
       {/* Drag header */}
@@ -94,10 +114,30 @@ export default function InlineMessageBox({ patient }) {
         <GripVertical className="w-3.5 h-3.5 opacity-60 flex-shrink-0" />
         <MessageSquare className="w-3.5 h-3.5 flex-shrink-0" />
         <span className="text-xs font-bold uppercase tracking-wider flex-1">
-          {patient ? `Message — ${patient.name}` : 'Messages'}
+          {activeComm ? `Re: ${activeComm.subject}` : patient ? `Message — ${patient.name}` : 'Messages'}
         </span>
         <Badge className="bg-white/20 text-white text-xs px-1.5 border-0">{thread.length}</Badge>
+        {onClose && (
+          <button onClick={onClose} className="ml-1 p-0.5 rounded hover:bg-white/20 text-white text-xs font-bold">✕</button>
+        )}
       </div>
+
+      {/* Context banner */}
+      {contextSummary && (
+        <div className="bg-amber-50 border-b border-amber-200">
+          <button
+            onClick={() => setContextOpen(v => !v)}
+            className="w-full flex items-center gap-1.5 px-3 py-1.5 text-left"
+          >
+            <Sparkles className="w-3 h-3 text-amber-600 flex-shrink-0" />
+            <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wide flex-1">Context Summary</span>
+            {contextOpen ? <ChevronUp className="w-3 h-3 text-amber-500" /> : <ChevronDown className="w-3 h-3 text-amber-500" />}
+          </button>
+          {contextOpen && (
+            <p className="px-3 pb-2 text-[10px] text-amber-800 leading-relaxed">{contextSummary}</p>
+          )}
+        </div>
+      )}
 
       {/* Channel selector */}
       <div className="flex border-b border-gray-100 bg-gray-50 px-2 py-1.5 gap-1">
@@ -122,9 +162,7 @@ export default function InlineMessageBox({ patient }) {
         {thread.map(msg => (
           <div key={msg.id} className={`flex flex-col ${msg.mine ? 'items-end' : 'items-start'}`}>
             <div className={`max-w-[85%] px-3 py-2 rounded-2xl text-xs leading-relaxed shadow-sm ${
-              msg.mine
-                ? 'bg-[#8B1F1F] text-white rounded-br-sm'
-                : 'bg-gray-100 text-gray-800 rounded-bl-sm'
+              msg.mine ? 'bg-[#8B1F1F] text-white rounded-br-sm' : 'bg-gray-100 text-gray-800 rounded-bl-sm'
             }`}>
               {msg.text}
             </div>

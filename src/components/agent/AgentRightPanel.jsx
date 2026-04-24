@@ -88,7 +88,7 @@ function padMessages(msgs, patient) {
   return combined;
 }
 
-export default function AgentRightPanel({ patient }) {
+export default function AgentRightPanel({ patient, onOpenMessage }) {
   const [kbSearch, setKbSearch] = useState('');
   const [kbExpanded, setKbExpanded] = useState(false);
   const [selectedMsg, setSelectedMsg] = useState(null);
@@ -153,7 +153,7 @@ export default function AgentRightPanel({ patient }) {
           return (
             <button
               key={msg.id}
-              onClick={() => setSelectedMsg(msg)}
+              onClick={() => { setSelectedMsg(msg); onOpenMessage?.(msg); }}
               className="w-full text-left flex items-start gap-2 p-2.5 hover:bg-red-50/50 transition-colors group"
             >
               <span className={`mt-0.5 flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full ${CHANNEL_COLOR[msg.type] || 'bg-gray-100 text-gray-500'}`}>
