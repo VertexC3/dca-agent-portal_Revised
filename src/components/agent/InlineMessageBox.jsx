@@ -10,16 +10,20 @@ const CHANNELS = [
   { key: 'ai',    label: 'AI',    icon: Bot,            color: 'text-orange-700 bg-orange-50 border-orange-200' },
 ];
 
-// Mock thread messages per patient
-function getMockThread(patient) {
+// Build thread from a comm record
+function buildThreadFromComm(comm, patient) {
   const name = patient?.name || 'Patient';
-  return [
-    { id: 1, from: name,  text: 'Hi, I wanted to check on my refill status.',           time: '10:02 AM', mine: false },
-    { id: 2, from: 'You', text: 'Hi! Your refill is processing and will ship tomorrow.', time: '10:04 AM', mine: true  },
-    { id: 3, from: name,  text: 'Great, thank you! Any side effects I should watch for?',time: '10:05 AM', mine: false },
-    { id: 4, from: 'You', text: 'Common ones are mild nausea and fatigue. Drink plenty of water.', time: '10:07 AM', mine: true },
-    { id: 5, from: name,  text: 'Got it. And when will I get the tracking number?',      time: '10:09 AM', mine: false },
-  ];
+  const msgs = [];
+  if (comm.message_content || comm.summary) {
+    msgs.push({ id: 1, from: name, text: comm.message_content || comm.summary, time: comm.date || '', mine: false });
+  }
+  if (comm.recommended_response || comm.response_sent) {
+    msgs.push({ id: 2, from: 'You', text: comm.recommended_response || comm.response_sent, time: comm.response_timestamp || comm.date || '', mine: true });
+  }
+  if (msgs.length === 0) {
+    msgs.push({ id: 1, from: name, text: comm.subject || '(No content)', time: comm.date || '', mine: false });
+  }
+  return msgs;
 }
 
 // Build a context summary from a comm record or fallback to patient history
@@ -45,16 +49,12 @@ export default function InlineMessageBox({ patient, activeComm, onClose }) {
   const bottomRef = useRef(null);
   const textareaRef = useRef(null);
 
-  // Reset thread when patient changes
-  useEffect(() => {
-    setThread(getMockThread(patient));
-  }, [patient?.id]);
-
-  // When a specific comm is loaded, switch channel and prepend context message
+  // When a specific comm is clicked, load its content and switch channel
   useEffect(() => {
     if (!activeComm) return;
     const channelMap = { phone: 'phone', email: 'email', text: 'text', ai_agent: 'ai' };
     setChannel(channelMap[activeComm.type] || 'text');
+    setThread(buildThreadFromComm(activeComm, patient));
     setContextOpen(true);
   }, [activeComm]);
 
