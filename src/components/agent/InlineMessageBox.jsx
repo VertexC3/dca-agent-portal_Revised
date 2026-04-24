@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, Send, Mail, Bot, GripVertical, ChevronDown, ChevronUp, Sparkles, Package, Truck, CheckCircle2, Clock } from 'lucide-react';
+import { MessageSquare, Send, Mail, Bot, GripVertical, ChevronDown, ChevronUp, Sparkles, Package, Truck, CheckCircle2, Clock, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import ShareColleagueModal from './ShareColleagueModal';
 
 const WhatsAppIcon = () => (
   <svg viewBox="0 0 24 24" className="w-3 h-3 fill-current" xmlns="http://www.w3.org/2000/svg">
@@ -106,6 +107,9 @@ export default function InlineMessageBox({ patient, activeComm, linkedOrder, onC
   const [input, setInput] = useState('');
   const [thread, setThread] = useState([]);
   const [contextOpen, setContextOpen] = useState(true);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareMessageId, setShareMessageId] = useState(null);
+  const [openMenuId, setOpenMenuId] = useState(null);
   const dragging = useRef(false);
   const offset = useRef({ x: 0, y: 0 });
   const boxRef = useRef(null);
@@ -224,11 +228,36 @@ export default function InlineMessageBox({ patient, activeComm, linkedOrder, onC
       {/* Thread */}
       <div className="flex flex-col gap-2 p-3 overflow-y-auto max-h-52 bg-white">
         {thread.map(msg => (
-          <div key={msg.id} className={`flex flex-col ${msg.mine ? 'items-end' : 'items-start'}`}>
-            <div className={`max-w-[85%] px-3 py-2 rounded-2xl text-xs leading-relaxed shadow-sm ${
-              msg.mine ? 'bg-[#8B1F1F] text-white rounded-br-sm' : 'bg-gray-100 text-gray-800 rounded-bl-sm'
-            }`}>
-              {msg.text}
+          <div key={msg.id} className={`flex flex-col group ${msg.mine ? 'items-end' : 'items-start'}`}>
+            <div className={`flex items-start gap-2 ${msg.mine ? 'flex-row-reverse' : ''}`}>
+              <div className={`max-w-[70%] px-3 py-2 rounded-2xl text-xs leading-relaxed shadow-sm relative ${
+                msg.mine ? 'bg-[#8B1F1F] text-white rounded-br-sm' : 'bg-gray-100 text-gray-800 rounded-bl-sm'
+              }`}>
+                {msg.text}
+              </div>
+              <div className="relative">
+                <button
+                  onClick={() => setOpenMenuId(openMenuId === msg.id ? null : msg.id)}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-gray-200 text-gray-500"
+                >
+                  <MoreVertical className="w-3 h-3" />
+                </button>
+                {openMenuId === msg.id && (
+                  <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden min-w-[150px]">
+                    <button
+                      onClick={() => {
+                        setShareMessageId(msg.id);
+                        setShowShareModal(true);
+                        setOpenMenuId(null);
+                      }}
+                      className="w-full text-left px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                    >
+                      <Mail className="w-3 h-3" />
+                      Share with Colleague
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
             <span className="text-[10px] text-gray-400 mt-0.5 px-1">{msg.from} · {msg.time}</span>
           </div>
@@ -259,6 +288,14 @@ export default function InlineMessageBox({ patient, activeComm, linkedOrder, onC
 
       {/* Linked Order */}
       <LinkedOrderPanel order={linkedOrder} />
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <ShareColleagueModal
+          onClose={() => { setShowShareModal(false); setShareMessageId(null); }}
+          onShare={() => {}}
+        />
+      )}
     </div>
   );
 }
