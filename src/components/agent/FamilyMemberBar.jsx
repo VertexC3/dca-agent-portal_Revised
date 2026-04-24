@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 
 export default function FamilyMemberBar({ familyMembers, onSwitchPatient }) {
   const [confirmMember, setConfirmMember] = useState(null);
+  const [showAddFlow, setShowAddFlow] = useState(false);
 
   if (!familyMembers || familyMembers.length === 0) return null;
 
@@ -32,7 +33,9 @@ export default function FamilyMemberBar({ familyMembers, onSwitchPatient }) {
               <span className="text-gray-400 font-normal">{member.relation}</span>
             </button>
           ))}
-          <button className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-100 border border-blue-300 hover:border-blue-500 hover:bg-blue-200 transition-all text-xs font-semibold text-blue-700 shadow-sm">
+          <button 
+            onClick={() => setShowAddFlow(true)}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-100 border border-blue-300 hover:border-blue-500 hover:bg-blue-200 transition-all text-xs font-semibold text-blue-700 shadow-sm">
             <Plus className="w-4 h-4" />
             Add
           </button>
@@ -80,6 +83,58 @@ export default function FamilyMemberBar({ familyMembers, onSwitchPatient }) {
               >
                 <ArrowRight className="w-3.5 h-3.5 mr-1" />
                 Switch Profile
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Family Member Flow */}
+      {showAddFlow && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowAddFlow(false)}>
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6" onClick={e => e.stopPropagation()}>
+            <div className="flex items-start justify-between mb-4">
+              <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                <Plus className="w-5 h-5 text-green-600" />
+              </div>
+              <button onClick={() => setShowAddFlow(false)} className="text-gray-400 hover:text-gray-600">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <h3 className="text-sm font-bold text-gray-900 mb-1">Add Family Member</h3>
+            <p className="text-xs text-gray-500 mb-5">
+              Enter the details of the family member to add to this account.
+            </p>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-gray-700">Name</label>
+                <input type="text" placeholder="Full name" className="w-full text-xs border border-gray-200 rounded-lg px-2.5 py-2 mt-1 focus:outline-none focus:border-blue-400" />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-700">Relation</label>
+                <select className="w-full text-xs border border-gray-200 rounded-lg px-2.5 py-2 mt-1 focus:outline-none focus:border-blue-400">
+                  <option>Child</option>
+                  <option>Spouse</option>
+                  <option>Parent</option>
+                  <option>Sibling</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-700">Email</label>
+                <input type="email" placeholder="email@example.com" className="w-full text-xs border border-gray-200 rounded-lg px-2.5 py-2 mt-1 focus:outline-none focus:border-blue-400" />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-6">
+              <Button variant="outline" className="flex-1 text-xs h-9" onClick={() => setShowAddFlow(false)}>
+                Cancel
+              </Button>
+              <Button
+                className="flex-1 text-xs h-9 bg-green-600 hover:bg-green-700"
+                onClick={() => { setShowAddFlow(false); }}
+              >
+                <Plus className="w-3.5 h-3.5 mr-1" />
+                Add Member
               </Button>
             </div>
           </div>
