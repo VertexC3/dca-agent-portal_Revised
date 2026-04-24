@@ -205,13 +205,15 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWo
                </div>
              </div>
 
-             <div className="mt-2 space-y-2 text-xs border-t border-gray-200 pt-2">
+             <div className="mt-2 space-y-3 text-xs border-t border-gray-200 pt-2">
                <div>
-                 <p className="text-gray-500">Primary Address</p>
+                 <p className="text-gray-500 mb-1">Primary Address</p>
+                 <p className="font-semibold text-gray-800 mb-1">{editedPrimaryAddress}</p>
                  <AddressField address={editedPrimaryAddress} onChange={setEditedPrimaryAddress} />
                </div>
                <div>
-                 <p className="text-gray-500">Shipping Address</p>
+                 <p className="text-gray-500 mb-1">Shipping Address</p>
+                 <p className="font-semibold text-gray-800 mb-1">{editedShippingAddress}</p>
                  <AddressField address={editedShippingAddress} onChange={setEditedShippingAddress} />
                </div>
              </div>
@@ -463,6 +465,7 @@ function OverviewTab({ patient, editedPhysician, onChangePhysician, onSwitchTab 
   const [selectedOrderId, setSelectedOrderId] = useState(patient.orders[0]?.id || null);
   const [detailOrder, setDetailOrder] = useState(null);
   const [showPhysicianContext, setShowPhysicianContext] = useState(false);
+  const [collapsedPanels, setCollapsedPanels] = useState({});
 
   const unpaid = patient.invoices.filter(i => i.status !== 'paid');
   const lowRefills = patient.prescriptions.filter(p => p.refills <= 1);
@@ -605,6 +608,29 @@ function OverviewTab({ patient, editedPhysician, onChangePhysician, onSwitchTab 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patient.id]);
 
+  const togglePanel = (panelId) => {
+    setCollapsedPanels(prev => ({ ...prev, [panelId]: !prev[panelId] }));
+  };
+
+  const PanelWrapper = ({ panel }) => (
+    <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+      <button
+        onClick={() => togglePanel(panel.id)}
+        className="w-full px-3 py-2 bg-gray-50 border-b border-gray-200 flex items-center justify-between hover:bg-gray-100 transition-colors"
+      >
+        <p className="text-xs font-bold text-gray-700 uppercase tracking-wide">{panel.title}</p>
+        <svg className={`w-4 h-4 text-gray-500 transition-transform ${collapsedPanels[panel.id] ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
+      </button>
+      {!collapsedPanels[panel.id] && (
+        <div className="p-3">
+          {panel.content}
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div>
       {openModal && <StatCardModal stat={openModal} patient={patient} onClose={() => setOpenModal(null)} onGoToOrders={() => { setOpenModal(null); onSwitchTab('orders'); }} />}
@@ -615,7 +641,11 @@ function OverviewTab({ patient, editedPhysician, onChangePhysician, onSwitchTab 
         <p className="text-xs text-gray-400 flex items-center gap-1"><GripVertical className="w-3 h-3" /> Drag panels to reorder</p>
       </div>
 
-      <DraggablePanelGrid panels={panels} onReorder={setPanels} />
+      <div className="space-y-3">
+        {panels.map(panel => (
+          <PanelWrapper key={panel.id} panel={panel} />
+        ))}
+      </div>
     </div>
   );
 }
