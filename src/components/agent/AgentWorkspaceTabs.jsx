@@ -205,15 +205,15 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWo
                </div>
              </div>
 
-             <div className="mt-2 space-y-3 text-xs border-t border-gray-200 pt-2">
+             <div className="grid grid-cols-2 gap-4 mt-2 text-xs border-t border-gray-200 pt-2">
                <div>
                  <p className="text-gray-500 mb-1">Primary Address</p>
-                 <p className="font-semibold text-gray-800 mb-1">{editedPrimaryAddress}</p>
+                 <p className="font-semibold text-gray-800 mb-1">123 Main Street</p>
                  <AddressField address={editedPrimaryAddress} onChange={setEditedPrimaryAddress} />
                </div>
                <div>
                  <p className="text-gray-500 mb-1">Shipping Address</p>
-                 <p className="font-semibold text-gray-800 mb-1">{editedShippingAddress}</p>
+                 <p className="font-semibold text-gray-800 mb-1">123 Main Street</p>
                  <AddressField address={editedShippingAddress} onChange={setEditedShippingAddress} />
                </div>
              </div>
