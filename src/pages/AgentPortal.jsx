@@ -45,12 +45,13 @@ function ResizeDivider({ onDrag, onSwap }) {
     >
       {/* Vertical line */}
       <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-gray-200 group-hover:bg-[#8B1F1F]/30 transition-colors" />
-      {/* Swap button */}
+      {/* Swap button — positioned near top */}
       <button
         onMouseDown={e => e.stopPropagation()}
         onClick={onSwap}
         title="Swap panels"
-        className="relative z-10 w-6 h-6 rounded-full bg-white border border-gray-300 shadow-sm flex items-center justify-center hover:bg-[#8B1F1F] hover:border-[#8B1F1F] hover:text-white text-gray-500 transition-all"
+        style={{ top: '80px' }}
+        className="absolute z-10 w-6 h-6 rounded-full bg-white border border-gray-300 shadow-sm flex items-center justify-center hover:bg-[#8B1F1F] hover:border-[#8B1F1F] hover:text-white text-gray-500 transition-all duration-200 hover:scale-[2]"
       >
         <ArrowLeftRight className="w-3 h-3" />
       </button>
