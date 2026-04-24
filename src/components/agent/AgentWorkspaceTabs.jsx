@@ -274,9 +274,9 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWo
                 <p className="text-gray-500">Primary</p>
                 <AddressField address={editedAddress} onChange={setEditedAddress} />
               </div>
-              <div>
+              <div className="col-start-3">
                 <p className="text-gray-500">Shipping</p>
-                <p className="font-semibold text-gray-800 text-xs">{editedAddress}</p>
+                <p className="font-semibold text-gray-800 text-xs truncate max-w-[180px]">{editedAddress}</p>
               </div>
             </div>
 
