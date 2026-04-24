@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ShoppingCart, X, Trash2, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -6,13 +6,14 @@ import { useCart } from './CartContext';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import CheckoutFlow from '../agent/CheckoutFlow';
 
-export default function CartPopup({ open, onClose }) {
+export default function CartPopup({ open, onClose, patient }) {
   const { cartItems, removeFromCart, clearCart, submitCart, updateCartItemComment } = useCart();
+  const [showCheckout, setShowCheckout] = useState(false);
 
-  const handleCheckout = () => {
-    alert('Refill request submitted for ' + cartItems.length + ' prescription(s)');
-    submitCart();
+  const handleGoToCart = () => {
+    setShowCheckout(true);
     onClose();
   };
 
@@ -87,12 +88,18 @@ export default function CartPopup({ open, onClose }) {
                 Clear Cart
               </Button>
               <Button
-                onClick={handleCheckout}
+                onClick={handleGoToCart}
                 className="flex-1 bg-[#8B1F1F] hover:bg-[#721919] text-white"
               >
-                Submit
+                Go to Cart
               </Button>
             </div>
+            <CheckoutFlow 
+              open={showCheckout} 
+              onClose={() => setShowCheckout(false)}
+              selectedItems={cartItems}
+              patient={patient}
+            />
           </>
         )}
       </DialogContent>
