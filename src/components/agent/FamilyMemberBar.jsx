@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, ArrowRight, X } from 'lucide-react';
+import { Users, ArrowRight, X, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function FamilyMemberBar({ familyMembers, onSwitchPatient }) {
@@ -32,6 +32,10 @@ export default function FamilyMemberBar({ familyMembers, onSwitchPatient }) {
               <span className="text-gray-400 font-normal">{member.relation}</span>
             </button>
           ))}
+          <button className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-100 border border-blue-300 hover:border-blue-500 hover:bg-blue-200 transition-all text-xs font-semibold text-blue-700 shadow-sm">
+            <Plus className="w-4 h-4" />
+            Add
+          </button>
         </div>
       </div>
 

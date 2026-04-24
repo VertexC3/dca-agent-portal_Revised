@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   LayoutDashboard, Pill, ShoppingCart, MessageSquare, CreditCard,
   RefreshCw, Phone, Mail, Send, AlertTriangle, Bot, ExternalLink, Clock, IdCard, ChevronRight, CheckCircle2,
-  Pencil, Check, X, StickyNote, Truck, GripVertical
+  Pencil, Check, X, StickyNote, Truck, GripVertical, Plus
 } from 'lucide-react';
 import DraggablePanelGrid from './DraggablePanelGrid';
 import { Input } from '@/components/ui/input';
@@ -270,9 +270,13 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient }) {
                 <p className="text-gray-500">Email</p>
                 <p className="font-semibold text-gray-800 truncate">{patient.email}</p>
               </div>
-              <div className="col-span-2">
-                <p className="text-gray-500">Address</p>
+              <div>
+                <p className="text-gray-500">Primary</p>
                 <AddressField address={editedAddress} onChange={setEditedAddress} />
+              </div>
+              <div>
+                <p className="text-gray-500">Shipping</p>
+                <p className="font-semibold text-gray-800 text-xs">{editedAddress}</p>
               </div>
             </div>
 
@@ -357,27 +361,50 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient }) {
 function StatCardModal({ stat, patient, onClose, onGoToOrders }) {
   const unpaid = patient.invoices.filter(i => i.status !== 'paid');
   const lowRefills = patient.prescriptions.filter(p => p.refills <= 1);
+  const [selectedRx, setSelectedRx] = React.useState([]);
+
+  const addToCart = (rx) => {
+    setSelectedRx(prev => prev.includes(rx.id) ? prev.filter(id => id !== rx.id) : [...prev, rx.id]);
+  };
 
   const renderContent = () => {
     if (stat === 'rx') return (
       <div className="space-y-2">
-        {patient.prescriptions.map(rx => (
-          <div key={rx.id} className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-xs">
-            <div className="flex items-center justify-between mb-1">
-              <span className="font-bold text-gray-900">{rx.name}</span>
-              <Badge className={rx.refills === 0 ? 'bg-red-100 text-red-800' : rx.refills <= 1 ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}>
-                {rx.refills} refill{rx.refills !== 1 ? 's' : ''} left
-              </Badge>
+        {patient.prescriptions.map(rx => {
+          const isSelected = selectedRx.includes(rx.id);
+          return (
+            <div key={rx.id} className={`p-3 border rounded-lg text-xs transition-all ${isSelected ? 'bg-blue-50 border-blue-200 ring-1 ring-blue-300' : 'bg-gray-50 border-gray-200'}`}>
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  onChange={() => addToCart(rx)}
+                  className="mt-1 cursor-pointer accent-[#8B1F1F]"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-bold text-gray-900">{rx.name}</span>
+                    <Badge className={rx.refills === 0 ? 'bg-red-100 text-red-800' : rx.refills <= 1 ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}>
+                      {rx.refills} refill{rx.refills !== 1 ? 's' : ''} left
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-gray-600">
+                    <span>Rx #: <strong>{rx.rx_number}</strong></span>
+                    <span>Dosage: <strong>{rx.dosage}</strong></span>
+                    <span>Frequency: <strong>{rx.frequency}</strong></span>
+                    <span>Last Filled: <strong>{format(new Date(rx.last_filled), 'MM/dd/yyyy')}</strong></span>
+                    <span className="col-span-2">Prescriber: <strong>{rx.prescriber}</strong></span>
+                  </div>
+                </div>
+                {isSelected && (
+                  <button className="p-1.5 rounded hover:bg-blue-200 transition-colors flex-shrink-0" title="Add to cart">
+                    <ShoppingCart className="w-4 h-4 text-blue-600" />
+                  </button>
+                )}
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-gray-600">
-              <span>Rx #: <strong>{rx.rx_number}</strong></span>
-              <span>Dosage: <strong>{rx.dosage}</strong></span>
-              <span>Frequency: <strong>{rx.frequency}</strong></span>
-              <span>Last Filled: <strong>{format(new Date(rx.last_filled), 'MM/dd/yyyy')}</strong></span>
-              <span className="col-span-2">Prescriber: <strong>{rx.prescriber}</strong></span>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
     if (stat === 'orders') return (
