@@ -30,49 +30,18 @@ const TABS = [
 ];
 
 function AddressField({ address, onChange }) {
-  const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState('');
-  const [editingType, setEditingType] = useState(null);
-
-  const ADDRESS_TYPES = [
-    { key: 'primary',  label: 'Primary',  badgeClass: 'bg-blue-100 text-blue-700' },
-    { key: 'shipping', label: 'Shipping', badgeClass: 'bg-green-100 text-green-700' },
-    { key: 'billing',  label: 'Billing',  badgeClass: 'bg-purple-100 text-purple-700' },
-  ];
-
-  const [addresses, setAddresses] = useState({
-    primary:  address,
-    shipping: address,
-    billing:  address,
-  });
-  const [activeType, setActiveType] = useState('primary');
-
-  const activeConfig = ADDRESS_TYPES.find(t => t.key === activeType);
-
-  const handleSwitch = (key) => {
-    setActiveType(key);
-    onChange(addresses[key]);
-    setOpen(false);
-  };
-
-  const handleStartEdit = (key, e) => {
-    e.stopPropagation();
-    setEditingType(key);
-    setDraft(addresses[key]);
-    setEditing(true);
-    setOpen(false);
-  };
+  const [draft, setDraft] = useState(address);
 
   const handleSaveEdit = () => {
-    const updated = { ...addresses, [editingType]: draft };
-    setAddresses(updated);
-    if (editingType === activeType) onChange(draft);
+    onChange(draft);
     setEditing(false);
-    setEditingType(null);
   };
 
-  const handleCancelEdit = () => { setEditing(false); setEditingType(null); };
+  const handleCancelEdit = () => { 
+    setDraft(address); 
+    setEditing(false); 
+  };
 
   if (editing) {
     return (
@@ -91,51 +60,13 @@ function AddressField({ address, onChange }) {
   }
 
   return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen(v => !v)}
-        className="flex items-center gap-1 font-semibold text-gray-800 text-xs hover:text-[#8B1F1F] transition-colors group text-left"
-      >
-        <span className={`px-1.5 py-0 rounded-full text-xs font-bold flex-shrink-0 ${activeConfig.badgeClass}`}>
-          {activeConfig.label}
-        </span>
-        <span className="truncate max-w-[160px]">{addresses[activeType]}</span>
-        <Pencil className="w-2.5 h-2.5 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
-      </button>
-
-      {open && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-lg shadow-xl w-80 overflow-hidden">
-            <div className="px-3 py-2 bg-gray-50 border-b border-gray-100">
-              <p className="text-xs font-bold text-gray-600 uppercase tracking-wide">Addresses on File</p>
-            </div>
-            {ADDRESS_TYPES.map(({ key, label, badgeClass }) => (
-              <div
-                key={key}
-                className={`flex items-start gap-2 px-3 py-2.5 hover:bg-gray-50 transition-colors ${activeType === key ? 'bg-red-50' : ''}`}
-              >
-                <button
-                  onClick={() => handleSwitch(key)}
-                  className="flex items-start gap-2 flex-1 text-left min-w-0"
-                >
-                  <span className={`mt-0.5 px-1.5 py-0 rounded-full text-xs font-bold flex-shrink-0 ${badgeClass}`}>{label}</span>
-                  <span className="text-xs text-gray-800 leading-relaxed">{addresses[key]}</span>
-                  {activeType === key && <Check className="w-3.5 h-3.5 text-[#8B1F1F] flex-shrink-0 mt-0.5 ml-auto" />}
-                </button>
-                <button
-                  onClick={(e) => handleStartEdit(key, e)}
-                  className="flex-shrink-0 p-1 rounded hover:bg-gray-200 text-gray-400 hover:text-gray-700 transition-colors"
-                  title={`Edit ${label} address`}
-                >
-                  <Pencil className="w-3 h-3" />
-                </button>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
+    <button
+      onClick={() => setEditing(true)}
+      className="flex items-center gap-1 font-semibold text-gray-800 text-xs hover:text-[#8B1F1F] transition-colors group text-left"
+    >
+      <span className="truncate max-w-[220px]">{address}</span>
+      <Pencil className="w-2.5 h-2.5 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+    </button>
   );
 }
 
@@ -258,27 +189,24 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWo
             <p className="text-xs text-gray-500 mt-0.5">ID: {patient.id}</p>
             
             <div className="grid grid-cols-3 gap-3 mt-2 text-xs">
-              <div>
-                <p className="text-gray-500">DOB</p>
-                <p className="font-semibold text-gray-800">{format(new Date(patient.dob), 'MM/dd/yyyy')}</p>
-              </div>
-              <div>
-                <p className="text-gray-500">Phone</p>
-                <p className="font-semibold text-gray-800">{patient.phone}</p>
-              </div>
-              <div>
-                <p className="text-gray-500">Email</p>
-                <p className="font-semibold text-gray-800 truncate">{patient.email}</p>
-              </div>
-              <div>
-                <p className="text-gray-500">Primary</p>
-                <AddressField address={editedAddress} onChange={setEditedAddress} />
-              </div>
-              <div className="col-start-3">
-                <p className="text-gray-500">Shipping</p>
-                <p className="font-semibold text-gray-800 text-xs truncate max-w-[180px]">{editedAddress}</p>
-              </div>
-            </div>
+               <div>
+                 <p className="text-gray-500">DOB</p>
+                 <p className="font-semibold text-gray-800">{format(new Date(patient.dob), 'MM/dd/yyyy')}</p>
+               </div>
+               <div>
+                 <p className="text-gray-500">Phone</p>
+                 <p className="font-semibold text-gray-800">{patient.phone}</p>
+               </div>
+               <div>
+                 <p className="text-gray-500">Email</p>
+                 <p className="font-semibold text-gray-800 truncate">{patient.email}</p>
+               </div>
+             </div>
+
+             <div className="mt-2 text-xs">
+               <p className="text-gray-500">Shipping</p>
+               <AddressField address={editedAddress} onChange={setEditedAddress} />
+             </div>
 
             <div className="grid grid-cols-3 gap-3 mt-2 text-xs border-t border-gray-200 pt-2">
               <div>
