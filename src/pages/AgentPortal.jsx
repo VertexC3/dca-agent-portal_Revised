@@ -184,6 +184,7 @@ export default function AgentPortal() {
             <InlineMessageBox
               patient={selectedPatient}
               activeComm={activeComm}
+              linkedOrder={activeComm?.order_id ? selectedPatient?.orders?.find(o => o.id === activeComm.order_id) : null}
               onClose={() => { setShowMessageBox(false); setActiveComm(null); }}
             />
           )}

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, Send, Phone, Mail, Bot, GripVertical, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import { MessageSquare, Send, Phone, Mail, Bot, GripVertical, ChevronDown, ChevronUp, Sparkles, Package, Truck, CheckCircle2, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
@@ -37,7 +37,40 @@ function buildContext(patient, activeComm) {
   return `${patient.name}'s last contact: ${lastComm ? `"${lastComm.subject}" on ${lastComm.date}` : 'none on record'}. Active Rx: ${rxNames || 'none'}.`;
 }
 
-export default function InlineMessageBox({ patient, activeComm, onClose }) {
+function LinkedOrderPanel({ order }) {
+  if (!order) return null;
+  const statusColor = order.status === 'Delivered' ? 'text-green-700 bg-green-50 border-green-200'
+    : order.status === 'In Transit' ? 'text-blue-700 bg-blue-50 border-blue-200'
+    : order.status === 'In Progress' ? 'text-blue-700 bg-blue-50 border-blue-200'
+    : 'text-yellow-700 bg-yellow-50 border-yellow-200';
+  const StatusIcon = order.status === 'Delivered' ? CheckCircle2 : order.status === 'In Transit' ? Truck : Clock;
+  return (
+    <div className="border-t border-gray-100 bg-gray-50 px-3 py-2">
+      <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1.5 flex items-center gap-1">
+        <Package className="w-3 h-3" /> Linked Order
+      </p>
+      <div className="bg-white border border-gray-200 rounded-lg p-2 text-xs space-y-1">
+        <div className="flex items-center justify-between">
+          <span className="font-semibold text-gray-800 truncate">{order.medication}</span>
+          <Badge className={`text-xs flex items-center gap-0.5 border ${statusColor}`}>
+            <StatusIcon className="w-2.5 h-2.5" />{order.status}
+          </Badge>
+        </div>
+        <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-gray-500">
+          <span>Receipt: <strong className="text-gray-700">#{order.receipt}</strong></span>
+          <span>Amt: <strong className="text-gray-700">${order.amount.toFixed(2)}</strong></span>
+          {order.tracking && order.tracking !== 'Pending' && (
+            <span className="col-span-2">Tracking: <strong className="font-mono text-gray-700">{order.tracking}</strong></span>
+          )}
+          {order.delivered_at && <span className="col-span-2 text-green-700">Delivered: {order.delivered_at}</span>}
+          {order.est_delivery && <span className="col-span-2 text-blue-700">Est. Delivery: {order.est_delivery}</span>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function InlineMessageBox({ patient, activeComm, linkedOrder, onClose }) {
   const [pos, setPos] = useState({ x: window.innerWidth - 360, y: 70 });
   const [channel, setChannel] = useState('text');
   const [input, setInput] = useState('');
@@ -192,6 +225,9 @@ export default function InlineMessageBox({ patient, activeComm, onClose }) {
           <Send className="w-3.5 h-3.5" />
         </Button>
       </div>
+
+      {/* Linked Order */}
+      <LinkedOrderPanel order={linkedOrder} />
     </div>
   );
 }

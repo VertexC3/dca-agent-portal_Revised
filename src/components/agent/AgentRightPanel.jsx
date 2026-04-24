@@ -153,7 +153,7 @@ export default function AgentRightPanel({ patient, onOpenMessage }) {
           return (
             <button
               key={msg.id}
-              onClick={() => { setSelectedMsg(msg); onOpenMessage?.(msg); }}
+              onClick={() => { onOpenMessage?.(msg); }}
               className="w-full text-left flex items-start gap-2 p-2.5 hover:bg-red-50/50 transition-colors group"
             >
               <span className={`mt-0.5 flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full ${CHANNEL_COLOR[msg.type] || 'bg-gray-100 text-gray-500'}`}>
@@ -267,13 +267,6 @@ export default function AgentRightPanel({ patient, onOpenMessage }) {
 
   return (
     <>
-      {selectedMsg && patient && (
-        <CommunicationDetailModal
-          comm={selectedMsg}
-          patient={patient}
-          onClose={() => setSelectedMsg(null)}
-        />
-      )}
       <div className="flex flex-col gap-3 overflow-y-auto h-full p-3">
 
         {/* Patient Messages */}

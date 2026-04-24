@@ -1,13 +1,116 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ShipmentVisibilityCard from './shipment/ShipmentVisibilityCard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   X, Package, Truck, CheckCircle2, Clock, FileText,
   CreditCard, MapPin, Phone, Mail, Send, Bot, AlertTriangle,
-  ClipboardList, Pill, ShieldCheck, RefreshCw
+  ClipboardList, Pill, ShieldCheck, RefreshCw, Share2, Plus
 } from 'lucide-react';
 import { format } from 'date-fns';
+
+function ShareTrackingModal({ tracking, patient, onClose }) {
+  const [mode, setMode] = useState(null); // 'email' | 'text'
+  const [extraEmail, setExtraEmail] = useState('');
+  const [sent, setSent] = useState(false);
+
+  const handleSend = () => {
+    setSent(true);
+    setTimeout(() => { setSent(false); onClose(); }, 1500);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden" onClick={e => e.stopPropagation()}>
+        <div className="bg-[#8B1F1F] px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-white">
+            <Share2 className="w-4 h-4" />
+            <span className="font-bold text-sm">Share Tracking Number</span>
+          </div>
+          <button onClick={onClose} className="text-white/70 hover:text-white"><X className="w-4 h-4" /></button>
+        </div>
+
+        <div className="p-4">
+          <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 mb-4 text-center">
+            <p className="text-xs text-gray-500 mb-0.5">Tracking Number</p>
+            <p className="font-mono font-bold text-gray-900 text-sm">{tracking}</p>
+          </div>
+
+          {!mode && (
+            <div className="flex gap-3">
+              <button
+                onClick={() => setMode('email')}
+                className="flex-1 flex flex-col items-center gap-2 p-4 border-2 border-gray-200 rounded-xl hover:border-purple-400 hover:bg-purple-50 transition-all group"
+              >
+                <Mail className="w-6 h-6 text-purple-600 group-hover:scale-110 transition-transform" />
+                <span className="text-xs font-bold text-gray-700">Email</span>
+              </button>
+              <button
+                onClick={() => setMode('text')}
+                className="flex-1 flex flex-col items-center gap-2 p-4 border-2 border-gray-200 rounded-xl hover:border-green-400 hover:bg-green-50 transition-all group"
+              >
+                <Send className="w-6 h-6 text-green-600 group-hover:scale-110 transition-transform" />
+                <span className="text-xs font-bold text-gray-700">Text (SMS)</span>
+              </button>
+            </div>
+          )}
+
+          {mode === 'email' && (
+            <div className="space-y-3">
+              <p className="text-xs font-bold text-gray-700 uppercase tracking-wide">Send via Email</p>
+              <div className="flex items-center gap-2 p-2.5 bg-purple-50 border border-purple-200 rounded-lg">
+                <Mail className="w-3.5 h-3.5 text-purple-600 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-gray-500">Patient email</p>
+                  <p className="text-xs font-semibold text-gray-800 truncate">{patient?.email}</p>
+                </div>
+                <CheckCircle2 className="w-4 h-4 text-purple-600 flex-shrink-0" />
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="email"
+                  placeholder="Add another email..."
+                  value={extraEmail}
+                  onChange={e => setExtraEmail(e.target.value)}
+                  className="flex-1 text-xs border border-gray-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-purple-400"
+                />
+                <button className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors">
+                  <Plus className="w-3.5 h-3.5 text-gray-600" />
+                </button>
+              </div>
+              <div className="flex gap-2 pt-1">
+                <Button variant="outline" size="sm" className="flex-1 h-8 text-xs" onClick={() => setMode(null)}>Back</Button>
+                <Button size="sm" className={`flex-1 h-8 text-xs ${sent ? 'bg-green-600 hover:bg-green-600' : 'bg-purple-600 hover:bg-purple-700'}`} onClick={handleSend}>
+                  {sent ? <><CheckCircle2 className="w-3 h-3 mr-1" />Sent!</> : <><Mail className="w-3 h-3 mr-1" />Send Email</>}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {mode === 'text' && (
+            <div className="space-y-3">
+              <p className="text-xs font-bold text-gray-700 uppercase tracking-wide">Send via SMS</p>
+              <div className="flex items-center gap-2 p-2.5 bg-green-50 border border-green-200 rounded-lg">
+                <Phone className="w-3.5 h-3.5 text-green-600 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-gray-500">Patient phone</p>
+                  <p className="text-xs font-semibold text-gray-800">{patient?.phone}</p>
+                </div>
+                <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
+              </div>
+              <div className="flex gap-2 pt-1">
+                <Button variant="outline" size="sm" className="flex-1 h-8 text-xs" onClick={() => setMode(null)}>Back</Button>
+                <Button size="sm" className={`flex-1 h-8 text-xs ${sent ? 'bg-green-600 hover:bg-green-600' : 'bg-green-600 hover:bg-green-700'}`} onClick={handleSend}>
+                  {sent ? <><CheckCircle2 className="w-3 h-3 mr-1" />Sent!</> : <><Send className="w-3 h-3 mr-1" />Send SMS</>}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // Generate a lifecycle timeline based on order data
 function buildTimeline(order) {
@@ -61,6 +164,7 @@ const CHANNEL_CONFIG = {
 };
 
 export default function OrderDetailModal({ order, patient, onClose }) {
+  const [showShareTracking, setShowShareTracking] = useState(false);
   if (!order) return null;
 
   const timeline = buildTimeline(order);
@@ -70,6 +174,14 @@ export default function OrderDetailModal({ order, patient, onClose }) {
   );
 
   return (
+    <>
+    {showShareTracking && (
+      <ShareTrackingModal
+        tracking={order.tracking}
+        patient={patient}
+        onClose={() => setShowShareTracking(false)}
+      />
+    )}
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div
         className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col"
@@ -114,7 +226,18 @@ export default function OrderDetailModal({ order, patient, onClose }) {
             </div>
             <div>
               <p className="text-xs text-gray-500 mb-0.5">Tracking #</p>
-              <p className="text-xs font-mono text-gray-900 break-all">{order.tracking}</p>
+              {order.tracking && order.tracking !== 'Pending' ? (
+                <button
+                  onClick={() => setShowShareTracking(true)}
+                  className="flex items-center gap-1 group hover:text-[#8B1F1F] transition-colors"
+                  title="Click to share tracking number"
+                >
+                  <span className="text-xs font-mono text-[#8B1F1F] underline underline-offset-2 decoration-dashed">{order.tracking}</span>
+                  <Share2 className="w-3 h-3 text-gray-400 group-hover:text-[#8B1F1F] transition-colors opacity-0 group-hover:opacity-100" />
+                </button>
+              ) : (
+                <p className="text-xs font-mono text-gray-400">{order.tracking || 'Pending'}</p>
+              )}
             </div>
             <div>
               <p className="text-xs text-gray-500 mb-0.5">Medication</p>
@@ -248,6 +371,11 @@ export default function OrderDetailModal({ order, patient, onClose }) {
           <Button size="sm" variant="outline" className="h-7 text-xs">
             <Mail className="w-3 h-3 mr-1" />Send Email
           </Button>
+          {order.tracking && order.tracking !== 'Pending' && (
+            <Button size="sm" variant="outline" className="h-7 text-xs border-blue-300 text-blue-700 hover:bg-blue-50" onClick={() => setShowShareTracking(true)}>
+              <Share2 className="w-3 h-3 mr-1" />Share Tracking
+            </Button>
+          )}
           {linkedRx && linkedRx.refills === 0 && (
             <Button size="sm" variant="outline" className="h-7 text-xs border-yellow-300 text-yellow-700 hover:bg-yellow-50">
               <RefreshCw className="w-3 h-3 mr-1" />Request Refill
@@ -257,5 +385,6 @@ export default function OrderDetailModal({ order, patient, onClose }) {
         </div>
       </div>
     </div>
+    </>
   );
 }
