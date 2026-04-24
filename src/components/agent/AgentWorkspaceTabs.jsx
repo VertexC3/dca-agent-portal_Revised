@@ -205,7 +205,7 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWo
                </div>
              </div>
 
-             <div className="grid grid-cols-2 gap-3 mt-2 text-xs">
+             <div className="mt-2 space-y-2 text-xs border-t border-gray-200 pt-2">
                <div>
                  <p className="text-gray-500">Primary Address</p>
                  <AddressField address={editedPrimaryAddress} onChange={setEditedPrimaryAddress} />
