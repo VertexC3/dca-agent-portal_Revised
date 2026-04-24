@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { ChevronDown, LayoutDashboard } from 'lucide-react';
+import { ChevronDown, LayoutDashboard, MessageSquare } from 'lucide-react';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
@@ -7,6 +7,7 @@ import AgentWorkspaceTabs from '../components/agent/AgentWorkspaceTabs';
 import AgentRightPanel from '../components/agent/AgentRightPanel';
 import OrderSearchBar from '../components/agent/OrderSearchBar';
 import AgentDashboard from '../components/agent/AgentDashboard';
+import InlineMessageBox from '../components/agent/InlineMessageBox';
 import { mockPatients } from '../data/mockPatients';
 
 // Drag-to-resize divider
@@ -50,6 +51,7 @@ function ResizeDivider({ onDrag }) {
 export default function AgentPortal() {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [middleW, setMiddleW] = useState(700);
+  const [showMessageBox, setShowMessageBox] = useState(true);
 
   const MIN = 400;
   const MAX = 1000;
@@ -91,6 +93,22 @@ export default function AgentPortal() {
           <div className="ml-auto flex items-center gap-4">
             <div className="w-px h-6 bg-gray-200 flex-shrink-0" />
             <OrderSearchBar onSelectPatient={setSelectedPatient} />
+            {selectedPatient && (
+              <>
+                <div className="w-px h-6 bg-gray-200 flex-shrink-0" />
+                <button
+                  onClick={() => setShowMessageBox(v => !v)}
+                  className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
+                    showMessageBox
+                      ? 'bg-[#8B1F1F] text-white border-[#8B1F1F]'
+                      : 'bg-white text-gray-600 border-gray-200 hover:border-[#8B1F1F] hover:text-[#8B1F1F]'
+                  }`}
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  {showMessageBox ? 'Hide Messages' : 'Messages'}
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -101,25 +119,32 @@ export default function AgentPortal() {
           <AgentDashboard onSelectPatient={setSelectedPatient} />
         </div>
       ) : (
-        <div className="flex gap-0 flex-1 overflow-hidden">
-          {/* Middle: Workspace with Patient Info + Tabs */}
-          <div style={{ width: middleW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden flex flex-col border-r border-gray-200">
-            <AgentWorkspaceTabs
-              patient={selectedPatient}
-              onSwitchPatient={(member) => {
-                const found = mockPatients.find(p => p.email === member.email);
-                if (found) setSelectedPatient(found);
-              }}
-            />
+        <>
+          <div className="flex gap-0 flex-1 overflow-hidden">
+            {/* Middle: Workspace with Patient Info + Tabs */}
+            <div style={{ width: middleW, minWidth: MIN, maxWidth: MAX }} className="flex-shrink-0 overflow-hidden flex flex-col border-r border-gray-200">
+              <AgentWorkspaceTabs
+                patient={selectedPatient}
+                onSwitchPatient={(member) => {
+                  const found = mockPatients.find(p => p.email === member.email);
+                  if (found) setSelectedPatient(found);
+                }}
+              />
+            </div>
+
+            <ResizeDivider onDrag={dragMiddle} />
+
+            {/* Right: Right Panel */}
+            <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
+              <AgentRightPanel patient={selectedPatient} />
+            </div>
           </div>
 
-          <ResizeDivider onDrag={dragMiddle} />
-
-          {/* Right: Right Panel */}
-          <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
-            <AgentRightPanel patient={selectedPatient} />
-          </div>
-        </div>
+          {/* Floating Inline Message Box */}
+          {showMessageBox && (
+            <InlineMessageBox patient={selectedPatient} />
+          )}
+        </>
       )}
     </div>
   );
