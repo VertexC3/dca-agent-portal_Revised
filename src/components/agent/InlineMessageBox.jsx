@@ -16,15 +16,30 @@ const CHANNELS = [
   { key: 'ai',        label: 'AI',        icon: Bot,           color: 'text-orange-700 bg-orange-50 border-orange-200' },
 ];
 
+const AI_AGENT_NAME = 'Vera Joy';
+
 // Build thread from a comm record
 function buildThreadFromComm(comm, patient) {
   const name = patient?.name || 'Patient';
+  const isAI = comm.type === 'ai_agent';
+  const agentName = isAI ? AI_AGENT_NAME : (comm.agent || 'You');
   const msgs = [];
   if (comm.message_content || comm.summary) {
     msgs.push({ id: 1, from: name, text: comm.message_content || comm.summary, time: comm.date || '', mine: false });
   }
-  if (comm.recommended_response || comm.response_sent) {
-    msgs.push({ id: 2, from: 'You', text: comm.recommended_response || comm.response_sent, time: comm.response_timestamp || comm.date || '', mine: true });
+  if (isAI) {
+    // Show a realistic AI conversation thread
+    msgs.push({ id: 2, from: AI_AGENT_NAME, text: `Hello ${name.split(' ')[0]}, I'm Vera Joy, your virtual pharmacy assistant. How can I help you today?`, time: comm.date || '', mine: true, isAI: true });
+    if (comm.summary) {
+      msgs.push({ id: 3, from: name, text: comm.summary, time: comm.date || '', mine: false });
+    }
+    if (comm.recommended_response || comm.response_sent) {
+      msgs.push({ id: 4, from: AI_AGENT_NAME, text: comm.recommended_response || comm.response_sent, time: comm.response_timestamp || comm.date || '', mine: true, isAI: true });
+    }
+  } else {
+    if (comm.recommended_response || comm.response_sent) {
+      msgs.push({ id: 2, from: agentName, text: comm.recommended_response || comm.response_sent, time: comm.response_timestamp || comm.date || '', mine: true });
+    }
   }
   if (msgs.length === 0) {
     msgs.push({ id: 1, from: name, text: comm.subject || '(No content)', time: comm.date || '', mine: false });
@@ -74,6 +89,15 @@ function LinkedOrderPanel({ order }) {
       </div>
     </div>
   );
+}
+
+// Get logged-in agent name from localStorage
+function getAgentName() {
+  try {
+    const stored = localStorage.getItem('mockUser');
+    if (stored) return JSON.parse(stored).full_name || 'Agent';
+  } catch {}
+  return 'Agent';
 }
 
 export default function InlineMessageBox({ patient, activeComm, linkedOrder, onClose }) {
@@ -127,7 +151,8 @@ export default function InlineMessageBox({ patient, activeComm, linkedOrder, onC
     if (!text) return;
     const now = new Date();
     const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    setThread(prev => [...prev, { id: Date.now(), from: 'You', text, time, mine: true }]);
+    const senderName = channel === 'ai' ? AI_AGENT_NAME : getAgentName();
+    setThread(prev => [...prev, { id: Date.now(), from: senderName, text, time, mine: true }]);
     setInput('');
     textareaRef.current?.focus();
   };

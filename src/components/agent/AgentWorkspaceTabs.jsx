@@ -33,18 +33,20 @@ function AddressField({ address, onChange }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
-  const [editingType, setEditingType] = useState(null); // 'main' | 'work'
+  const [editingType, setEditingType] = useState(null);
 
   const ADDRESS_TYPES = [
-    { key: 'main', label: 'Main', badgeClass: 'bg-blue-100 text-blue-700' },
-    { key: 'work', label: 'Work', badgeClass: 'bg-green-100 text-green-700' },
+    { key: 'primary',  label: 'Primary',  badgeClass: 'bg-blue-100 text-blue-700' },
+    { key: 'shipping', label: 'Shipping', badgeClass: 'bg-green-100 text-green-700' },
+    { key: 'billing',  label: 'Billing',  badgeClass: 'bg-purple-100 text-purple-700' },
   ];
 
   const [addresses, setAddresses] = useState({
-    main: address,
-    work: '123 Business Park Dr, Suite 400, Columbia, SC 29201',
+    primary:  address,
+    shipping: address,
+    billing:  address,
   });
-  const [activeType, setActiveType] = useState('main');
+  const [activeType, setActiveType] = useState('primary');
 
   const activeConfig = ADDRESS_TYPES.find(t => t.key === activeType);
 
