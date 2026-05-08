@@ -329,27 +329,43 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
           </>
         )}
 
-        {/* Quick Actions — trigger button */}
+        {/* Quick Actions — prominent pull-tab trigger */}
         <button
           onClick={() => setShowQuickActionsPanel(true)}
-          className="w-full flex items-center gap-2 px-3 py-2.5 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-[#8B1F1F] hover:bg-red-50/30 transition-all text-left"
+          className="w-full group flex items-center gap-2.5 px-3 py-3 bg-gradient-to-r from-[#8B1F1F] to-[#a52828] text-white rounded-lg shadow-md hover:shadow-lg hover:from-[#7a1b1b] hover:to-[#8B1F1F] transition-all text-left border-2 border-[#8B1F1F]"
         >
-          <Zap className="w-3.5 h-3.5 text-[#8B1F1F]" />
-          <span className="text-xs font-bold text-gray-700 uppercase tracking-wide flex-1">Quick Actions</span>
-          <ChevronDown className="w-3.5 h-3.5 text-gray-400 -rotate-90" />
+          <div className="flex items-center justify-center w-7 h-7 bg-white/20 rounded-md group-hover:bg-white/30 transition-colors">
+            <Zap className="w-4 h-4 text-white" />
+          </div>
+          <div className="flex-1">
+            <span className="text-xs font-bold uppercase tracking-wider block">Quick Actions</span>
+            <span className="text-xs text-white/70">Refill · Call · Email · Escalate</span>
+          </div>
+          <div className="flex items-center gap-1 bg-white/20 rounded px-2 py-1 group-hover:bg-white/30 transition-colors">
+            <span className="text-xs font-semibold">Open</span>
+            <ChevronDown className="w-3.5 h-3.5 -rotate-90" />
+          </div>
         </button>
 
         {/* Quick Actions Slide-out Panel */}
         {showQuickActionsPanel && (
           <>
-            <div className="fixed inset-0 z-40 bg-black/20" onClick={() => setShowQuickActionsPanel(false)} />
-            <div className="fixed top-0 right-0 h-full w-72 bg-white border-l border-gray-200 shadow-2xl z-50 flex flex-col">
-              <div className="flex items-center justify-between px-4 py-3 bg-[#8B1F1F] text-white">
+            <div className="fixed inset-0 z-40 bg-black/30" onClick={() => setShowQuickActionsPanel(false)} />
+            <div
+              className="fixed top-0 right-0 h-full w-72 bg-white border-l border-gray-200 shadow-2xl z-50 flex flex-col"
+              style={{ animation: 'slideInRight 0.2s ease-out' }}
+            >
+              <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-[#8B1F1F] to-[#a52828] text-white">
                 <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4" />
-                  <span className="font-bold text-sm uppercase tracking-wide">Quick Actions</span>
+                  <div className="w-7 h-7 bg-white/20 rounded-md flex items-center justify-center">
+                    <Zap className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="font-bold text-sm uppercase tracking-wide block">Quick Actions</span>
+                    <span className="text-xs text-white/70">Patient: {patient?.name || 'None selected'}</span>
+                  </div>
                 </div>
-                <button onClick={() => setShowQuickActionsPanel(false)} className="p-1 rounded hover:bg-white/20 transition-colors">
+                <button onClick={() => setShowQuickActionsPanel(false)} className="p-1.5 rounded-md hover:bg-white/20 transition-colors">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -359,6 +375,7 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
             </div>
           </>
         )}
+        <style>{`@keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }`}</style>
 
         {/* Knowledge Base */}
         {!floats.kb && (
