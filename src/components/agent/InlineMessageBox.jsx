@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, Send, Mail, Bot, GripVertical, ChevronDown, ChevronUp, Sparkles, Package, Truck, CheckCircle2, Clock, MoreVertical } from 'lucide-react';
+import { MessageSquare, Send, Mail, Bot, GripVertical, ChevronDown, ChevronUp, Sparkles, Package, Truck, CheckCircle2, Clock, MoreVertical, Pin, PinOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import ShareColleagueModal from './ShareColleagueModal';
@@ -103,6 +103,7 @@ function getAgentName() {
 
 export default function InlineMessageBox({ patient, activeComm, linkedOrder, onClose }) {
   const [pos, setPos] = useState({ x: window.innerWidth - 360, y: 70 });
+  const [pinned, setPinned] = useState(false);
   const [channel, setChannel] = useState('text');
   const [input, setInput] = useState('');
   const [thread, setThread] = useState([]);
@@ -168,23 +169,34 @@ export default function InlineMessageBox({ patient, activeComm, linkedOrder, onC
   const activeChannel = CHANNELS.find(c => c.key === channel);
   const contextSummary = buildContext(patient, activeComm);
 
+  const pinnedStyle = pinned
+    ? { position: 'sticky', top: 0, zIndex: 300, width: '100%' }
+    : { position: 'fixed', left: pos.x, top: pos.y, zIndex: 300, width: 340 };
+
   return (
     <div
       ref={boxRef}
-      style={{ position: 'fixed', left: pos.x, top: pos.y, zIndex: 300, width: 340 }}
-      className="rounded-xl shadow-2xl border border-gray-200 overflow-hidden bg-white flex flex-col"
+      style={pinnedStyle}
+      className={`${pinned ? 'rounded-none border-x-0 border-t-0' : 'rounded-xl shadow-2xl'} border border-gray-200 overflow-hidden bg-white flex flex-col`}
     >
-      {/* Drag header */}
+      {/* Drag/Pin header */}
       <div
-        onMouseDown={onMouseDown}
-        className="bg-[#8B1F1F] text-white px-3 py-2 flex items-center gap-2 cursor-grab active:cursor-grabbing select-none"
+        onMouseDown={pinned ? undefined : onMouseDown}
+        className={`bg-[#8B1F1F] text-white px-3 py-2 flex items-center gap-2 select-none ${pinned ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
       >
-        <GripVertical className="w-3.5 h-3.5 opacity-60 flex-shrink-0" />
+        {!pinned && <GripVertical className="w-3.5 h-3.5 opacity-60 flex-shrink-0" />}
         <MessageSquare className="w-3.5 h-3.5 flex-shrink-0" />
         <span className="text-xs font-bold uppercase tracking-wider flex-1">
           {activeComm ? `Re: ${activeComm.subject}` : patient ? `Message — ${patient.name}` : 'Messages'}
         </span>
         <Badge className="bg-white/20 text-white text-xs px-1.5 border-0">{thread.length}</Badge>
+        <button
+          onClick={() => setPinned(v => !v)}
+          className="p-0.5 rounded hover:bg-white/20 text-white"
+          title={pinned ? 'Unpin (float)' : 'Pin to top'}
+        >
+          {pinned ? <PinOff className="w-3.5 h-3.5" /> : <Pin className="w-3.5 h-3.5" />}
+        </button>
         {onClose && (
           <button onClick={onClose} className="ml-1 p-0.5 rounded hover:bg-white/20 text-white text-xs font-bold">✕</button>
         )}

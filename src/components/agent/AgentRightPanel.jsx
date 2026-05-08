@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   AlertTriangle, CheckCircle2, Zap, Search, BookOpen,
   Phone, Mail, Send, RefreshCw, UserPlus, FileText,
-  ChevronDown, ChevronUp, Clock, ArrowUpCircle, ExternalLink, Bot, MessageSquare
+  ChevronDown, ChevronUp, Clock, ArrowUpCircle, ExternalLink, Bot, MessageSquare, X
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -94,6 +94,7 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
   const [selectedMsg, setSelectedMsg] = useState(null);
   const [sortBy, setSortBy] = useState('latest');
   const [showSortMenu, setShowSortMenu] = useState(false);
+  const [showQuickActionsPanel, setShowQuickActionsPanel] = useState(false);
   
   // Modal states
   const [showRefillModal, setShowRefillModal] = useState(false);
@@ -105,7 +106,7 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
   const [showNewPatientModal, setShowNewPatientModal] = useState(false);
 
   // Pop-out state
-  const [floats, setFloats] = useState({ priority: false, quick: false, alerts: false, kb: false });
+  const [floats, setFloats] = useState({ priority: false, kb: false });
   const popOut = (key) => setFloats(f => ({ ...f, [key]: true }));
   const popIn = (key) => setFloats(f => ({ ...f, [key]: false }));
 
@@ -328,39 +329,34 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
           </>
         )}
 
-        {/* Quick Actions */}
-        {!floats.quick && (
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-            <SectionHeader icon={Zap} title="Quick Actions" onPopOut={() => popOut('quick')} />
-            <QuickContent />
-          </div>
-        )}
-        {floats.quick && (
-          <>
-            <div className="bg-white border border-dashed border-gray-300 rounded-lg p-3 text-center text-xs text-gray-400">
-              Quick Actions — popped out
-            </div>
-            <FloatingWidget title="Quick Actions" onClose={() => popIn('quick')} defaultPos={{ x: 120, y: 200 }}>
-              <QuickContent />
-            </FloatingWidget>
-          </>
-        )}
+        {/* Quick Actions — trigger button */}
+        <button
+          onClick={() => setShowQuickActionsPanel(true)}
+          className="w-full flex items-center gap-2 px-3 py-2.5 bg-white border border-gray-200 rounded-lg shadow-sm hover:border-[#8B1F1F] hover:bg-red-50/30 transition-all text-left"
+        >
+          <Zap className="w-3.5 h-3.5 text-[#8B1F1F]" />
+          <span className="text-xs font-bold text-gray-700 uppercase tracking-wide flex-1">Quick Actions</span>
+          <ChevronDown className="w-3.5 h-3.5 text-gray-400 -rotate-90" />
+        </button>
 
-        {/* Patient Alerts */}
-        {!floats.alerts && (
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-            <SectionHeader icon={AlertTriangle} title="Patient Alerts" color="bg-amber-700" onPopOut={() => popOut('alerts')} />
-            <AlertsContent />
-          </div>
-        )}
-        {floats.alerts && (
+        {/* Quick Actions Slide-out Panel */}
+        {showQuickActionsPanel && (
           <>
-            <div className="bg-white border border-dashed border-gray-300 rounded-lg p-3 text-center text-xs text-gray-400">
-              Patient Alerts — popped out
+            <div className="fixed inset-0 z-40 bg-black/20" onClick={() => setShowQuickActionsPanel(false)} />
+            <div className="fixed top-0 right-0 h-full w-72 bg-white border-l border-gray-200 shadow-2xl z-50 flex flex-col">
+              <div className="flex items-center justify-between px-4 py-3 bg-[#8B1F1F] text-white">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-4 h-4" />
+                  <span className="font-bold text-sm uppercase tracking-wide">Quick Actions</span>
+                </div>
+                <button onClick={() => setShowQuickActionsPanel(false)} className="p-1 rounded hover:bg-white/20 transition-colors">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-3">
+                <QuickContent />
+              </div>
             </div>
-            <FloatingWidget title="Patient Alerts" headerColor="bg-amber-700" onClose={() => popIn('alerts')} defaultPos={{ x: 160, y: 300 }}>
-              <AlertsContent />
-            </FloatingWidget>
           </>
         )}
 

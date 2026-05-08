@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   LayoutDashboard, Pill, ShoppingCart, MessageSquare, CreditCard,
   RefreshCw, Phone, Mail, Send, AlertTriangle, Bot, ExternalLink, Clock, IdCard, ChevronRight, CheckCircle2,
-  Pencil, Check, X, StickyNote, Truck, GripVertical, Plus, ChevronUp, ChevronDown, List
+  Pencil, Check, X, StickyNote, Truck, GripVertical, Plus, ChevronUp, ChevronDown, List, Zap
 } from 'lucide-react';
 import DraggablePanelGrid from './DraggablePanelGrid';
 import { Input } from '@/components/ui/input';
@@ -681,7 +681,22 @@ function OverviewTab({ patient, editedPhysician, onChangePhysician, onSwitchTab 
         </div>
       )}
 
-      <div className="flex items-center justify-end mb-3">
+      <div className="flex items-center justify-end gap-1 mb-3">
+        <button
+          onClick={() => {
+            const allCollapsed = panels.every(p => collapsedPanels[p.id]);
+            const next = {};
+            panels.forEach(p => { next[p.id] = !allCollapsed; });
+            setCollapsedPanels(next);
+          }}
+          className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+          title={panels.every(p => collapsedPanels[p.id]) ? 'Expand all' : 'Collapse all'}
+        >
+          {panels.every(p => collapsedPanels[p.id])
+            ? <ChevronDown className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+            : <ChevronUp className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+          }
+        </button>
         <button
           onClick={() => setShowReorderPopup(true)}
           className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
@@ -947,6 +962,7 @@ function OrdersTab({ patient }) {
 function CommunicationsTab({ patient, newNote, setNewNote }) {
   const [channelFilter, setChannelFilter] = useState('all');
   const [selectedComm, setSelectedComm] = useState(null);
+  const [showMacrosPanel, setShowMacrosPanel] = useState(false);
 
   const channelConfig = {
     phone:    { label: 'Call',     color: 'text-blue-700 bg-blue-50',   icon: Phone },
@@ -982,8 +998,34 @@ function CommunicationsTab({ patient, newNote, setNewNote }) {
       {/* KB Suggestions */}
       <KBSuggestions communications={patient.communications} />
 
-      {/* Quick Action Macros */}
-      <QuickActionMacros patient={patient} />
+      {/* Quick Action Macros — slide-out panel trigger */}
+      <button
+        onClick={() => setShowMacrosPanel(true)}
+        className="w-full flex items-center gap-2 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg hover:border-[#8B1F1F] hover:bg-red-50/30 transition-all text-left"
+      >
+        <Zap className="w-3.5 h-3.5 text-[#8B1F1F]" />
+        <span className="text-xs font-bold text-gray-700 uppercase tracking-wide flex-1">Quick Action Macros</span>
+        <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
+      </button>
+      {showMacrosPanel && (
+        <>
+          <div className="fixed inset-0 z-40 bg-black/20" onClick={() => setShowMacrosPanel(false)} />
+          <div className="fixed top-0 right-0 h-full w-80 bg-white border-l border-gray-200 shadow-2xl z-50 flex flex-col">
+            <div className="flex items-center justify-between px-4 py-3 bg-[#8B1F1F] text-white">
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4" />
+                <span className="font-bold text-sm uppercase tracking-wide">Quick Action Macros</span>
+              </div>
+              <button onClick={() => setShowMacrosPanel(false)} className="p-1 rounded hover:bg-white/20 transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-3">
+              <QuickActionMacros patient={patient} />
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Log New Interaction */}
       <div className="p-3 border border-gray-200 rounded-lg bg-gray-50">
