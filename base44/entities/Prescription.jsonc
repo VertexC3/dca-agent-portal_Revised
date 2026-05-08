@@ -1,0 +1,113 @@
+{
+  "name": "Prescription",
+  "type": "object",
+  "properties": {
+    "patient_email": {
+      "type": "string",
+      "description": "Email of the patient"
+    },
+    "patient_name": {
+      "type": "string",
+      "description": "Name of the patient"
+    },
+    "medication_name": {
+      "type": "string",
+      "description": "Name of the medication"
+    },
+    "dosage": {
+      "type": "string",
+      "description": "Dosage amount (e.g., 10mg, 500mg)"
+    },
+    "frequency": {
+      "type": "string",
+      "description": "How often to take (e.g., once daily, twice a day)"
+    },
+    "prescriber_name": {
+      "type": "string",
+      "description": "Name of the prescribing doctor"
+    },
+    "dispense_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the prescription was dispensed"
+    },
+    "quantity_dispensed": {
+      "type": "number",
+      "description": "Number of units dispensed"
+    },
+    "refills_remaining": {
+      "type": "number",
+      "description": "Number of refills left"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "discontinued",
+        "completed"
+      ],
+      "default": "active",
+      "description": "Current status of the prescription"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "When the prescription was initially prescribed"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "When the prescription is expected to end"
+    },
+    "drug_class": {
+      "type": "string",
+      "description": "Category of the drug (e.g., Antibiotic, Antihypertensive)"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Pharmacist notes"
+    }
+  },
+  "required": [
+    "patient_email",
+    "medication_name",
+    "dosage",
+    "dispense_date"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "representative"
+          }
+        }
+      ]
+    },
+    "read": {},
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "representative"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

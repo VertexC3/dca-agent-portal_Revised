@@ -1,0 +1,80 @@
+{
+  "name": "Message",
+  "type": "object",
+  "properties": {
+    "sender_email": {
+      "type": "string",
+      "description": "Email of the message sender"
+    },
+    "sender_name": {
+      "type": "string",
+      "description": "Name of the message sender"
+    },
+    "sender_type": {
+      "type": "string",
+      "enum": [
+        "patient",
+        "staff"
+      ],
+      "description": "Type of sender"
+    },
+    "recipient_email": {
+      "type": "string",
+      "description": "Email of the recipient (for patient-to-staff, use 'pharmacy')"
+    },
+    "patient_email": {
+      "type": "string",
+      "description": "Patient email for thread grouping"
+    },
+    "message_content": {
+      "type": "string",
+      "description": "The message text"
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "platform",
+        "email",
+        "text",
+        "phone",
+        "ai_agent"
+      ],
+      "default": "platform",
+      "description": "Communication channel"
+    },
+    "attachment_url": {
+      "type": "string",
+      "description": "URL to attached file"
+    },
+    "attachment_name": {
+      "type": "string",
+      "description": "Name of the attached file"
+    },
+    "read": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the message has been read"
+    },
+    "read_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the message was read"
+    }
+  },
+  "required": [
+    "sender_email",
+    "sender_name",
+    "sender_type",
+    "message_content"
+  ],
+  "rls": {
+    "create": {},
+    "read": {},
+    "update": {},
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

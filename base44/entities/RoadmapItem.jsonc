@@ -1,0 +1,72 @@
+{
+  "name": "RoadmapItem",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Title of the roadmap item"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the roadmap item"
+    },
+    "timeline": {
+      "type": "string",
+      "enum": [
+        "Q1'26",
+        "Q2'26",
+        "Q3'26",
+        "Q4'26"
+      ],
+      "description": "Timeline quarter for implementation"
+    },
+    "category": {
+      "type": "string",
+      "description": "AI-generated category based on description"
+    },
+    "complexity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "description": "Complexity level of the roadmap item"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "in_progress",
+        "completed",
+        "cancelled"
+      ],
+      "default": "planned",
+      "description": "Current status of the roadmap item"
+    }
+  },
+  "required": [
+    "title",
+    "description",
+    "timeline",
+    "complexity"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

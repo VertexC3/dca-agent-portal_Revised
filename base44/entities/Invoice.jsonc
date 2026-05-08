@@ -1,0 +1,130 @@
+{
+  "name": "Invoice",
+  "type": "object",
+  "properties": {
+    "invoice_number": {
+      "type": "string",
+      "description": "Unique identifier for the invoice"
+    },
+    "invoice_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the invoice was issued"
+    },
+    "billing_period_start": {
+      "type": "string",
+      "format": "date",
+      "description": "Start date of the billing period"
+    },
+    "billing_period_end": {
+      "type": "string",
+      "format": "date",
+      "description": "End date of the billing period"
+    },
+    "payment_terms": {
+      "type": "string",
+      "description": "Payment terms (e.g., 'Net 30 days')"
+    },
+    "currency": {
+      "type": "string",
+      "default": "USD",
+      "description": "Currency of the invoice (e.g., 'USD')"
+    },
+    "payment_instructions": {
+      "type": "string",
+      "description": "Detailed payment instructions"
+    },
+    "bill_to_name": {
+      "type": "string",
+      "description": "Name of the billed customer (e.g., 'DCA Pharmacy')"
+    },
+    "bill_to_address": {
+      "type": "string",
+      "description": "Billing address of the customer"
+    },
+    "bill_to_contact_person": {
+      "type": "string",
+      "description": "Contact person at the customer"
+    },
+    "bill_to_contact_email": {
+      "type": "string",
+      "description": "Contact email at the customer"
+    },
+    "bill_to_contact_phone": {
+      "type": "string",
+      "description": "Contact phone at the customer"
+    },
+    "bill_from_name": {
+      "type": "string",
+      "description": "Name of the billing vendor (e.g., 'Mochi Health Corp.')"
+    },
+    "bill_from_address": {
+      "type": "string",
+      "description": "Billing address of the vendor"
+    },
+    "bill_from_tax_id": {
+      "type": "string",
+      "description": "Tax ID of the vendor (e.g., EIN)"
+    },
+    "bill_from_contact_email": {
+      "type": "string",
+      "description": "Contact email at the vendor"
+    },
+    "bill_from_contact_phone": {
+      "type": "string",
+      "description": "Contact phone at the vendor"
+    },
+    "subtotal": {
+      "type": "number",
+      "description": "Sum of all order line amounts before taxes/shipping"
+    },
+    "taxes": {
+      "type": "number",
+      "default": 0,
+      "description": "Total taxes applied to the invoice"
+    },
+    "shipping_handling": {
+      "type": "number",
+      "default": 0,
+      "description": "Total shipping and handling charges"
+    },
+    "total_due": {
+      "type": "number",
+      "description": "Total amount due for the invoice"
+    },
+    "total_paid": {
+      "type": "number",
+      "default": 0,
+      "description": "Total amount paid towards this invoice"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "partially_paid",
+        "paid",
+        "overdue",
+        "cancelled"
+      ],
+      "default": "open",
+      "description": "Current status of the invoice"
+    },
+    "facility_id": {
+      "type": "string",
+      "description": "ID of the FacilityProfile this invoice belongs to"
+    }
+  },
+  "required": [
+    "invoice_number",
+    "invoice_date",
+    "billing_period_start",
+    "billing_period_end",
+    "payment_terms",
+    "currency",
+    "bill_to_name",
+    "bill_from_name",
+    "subtotal",
+    "total_due",
+    "facility_id"
+  ]
+}

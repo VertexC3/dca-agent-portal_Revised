@@ -1,0 +1,120 @@
+{
+  "name": "WorkflowRule",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the workflow rule"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of what this workflow does"
+    },
+    "trigger_type": {
+      "type": "string",
+      "enum": [
+        "keyword_match",
+        "request_type",
+        "channel",
+        "sentiment",
+        "time_based"
+      ],
+      "description": "What triggers this workflow"
+    },
+    "trigger_keywords": {
+      "type": "string",
+      "description": "Comma-separated keywords that trigger this workflow"
+    },
+    "trigger_request_types": {
+      "type": "string",
+      "description": "Comma-separated request types that trigger this workflow"
+    },
+    "trigger_channels": {
+      "type": "string",
+      "description": "Comma-separated channels that trigger this workflow"
+    },
+    "action_type": {
+      "type": "string",
+      "enum": [
+        "send_email",
+        "schedule_callback",
+        "create_task",
+        "send_sms",
+        "escalate_to_human",
+        "send_followup",
+        "create_prescription_request",
+        "update_status"
+      ],
+      "description": "Action to perform when triggered"
+    },
+    "action_parameters": {
+      "type": "string",
+      "description": "JSON string of action parameters"
+    },
+    "delay_minutes": {
+      "type": "number",
+      "default": 0,
+      "description": "Minutes to wait before executing action"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive",
+        "testing"
+      ],
+      "default": "active",
+      "description": "Status of the workflow rule"
+    },
+    "priority": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 10,
+      "default": 5,
+      "description": "Priority level (1=lowest, 10=highest)"
+    },
+    "execution_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of times this workflow has been triggered"
+    },
+    "last_executed": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last time this workflow was executed"
+    },
+    "success_rate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Success rate percentage"
+    }
+  },
+  "required": [
+    "name",
+    "trigger_type",
+    "action_type"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

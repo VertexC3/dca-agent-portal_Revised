@@ -1,0 +1,67 @@
+{
+  "name": "PatientRoadmapItem",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Title of the roadmap item"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the roadmap item"
+    },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "Phase 1",
+        "Phase 2",
+        "Phase 3",
+        "Phase 4",
+        "Phase 5",
+        "Future"
+      ],
+      "description": "Which phase this item belongs to"
+    },
+    "phase_date": {
+      "type": "string",
+      "description": "Target date or timeframe for the phase (e.g., 'Q1 2026', 'January 2026')"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "in_progress",
+        "completed"
+      ],
+      "default": "planned",
+      "description": "Status of the roadmap item"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Display order within the phase"
+    }
+  },
+  "required": [
+    "title",
+    "phase"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

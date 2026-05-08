@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   LayoutDashboard, Pill, ShoppingCart, MessageSquare, CreditCard,
   RefreshCw, Phone, Mail, Send, AlertTriangle, Bot, ExternalLink, Clock, IdCard, ChevronRight, CheckCircle2,
-  Pencil, Check, X, StickyNote, Truck, GripVertical, Plus
+  Pencil, Check, X, StickyNote, Truck, GripVertical, Plus, ChevronUp, ChevronDown, List
 } from 'lucide-react';
 import DraggablePanelGrid from './DraggablePanelGrid';
 import { Input } from '@/components/ui/input';
@@ -466,6 +466,7 @@ function OverviewTab({ patient, editedPhysician, onChangePhysician, onSwitchTab 
   const [detailOrder, setDetailOrder] = useState(null);
   const [showPhysicianContext, setShowPhysicianContext] = useState(false);
   const [collapsedPanels, setCollapsedPanels] = useState({});
+  const [showReorderPopup, setShowReorderPopup] = useState(false);
 
   const unpaid = patient.invoices.filter(i => i.status !== 'paid');
   const lowRefills = patient.prescriptions.filter(p => p.refills <= 1);
@@ -631,14 +632,63 @@ function OverviewTab({ patient, editedPhysician, onChangePhysician, onSwitchTab 
     </div>
   );
 
+  const movePanel = (index, direction) => {
+    const newPanels = [...panels];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= newPanels.length) return;
+    [newPanels[index], newPanels[targetIndex]] = [newPanels[targetIndex], newPanels[index]];
+    setPanels(newPanels);
+  };
+
   return (
     <div>
       {openModal && <StatCardModal stat={openModal} patient={patient} onClose={() => setOpenModal(null)} onGoToOrders={() => { setOpenModal(null); onSwitchTab('orders'); }} />}
       {detailOrder && <OrderDetailModal order={detailOrder} patient={patient} onClose={() => setDetailOrder(null)} />}
       {showPhysicianContext && <PhysicianContextPopup patient={patient} onClose={() => setShowPhysicianContext(false)} />}
 
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-xs text-gray-400 flex items-center gap-1"><GripVertical className="w-3 h-3" /> Drag panels to reorder</p>
+      {/* Reorder Popup */}
+      {showReorderPopup && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center" onClick={() => setShowReorderPopup(false)}>
+          <div className="bg-white rounded-xl shadow-2xl w-80 overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200">
+              <h3 className="font-bold text-sm text-gray-900">Reorder Panels</h3>
+              <button onClick={() => setShowReorderPopup(false)} className="text-gray-400 hover:text-gray-700 text-lg leading-none">✕</button>
+            </div>
+            <div className="p-3 space-y-1.5">
+              {panels.map((panel, index) => (
+                <div key={panel.id} className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg">
+                  <span className="flex-1 text-xs font-semibold text-gray-700">{panel.title}</span>
+                  <button
+                    onClick={() => movePanel(index, 'up')}
+                    disabled={index === 0}
+                    className="p-1 rounded hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    title="Move up"
+                  >
+                    <ChevronUp className="w-3.5 h-3.5 text-gray-600" />
+                  </button>
+                  <button
+                    onClick={() => movePanel(index, 'down')}
+                    disabled={index === panels.length - 1}
+                    className="p-1 rounded hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    title="Move down"
+                  >
+                    <ChevronDown className="w-3.5 h-3.5 text-gray-600" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-center justify-end mb-3">
+        <button
+          onClick={() => setShowReorderPopup(true)}
+          className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+          title="Reorder panels"
+        >
+          <List className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+        </button>
       </div>
 
       <div className="space-y-3">

@@ -1,0 +1,171 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "phone": {
+      "type": "string",
+      "description": "Phone number"
+    },
+    "date_of_birth": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of birth"
+    },
+    "patient_since": {
+      "type": "string",
+      "format": "date",
+      "description": "Date when patient first registered"
+    },
+    "current_address": {
+      "type": "string",
+      "description": "Current address"
+    },
+    "addresses": {
+      "type": "array",
+      "description": "Multiple delivery addresses with schedules",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "delivery_days": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "delivery_time": {
+            "type": "string"
+          },
+          "is_primary": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "additional_addresses": {
+      "type": "array",
+      "description": "Additional addresses",
+      "items": {
+        "type": "string"
+      }
+    },
+    "allergies": {
+      "type": "string",
+      "description": "Known allergies"
+    },
+    "current_medications": {
+      "type": "string",
+      "description": "Current medications"
+    },
+    "known_conditions": {
+      "type": "string",
+      "description": "Known medical conditions"
+    },
+    "emergency_contact_name": {
+      "type": "string",
+      "description": "Emergency contact name"
+    },
+    "emergency_contact_phone": {
+      "type": "string",
+      "description": "Emergency contact phone"
+    },
+    "profile_picture": {
+      "type": "string",
+      "description": "URL to profile picture"
+    },
+    "quick_actions": {
+      "type": "array",
+      "description": "Selected quick actions for dashboard",
+      "items": {
+        "type": "string"
+      }
+    },
+    "payment_methods": {
+      "type": "array",
+      "description": "Stored payment methods",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "card_holder_name": {
+            "type": "string"
+          },
+          "card_last_four": {
+            "type": "string"
+          },
+          "card_type": {
+            "type": "string"
+          },
+          "expiry_month": {
+            "type": "string"
+          },
+          "expiry_year": {
+            "type": "string"
+          },
+          "billing_address": {
+            "type": "string"
+          },
+          "is_primary": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "patient_pref_prescriptions": {
+      "type": "boolean",
+      "default": true,
+      "description": "Show Prescriptions on dashboard"
+    },
+    "patient_pref_communications": {
+      "type": "boolean",
+      "default": true,
+      "description": "Show Recent Communications on dashboard"
+    },
+    "patient_pref_quick_actions": {
+      "type": "boolean",
+      "default": true,
+      "description": "Show Quick Actions on dashboard"
+    },
+    "patient_pref_orders": {
+      "type": "boolean",
+      "default": true,
+      "description": "Show Recent Orders on dashboard"
+    },
+    "patient_pref_prescriptions_nav": {
+      "type": "boolean",
+      "default": true,
+      "description": "Show Prescriptions in navigation"
+    },
+    "patient_pref_messages_nav": {
+      "type": "boolean",
+      "default": true,
+      "description": "Show Messages in navigation"
+    },
+    "facility_id": {
+      "type": "string",
+      "description": "ID of the FacilityProfile for facility users"
+    }
+  },
+  "required": [
+    "phone",
+    "date_of_birth",
+    "current_address",
+    "addresses",
+    "additional_addresses",
+    "allergies",
+    "current_medications",
+    "known_conditions",
+    "emergency_contact_name",
+    "emergency_contact_phone",
+    "profile_picture",
+    "quick_actions",
+    "payment_methods"
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "name": "CommunicationNote",
+  "type": "object",
+  "properties": {
+    "communication_id": {
+      "type": "string",
+      "description": "ID of the related communication"
+    },
+    "note_content": {
+      "type": "string",
+      "description": "Content of the note"
+    },
+    "is_internal": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether note is internal or visible to patient"
+    },
+    "note_type": {
+      "type": "string",
+      "enum": [
+        "general",
+        "action_item",
+        "follow_up",
+        "alert"
+      ],
+      "default": "general",
+      "description": "Type of note"
+    },
+    "created_by_name": {
+      "type": "string",
+      "description": "Name of the person who created the note"
+    }
+  },
+  "required": [
+    "communication_id",
+    "note_content"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "representative"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "representative"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "representative"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "representative"
+          }
+        }
+      ]
+    }
+  }
+}

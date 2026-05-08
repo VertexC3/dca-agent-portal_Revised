@@ -1,0 +1,215 @@
+{
+  "name": "PatientCommunication",
+  "type": "object",
+  "properties": {
+    "patient_name": {
+      "type": "string",
+      "description": "Name of the patient"
+    },
+    "patient_id": {
+      "type": "string",
+      "description": "Unique patient identifier"
+    },
+    "patient_email": {
+      "type": "string",
+      "description": "Patient email address"
+    },
+    "patient_phone": {
+      "type": "string",
+      "description": "Patient phone number"
+    },
+    "patient_date_of_birth": {
+      "type": "string",
+      "format": "date",
+      "description": "Patient date of birth"
+    },
+    "patient_address": {
+      "type": "string",
+      "description": "Patient address"
+    },
+    "patient_allergies": {
+      "type": "string",
+      "description": "Known allergies (comma-separated)"
+    },
+    "current_medications": {
+      "type": "string",
+      "description": "Current medications (comma-separated)"
+    },
+    "known_conditions": {
+      "type": "string",
+      "description": "Known medical conditions (comma-separated)"
+    },
+    "insurance_provider": {
+      "type": "string",
+      "description": "Insurance provider name"
+    },
+    "preferred_contact_method": {
+      "type": "string",
+      "enum": [
+        "email",
+        "phone",
+        "text"
+      ],
+      "description": "Patient's preferred contact method"
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "email",
+        "phone",
+        "text",
+        "ai_agent"
+      ],
+      "description": "Communication channel"
+    },
+    "handled_by_type": {
+      "type": "string",
+      "enum": [
+        "ai_agent",
+        "representative"
+      ],
+      "default": "representative",
+      "description": "Whether handled by AI or human representative"
+    },
+    "escalated_to_human": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether AI Agent escalated to human representative"
+    },
+    "message_content": {
+      "type": "string",
+      "description": "The message from the patient"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of communication"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Exact time of communication"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "resolved"
+      ],
+      "default": "pending",
+      "description": "Status of the communication"
+    },
+    "request_type": {
+      "type": "string",
+      "enum": [
+        "prescription_refill",
+        "medication_inquiry",
+        "delivery_status",
+        "billing_question",
+        "side_effects",
+        "appointment_scheduling",
+        "insurance_question",
+        "general_inquiry",
+        "complaint",
+        "other"
+      ],
+      "description": "Category of patient request"
+    },
+    "voice_recording_url": {
+      "type": "string",
+      "description": "URL to voice recording (for phone channel)"
+    },
+    "transcript": {
+      "type": "string",
+      "description": "Transcript of voice communication"
+    },
+    "recommended_response": {
+      "type": "string",
+      "description": "AI-generated recommended response"
+    },
+    "response_sent": {
+      "type": "string",
+      "description": "Actual response sent to patient"
+    },
+    "response_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When response was sent"
+    },
+    "handled_by": {
+      "type": "string",
+      "description": "Email of staff member who handled this"
+    },
+    "response_time_minutes": {
+      "type": "number",
+      "description": "Time taken to respond in minutes"
+    },
+    "satisfaction_score": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "Patient satisfaction rating (1-5)"
+    },
+    "satisfaction_feedback": {
+      "type": "string",
+      "description": "Patient feedback comments"
+    },
+    "feedback_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When feedback was provided"
+    }
+  },
+  "required": [
+    "patient_name",
+    "channel",
+    "message_content",
+    "date"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "representative"
+          }
+        }
+      ]
+    },
+    "read": {},
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "representative"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "representative"
+          }
+        }
+      ]
+    }
+  }
+}

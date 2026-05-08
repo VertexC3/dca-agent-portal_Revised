@@ -1,0 +1,135 @@
+{
+  "name": "Order",
+  "type": "object",
+  "properties": {
+    "patient_email": {
+      "type": "string",
+      "description": "Email of the patient"
+    },
+    "patient_name": {
+      "type": "string",
+      "description": "Name of the patient"
+    },
+    "patient_initials": {
+      "type": "string",
+      "description": "De-identified patient initials for HIPAA compliance"
+    },
+    "patient_code": {
+      "type": "string",
+      "description": "De-identified patient code"
+    },
+    "order_number": {
+      "type": "string",
+      "description": "Unique order number"
+    },
+    "order_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date of the order"
+    },
+    "items": {
+      "type": "string",
+      "description": "JSON string of order items"
+    },
+    "medication_name": {
+      "type": "string",
+      "description": "Name of the medication"
+    },
+    "medication_strength": {
+      "type": "string",
+      "description": "Strength and form (e.g., mg per mL, vial/pen)"
+    },
+    "quantity_dispensed": {
+      "type": "number",
+      "description": "Quantity dispensed per order"
+    },
+    "unit_price": {
+      "type": "number",
+      "description": "Price per unit of the medication"
+    },
+    "extended_line_amount": {
+      "type": "number",
+      "description": "Total amount for this order (quantity \u00d7 unit price)"
+    },
+    "discounts_rebates": {
+      "type": "number",
+      "default": 0,
+      "description": "Any discounts or rebates applied to the order"
+    },
+    "total_amount": {
+      "type": "number",
+      "description": "Total order amount"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "processing",
+        "completed",
+        "cancelled"
+      ],
+      "default": "pending",
+      "description": "Order status"
+    },
+    "order_stage": {
+      "type": "string",
+      "enum": [
+        "new",
+        "in_process",
+        "shipped"
+      ],
+      "default": "new",
+      "description": "Order fulfillment stage"
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": [
+        "paid",
+        "unpaid",
+        "partially_paid"
+      ],
+      "default": "unpaid",
+      "description": "Individual order payment status"
+    },
+    "invoice_id": {
+      "type": "string",
+      "description": "ID of the invoice this order belongs to"
+    },
+    "receipt_url": {
+      "type": "string",
+      "description": "URL to receipt image"
+    },
+    "payment_method": {
+      "type": "string",
+      "description": "Payment method used"
+    },
+    "pharmacy_location": {
+      "type": "string",
+      "description": "Pharmacy location"
+    }
+  },
+  "required": [
+    "patient_email",
+    "order_number",
+    "order_date",
+    "total_amount"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

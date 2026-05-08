@@ -1,0 +1,106 @@
+{
+  "name": "PrescriptionRequest",
+  "type": "object",
+  "properties": {
+    "communication_id": {
+      "type": "string",
+      "description": "ID of the communication that triggered this request"
+    },
+    "patient_name": {
+      "type": "string",
+      "description": "Name of the patient"
+    },
+    "patient_id": {
+      "type": "string",
+      "description": "Patient identifier"
+    },
+    "patient_email": {
+      "type": "string",
+      "description": "Patient email"
+    },
+    "patient_phone": {
+      "type": "string",
+      "description": "Patient phone"
+    },
+    "medication_name": {
+      "type": "string",
+      "description": "Name of medication to refill"
+    },
+    "prescription_number": {
+      "type": "string",
+      "description": "Prescription number if provided"
+    },
+    "requested_via": {
+      "type": "string",
+      "enum": [
+        "automated",
+        "manual",
+        "ai_agent"
+      ],
+      "default": "automated",
+      "description": "How the request was created"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "processing",
+        "ready",
+        "completed",
+        "cancelled"
+      ],
+      "default": "pending",
+      "description": "Status of the prescription request"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes or context"
+    },
+    "processed_by": {
+      "type": "string",
+      "description": "Email of pharmacist who processed this"
+    },
+    "processed_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the request was processed"
+    },
+    "ready_for_pickup": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether prescription is ready for pickup"
+    },
+    "pickup_notification_sent": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether pickup notification was sent"
+    }
+  },
+  "required": [
+    "patient_name",
+    "medication_name"
+  ],
+  "rls": {
+    "create": {},
+    "read": {},
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "representative"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "name": "KnowledgeBase",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Title of the knowledge article or FAQ"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "prescription_refill",
+        "medication_inquiry",
+        "delivery_status",
+        "billing_question",
+        "side_effects",
+        "appointment_scheduling",
+        "insurance_question",
+        "general_inquiry",
+        "complaint",
+        "other"
+      ],
+      "description": "Category of the knowledge article"
+    },
+    "content": {
+      "type": "string",
+      "description": "Full content of the article"
+    },
+    "keywords": {
+      "type": "string",
+      "description": "Comma-separated keywords for search"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "published",
+        "archived"
+      ],
+      "default": "draft",
+      "description": "Publication status"
+    },
+    "ai_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether AI can reference this article"
+    },
+    "usage_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of times AI referenced this article"
+    },
+    "last_used": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last time AI used this article"
+    },
+    "helpfulness_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 5,
+      "description": "Average helpfulness rating"
+    },
+    "created_by": {
+      "type": "string",
+      "description": "Email of creator"
+    }
+  },
+  "required": [
+    "title",
+    "category",
+    "content"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "representative"
+          }
+        },
+        {
+          "status": "published"
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

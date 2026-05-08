@@ -1,0 +1,41 @@
+{
+  "name": "FacilityProfile",
+  "type": "object",
+  "properties": {
+    "facility_name": {
+      "type": "string",
+      "description": "Name of the facility (e.g., Mochi Health Corp.)"
+    },
+    "address": {
+      "type": "string",
+      "description": "Address of the facility"
+    },
+    "tax_id": {
+      "type": "string",
+      "description": "Tax ID of the facility (e.g., EIN)"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "Primary contact email for the facility"
+    },
+    "contact_phone": {
+      "type": "string",
+      "description": "Primary contact phone for the facility"
+    },
+    "logo_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to the facility's logo"
+    },
+    "associated_user_id": {
+      "type": "string",
+      "description": "ID of the User entity that manages this facility profile"
+    }
+  },
+  "required": [
+    "facility_name",
+    "address",
+    "contact_email",
+    "associated_user_id"
+  ]
+}

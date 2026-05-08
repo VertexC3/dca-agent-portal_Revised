@@ -1,0 +1,104 @@
+{
+  "name": "AutomatedAction",
+  "type": "object",
+  "properties": {
+    "communication_id": {
+      "type": "string",
+      "description": "ID of the related communication"
+    },
+    "workflow_rule_id": {
+      "type": "string",
+      "description": "ID of the workflow rule that triggered this"
+    },
+    "action_type": {
+      "type": "string",
+      "enum": [
+        "send_email",
+        "schedule_callback",
+        "create_task",
+        "send_sms",
+        "escalate_to_human",
+        "send_followup",
+        "create_prescription_request",
+        "update_status"
+      ],
+      "description": "Type of action performed"
+    },
+    "action_details": {
+      "type": "string",
+      "description": "Details of the action performed"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "scheduled",
+        "completed",
+        "failed"
+      ],
+      "default": "pending",
+      "description": "Status of the automated action"
+    },
+    "scheduled_for": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the action is scheduled to execute"
+    },
+    "executed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the action was executed"
+    },
+    "result": {
+      "type": "string",
+      "description": "Result or output of the action"
+    },
+    "error_message": {
+      "type": "string",
+      "description": "Error message if action failed"
+    },
+    "patient_name": {
+      "type": "string",
+      "description": "Patient name for reference"
+    },
+    "patient_email": {
+      "type": "string",
+      "description": "Patient email for reference"
+    }
+  },
+  "required": [
+    "communication_id",
+    "action_type"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "representative"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
