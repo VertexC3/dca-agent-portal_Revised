@@ -180,40 +180,40 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
   );
 
   const QuickContent = () => (
-    <div className="p-2 grid grid-cols-2 gap-1.5">
+    <div className="p-2 grid grid-cols-2 gap-2.5">
       <Button size="sm" variant="outline" onClick={() => onStartWorkflow?.('refill', { selectedRx: [] })}
-        className={`h-8 text-xs justify-start gap-1.5 border-gray-200 hover:bg-blue-50`}>
-        <RefreshCw className={`w-3.5 h-3.5 text-blue-600`} />
+        className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-blue-50 hover:border-blue-300">
+        <RefreshCw className="w-4 h-4 text-blue-600" />
         Refill Rx
       </Button>
       <Button size="sm" variant="outline" onClick={() => setShowCallModal(true)}
-        className={`h-8 text-xs justify-start gap-1.5 border-gray-200 hover:bg-green-50`}>
-        <Phone className={`w-3.5 h-3.5 text-green-600`} />
+        className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-green-50 hover:border-green-300">
+        <Phone className="w-4 h-4 text-green-600" />
         Log Call
       </Button>
       <Button size="sm" variant="outline" onClick={() => setShowEmailModal(true)}
-        className={`h-8 text-xs justify-start gap-1.5 border-gray-200 hover:bg-purple-50`}>
-        <Mail className={`w-3.5 h-3.5 text-purple-600`} />
+        className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-purple-50 hover:border-purple-300">
+        <Mail className="w-4 h-4 text-purple-600" />
         Send Email
       </Button>
       <Button size="sm" variant="outline" onClick={() => setShowTextModal(true)}
-        className={`h-8 text-xs justify-start gap-1.5 border-gray-200 hover:bg-orange-50`}>
-        <Send className={`w-3.5 h-3.5 text-orange-600`} />
+        className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-orange-50 hover:border-orange-300">
+        <Send className="w-4 h-4 text-orange-600" />
         Send Text
       </Button>
       <Button size="sm" variant="outline" onClick={() => setShowEscalateModal(true)}
-        className={`h-8 text-xs justify-start gap-1.5 border-gray-200 hover:bg-red-50`}>
-        <AlertTriangle className={`w-3.5 h-3.5 text-red-600`} />
+        className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-red-50 hover:border-red-300">
+        <AlertTriangle className="w-4 h-4 text-red-600" />
         Escalate
       </Button>
       <Button size="sm" variant="outline" onClick={() => setShowNoteModal(true)}
-        className={`h-8 text-xs justify-start gap-1.5 border-gray-200 hover:bg-yellow-50`}>
-        <FileText className={`w-3.5 h-3.5 text-yellow-600`} />
+        className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-yellow-50 hover:border-yellow-300">
+        <FileText className="w-4 h-4 text-yellow-600" />
         Add Note
       </Button>
       <Button size="sm" variant="outline" onClick={() => setShowNewPatientModal(true)}
-        className="h-8 text-xs justify-start gap-1.5 border-gray-200 hover:bg-teal-50 col-span-2">
-        <UserPlus className="w-3.5 h-3.5 text-teal-600" />
+        className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-teal-50 hover:border-teal-300 col-span-2">
+        <UserPlus className="w-4 h-4 text-teal-600" />
         New Patient Record
       </Button>
     </div>
@@ -268,6 +268,21 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
 
   return (
     <>
+      {/* ⚡ Quick Actions FAB — fixed to bottom-right */}
+      <button
+        onClick={() => setShowQuickActionsPanel(v => !v)}
+        title="Quick Actions"
+        className="fixed bottom-6 right-6 z-50 group flex items-center gap-0 overflow-hidden rounded-full shadow-2xl transition-all duration-300 hover:pr-4"
+        style={{ background: 'linear-gradient(135deg, #8B1F1F 0%, #c0392b 100%)' }}
+      >
+        <div className="w-14 h-14 flex items-center justify-center flex-shrink-0">
+          <Zap className="w-6 h-6 text-white drop-shadow" fill="white" />
+        </div>
+        <span className="max-w-0 group-hover:max-w-xs overflow-hidden whitespace-nowrap text-white font-bold text-sm uppercase tracking-wide transition-all duration-300 opacity-0 group-hover:opacity-100">
+          Quick Actions
+        </span>
+      </button>
+
       <div className="flex flex-col gap-3 overflow-y-auto h-full p-3">
 
         {/* Patient Messages */}
@@ -329,53 +344,35 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
           </>
         )}
 
-        {/* Quick Actions — prominent pull-tab trigger */}
-        <button
-          onClick={() => setShowQuickActionsPanel(true)}
-          className="w-full group flex items-center gap-2.5 px-3 py-3 bg-gradient-to-r from-[#8B1F1F] to-[#a52828] text-white rounded-lg shadow-md hover:shadow-lg hover:from-[#7a1b1b] hover:to-[#8B1F1F] transition-all text-left border-2 border-[#8B1F1F]"
-        >
-          <div className="flex items-center justify-center w-7 h-7 bg-white/20 rounded-md group-hover:bg-white/30 transition-colors">
-            <Zap className="w-4 h-4 text-white" />
-          </div>
-          <div className="flex-1">
-            <span className="text-xs font-bold uppercase tracking-wider block">Quick Actions</span>
-            <span className="text-xs text-white/70">Refill · Call · Email · Escalate</span>
-          </div>
-          <div className="flex items-center gap-1 bg-white/20 rounded px-2 py-1 group-hover:bg-white/30 transition-colors">
-            <span className="text-xs font-semibold">Open</span>
-            <ChevronDown className="w-3.5 h-3.5 -rotate-90" />
-          </div>
-        </button>
-
-        {/* Quick Actions Slide-out Panel */}
+        {/* Quick Actions Slide-out Panel — triggered by FAB below */}
         {showQuickActionsPanel && (
           <>
             <div className="fixed inset-0 z-40 bg-black/30" onClick={() => setShowQuickActionsPanel(false)} />
             <div
-              className="fixed top-0 right-0 h-full w-72 bg-white border-l border-gray-200 shadow-2xl z-50 flex flex-col"
-              style={{ animation: 'slideInRight 0.2s ease-out' }}
+              className="fixed top-0 right-0 h-full w-96 bg-white border-l border-gray-200 shadow-2xl z-50 flex flex-col"
+              style={{ animation: 'slideInRight 0.22s cubic-bezier(0.4,0,0.2,1)' }}
             >
-              <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-[#8B1F1F] to-[#a52828] text-white">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 bg-white/20 rounded-md flex items-center justify-center">
-                    <Zap className="w-4 h-4" />
+              <div className="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-[#8B1F1F] to-[#a52828] text-white">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center shadow-inner">
+                    <Zap className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="font-bold text-sm uppercase tracking-wide block">Quick Actions</span>
-                    <span className="text-xs text-white/70">Patient: {patient?.name || 'None selected'}</span>
+                    <span className="font-bold text-sm uppercase tracking-wide block leading-tight">Quick Actions</span>
+                    <span className="text-xs text-white/70">{patient?.name || 'No patient selected'}</span>
                   </div>
                 </div>
-                <button onClick={() => setShowQuickActionsPanel(false)} className="p-1.5 rounded-md hover:bg-white/20 transition-colors">
+                <button onClick={() => setShowQuickActionsPanel(false)} className="p-1.5 rounded-lg hover:bg-white/20 transition-colors">
                   <X className="w-4 h-4" />
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto p-3">
+              <div className="flex-1 overflow-y-auto p-4">
                 <QuickContent />
               </div>
             </div>
           </>
         )}
-        <style>{`@keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }`}</style>
+        <style>{`@keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
 
         {/* Knowledge Base */}
         {!floats.kb && (
