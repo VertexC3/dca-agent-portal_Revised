@@ -155,7 +155,7 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
           return (
             <div key={msg.id} className="border-b border-gray-100 last:border-0">
               <button
-                onClick={() => onOpenMessage?.(msg)}
+                onClick={() => setExpandedMsgId(isExpanded ? null : msg.id)}
                 className="w-full text-left flex items-start gap-2 p-2.5 hover:bg-red-50/50 transition-colors group"
               >
                 <span className={`mt-0.5 flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full ${CHANNEL_COLOR[msg.type] || 'bg-gray-100 text-gray-500'}`}>
@@ -171,9 +171,27 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
                     <span className="flex items-center gap-0.5 ml-auto">
                       <Clock className="w-2.5 h-2.5" />{msg.date}
                     </span>
+                    <ChevronDown className={`w-3 h-3 ml-1 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
                   </div>
                 </div>
               </button>
+              {isExpanded && (
+                <div className="bg-gray-50 border-t border-gray-100 px-3 py-3 text-xs text-gray-700 space-y-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-semibold ${CHANNEL_COLOR[msg.type] || 'bg-gray-100 text-gray-500'}`}>
+                      <Icon className="w-3 h-3" />{CHANNEL_LABEL[msg.type] || msg.type}
+                    </span>
+                    {msg.medication && (
+                      <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">{msg.medication}</span>
+                    )}
+                  </div>
+                  <p className="text-gray-800 leading-relaxed">{msg.summary}</p>
+                  <div className="flex items-center justify-between text-gray-400">
+                    <span>Handled by: <strong className="text-gray-600">{msg.agent}</strong></span>
+                    <span>{msg.date}</span>
+                  </div>
+                </div>
+              )}
             </div>
           );
         })
