@@ -91,7 +91,7 @@ function padMessages(msgs, patient) {
 export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflow }) {
   const [kbSearch, setKbSearch] = useState('');
   const [kbExpanded, setKbExpanded] = useState(false);
-  const [selectedMsg, setSelectedMsg] = useState(null);
+  const [expandedMsgId, setExpandedMsgId] = useState(null);
   const [sortBy, setSortBy] = useState('latest');
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showQuickActionsPanel, setShowQuickActionsPanel] = useState(false);
@@ -137,7 +137,7 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
 
   // ---- Reusable section content ----
   const PriorityContent = () => (
-    <div className="divide-y divide-gray-100 max-h-64 overflow-y-auto">
+    <div className="divide-y divide-gray-100 max-h-[32rem] overflow-y-auto">
       {!patient ? (
         <div className="p-4 text-center text-xs text-gray-500">
           <CheckCircle2 className="w-6 h-6 mx-auto mb-1 text-gray-300" />
@@ -151,28 +151,56 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
       ) : (
         sortedMessages.map(msg => {
           const Icon = CHANNEL_ICON[msg.type] || MessageSquare;
+          const isExpanded = expandedMsgId === msg.id;
           return (
-            <button
-              key={msg.id}
-              onClick={() => { onOpenMessage?.(msg); }}
-              className="w-full text-left flex items-start gap-2 p-2.5 hover:bg-red-50/50 transition-colors group"
-            >
-              <span className={`mt-0.5 flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full ${CHANNEL_COLOR[msg.type] || 'bg-gray-100 text-gray-500'}`}>
-                <Icon className="w-3 h-3" />
-              </span>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-gray-900 group-hover:text-[#8B1F1F] transition-colors truncate">{msg.subject}</p>
-                <p className="text-xs text-gray-500 leading-snug mt-0.5 truncate">{msg.summary}</p>
-                <div className="flex items-center gap-1.5 mt-0.5 text-xs text-gray-400">
-                  <span className="font-medium">{CHANNEL_LABEL[msg.type] || msg.type}</span>
-                  <span>·</span>
-                  <span>{msg.agent}</span>
-                  <span className="flex items-center gap-0.5 ml-auto">
-                    <Clock className="w-2.5 h-2.5" />{msg.date}
-                  </span>
+            <div key={msg.id} className="border-b border-gray-100 last:border-0">
+              <button
+                onClick={() => setExpandedMsgId(isExpanded ? null : msg.id)}
+                className="w-full text-left flex items-start gap-2 p-2.5 hover:bg-red-50/50 transition-colors group"
+              >
+                <span className={`mt-0.5 flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full ${CHANNEL_COLOR[msg.type] || 'bg-gray-100 text-gray-500'}`}>
+                  <Icon className="w-3 h-3" />
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold text-gray-900 group-hover:text-[#8B1F1F] transition-colors truncate">{msg.subject}</p>
+                  <p className="text-xs text-gray-500 leading-snug mt-0.5 truncate">{msg.summary}</p>
+                  <div className="flex items-center gap-1.5 mt-0.5 text-xs text-gray-400">
+                    <span className="font-medium">{CHANNEL_LABEL[msg.type] || msg.type}</span>
+                    <span>·</span>
+                    <span>{msg.agent}</span>
+                    <span className="flex items-center gap-0.5 ml-auto">
+                      <Clock className="w-2.5 h-2.5" />{msg.date}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </button>
+                <ChevronDown className={`w-3.5 h-3.5 text-gray-400 flex-shrink-0 mt-1 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
+              </button>
+              {isExpanded && (
+                <div className="bg-gray-50 border-t border-gray-100 px-3 py-3 text-xs text-gray-700 space-y-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-semibold ${CHANNEL_COLOR[msg.type] || 'bg-gray-100 text-gray-500'}`}>
+                      <Icon className="w-3 h-3" />{CHANNEL_LABEL[msg.type] || msg.type}
+                    </span>
+                    {msg.medication && (
+                      <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">{msg.medication}</span>
+                    )}
+                  </div>
+                  <p className="text-gray-800 leading-relaxed">{msg.summary}</p>
+                  <div className="flex items-center justify-between text-gray-400">
+                    <span>Handled by: <strong className="text-gray-600">{msg.agent}</strong></span>
+                    <span>{msg.date}</span>
+                  </div>
+                  <div className="flex gap-2 pt-1">
+                    <button
+                      onClick={() => onOpenMessage?.(msg)}
+                      className="text-xs text-[#8B1F1F] font-semibold hover:underline"
+                    >
+                      Open Full Thread →
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           );
         })
       )}
