@@ -127,7 +127,9 @@ export default function InlineMessageBox({ patient, activeComm, linkedOrder, onC
   }, [activeComm]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   }, [thread]);
 
   const onMouseDown = (e) => {
