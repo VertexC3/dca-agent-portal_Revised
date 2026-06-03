@@ -34,7 +34,7 @@ function SectionHeader({ icon: Icon, title, color = 'bg-[#8B1F1F]', badge, extra
         {extra}
         <button
           onClick={onPopOut}
-          className="p-0.5 rounded hover:bg-white/20 transition-colors"
+          className="hidden lg:inline-flex p-0.5 rounded hover:bg-white/20 transition-colors"
           title="Pop out"
         >
           <ExternalLink className="w-3 h-3" />
@@ -376,7 +376,7 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
                       </button>
                       <button
                         onClick={() => popOut('priority')}
-                        className="p-0.5 rounded hover:bg-white/20 transition-colors"
+                        className="hidden lg:inline-flex p-0.5 rounded hover:bg-white/20 transition-colors"
                         title="Pop out"
                       >
                         <ExternalLink className="w-3 h-3" />
@@ -491,7 +491,7 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
                 <h3 className="font-bold text-xs uppercase tracking-wider">Knowledge Base</h3>
                 {kbExpanded ? <ChevronUp className="w-3.5 h-3.5 ml-auto" /> : <ChevronDown className="w-3.5 h-3.5 ml-auto" />}
               </button>
-              <button onClick={() => popOut('kb')} className="ml-2 p-0.5 rounded hover:bg-white/20" title="Pop out">
+              <button onClick={() => popOut('kb')} className="hidden lg:inline-flex ml-2 p-0.5 rounded hover:bg-white/20" title="Pop out">
                 <ExternalLink className="w-3 h-3" />
               </button>
             </div>
