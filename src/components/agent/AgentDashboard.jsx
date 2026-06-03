@@ -204,7 +204,7 @@ export default function AgentDashboard({ onSelectPatient }) {
     <div className="flex flex-col h-full overflow-y-auto bg-gray-50 p-5 gap-5">
 
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-lg font-bold text-gray-900">Agent Dashboard</h1>
           <p className="text-xs text-gray-500 mt-0.5">
@@ -222,7 +222,7 @@ export default function AgentDashboard({ onSelectPatient }) {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {sections.map(s => (
           <StatCard
             key={s.key}
@@ -294,14 +294,16 @@ export default function AgentDashboard({ onSelectPatient }) {
               <button
                 key={patient.id}
                 onClick={() => onSelectPatient(patient)}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left"
+                className="w-full flex flex-col gap-2 sm:flex-row sm:items-center px-4 py-3 hover:bg-gray-50 transition-colors text-left"
               >
+                <div className="flex items-center gap-3 min-w-0 flex-1">
                 <PatientAvatar patient={patient} />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-bold text-gray-900">{patient.name}</p>
                   <p className="text-xs text-gray-500 truncate">{patient.email} · {patient.phone}</p>
                 </div>
-                <div className="flex items-center gap-1.5 flex-shrink-0">
+                </div>
+                <div className="flex flex-wrap items-center gap-1.5 sm:flex-shrink-0 pl-11 sm:pl-0">
                   {openInvCount > 0 && <Badge className="bg-red-100 text-red-700 text-xs">{openInvCount} invoice{openInvCount > 1 ? 's' : ''}</Badge>}
                   {lowRx > 0 && <Badge className="bg-yellow-100 text-yellow-700 text-xs">{lowRx} low Rx</Badge>}
                   <Badge className="bg-gray-100 text-gray-600 text-xs">{patient.orders.length} orders</Badge>

@@ -59,7 +59,7 @@ export default function OrderSearchBar({ onSelectPatient }) {
   };
 
   return (
-    <div ref={containerRef} className="relative w-96">
+    <div ref={containerRef} className="relative w-full min-w-0 md:w-80 lg:w-96 flex-1 md:flex-none">
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
         <input
@@ -78,7 +78,7 @@ export default function OrderSearchBar({ onSelectPatient }) {
       </div>
 
       {open && q.length >= 2 && (
-        <div className="absolute left-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-xl shadow-2xl w-[480px] overflow-hidden">
+        <div className="absolute left-0 right-0 md:right-auto top-full mt-1 z-50 bg-white border border-gray-200 rounded-xl shadow-2xl w-full md:w-[480px] overflow-hidden">
           {matches.length === 0 ? (
             <div className="px-4 py-5 text-center text-xs text-gray-400">
               <Package className="w-6 h-6 mx-auto mb-1.5 opacity-30" />

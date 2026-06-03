@@ -55,7 +55,7 @@ export default function SoftPhone() {
       {/* Floating Toggle Button */}
       <button
         onClick={() => setOpen(v => !v)}
-        className="fixed bottom-6 left-6 z-50 w-12 h-12 bg-[#8B1F1F] hover:bg-[#721919] text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+        className="fixed bottom-4 left-4 md:bottom-6 md:left-6 z-40 w-11 h-11 md:w-12 md:h-12 bg-[#8B1F1F] hover:bg-[#721919] text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95"
         title="Soft Phone"
       >
         {open ? <X className="w-5 h-5" /> : <Phone className="w-5 h-5" />}
@@ -63,7 +63,7 @@ export default function SoftPhone() {
 
       {/* Soft Phone Panel */}
       {open && (
-        <div className="fixed bottom-20 left-6 z-50 w-64 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+        <div className="fixed bottom-16 left-4 right-4 md:right-auto md:bottom-20 md:left-6 z-50 w-auto md:w-64 max-w-sm bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
           {/* Header */}
           <div className="bg-[#8B1F1F] px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2">

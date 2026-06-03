@@ -47,7 +47,7 @@ export default function AgentPortalLayout({ children, currentPageName }) {
     <div className="min-h-screen relative bg-gray-50">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/90 border-b border-gray-200 shadow-sm">
-        <div className="px-6 py-3">
+        <div className="px-3 sm:px-4 md:px-6 py-2.5 md:py-3">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-2">
@@ -108,8 +108,8 @@ export default function AgentPortalLayout({ children, currentPageName }) {
       </header>
 
       {/* Main Content */}
-      <main className="pt-20 px-6 pb-8">
-        <div className="max-w-full">
+      <main className="pt-16 md:pt-20 px-3 sm:px-4 md:px-6 pb-4 md:pb-6 h-[calc(100dvh-4rem)] md:h-[calc(100dvh-5rem)] overflow-hidden">
+        <div className="max-w-full h-full min-h-0 flex flex-col">
           {children}
         </div>
       </main>
