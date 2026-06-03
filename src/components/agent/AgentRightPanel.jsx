@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   AlertTriangle, CheckCircle2, Zap, Search, BookOpen,
-  Phone, Mail, Send, RefreshCw, UserPlus, FileText,
+  Phone, Mail, Send, RefreshCw, FileText,
   ChevronDown, ChevronUp, Clock, ArrowUpCircle, ExternalLink, Bot, MessageSquare, X
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -138,14 +138,8 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showQuickActionsPanel, setShowQuickActionsPanel] = useState(false);
   
-  // Modal states
-  const [showRefillModal, setShowRefillModal] = useState(false);
-  const [showCallModal, setShowCallModal] = useState(false);
-  const [showEmailModal, setShowEmailModal] = useState(false);
-  const [showTextModal, setShowTextModal] = useState(false);
   const [showEscalateModal, setShowEscalateModal] = useState(false);
   const [showNoteModal, setShowNoteModal] = useState(false);
-  const [showNewPatientModal, setShowNewPatientModal] = useState(false);
 
   // Pop-out state
   const [floats, setFloats] = useState({ priority: false, kb: false });
@@ -248,35 +242,15 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
         <RefreshCw className="w-4 h-4 text-blue-600" />
         Refill Rx
       </Button>
-      <Button size="sm" variant="outline" onClick={() => setShowCallModal(true)}
-        className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-green-50 hover:border-green-300">
-        <Phone className="w-4 h-4 text-green-600" />
-        Log Call
-      </Button>
-      <Button size="sm" variant="outline" onClick={() => setShowEmailModal(true)}
-        className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-purple-50 hover:border-purple-300">
-        <Mail className="w-4 h-4 text-purple-600" />
-        Send Email
-      </Button>
-      <Button size="sm" variant="outline" onClick={() => setShowTextModal(true)}
-        className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-orange-50 hover:border-orange-300">
-        <Send className="w-4 h-4 text-orange-600" />
-        Send Text
-      </Button>
       <Button size="sm" variant="outline" onClick={() => setShowEscalateModal(true)}
         className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-red-50 hover:border-red-300">
         <AlertTriangle className="w-4 h-4 text-red-600" />
         Escalate
       </Button>
       <Button size="sm" variant="outline" onClick={() => setShowNoteModal(true)}
-        className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-yellow-50 hover:border-yellow-300">
+        className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-yellow-50 hover:border-yellow-300 col-span-2">
         <FileText className="w-4 h-4 text-yellow-600" />
         Add Note
-      </Button>
-      <Button size="sm" variant="outline" onClick={() => setShowNewPatientModal(true)}
-        className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-teal-50 hover:border-teal-300 col-span-2">
-        <UserPlus className="w-4 h-4 text-teal-600" />
-        New Patient Record
       </Button>
     </div>
   );
@@ -555,54 +529,6 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
 
       </div>
 
-      {/* Action Modals */}
-      <ActionModal isOpen={showRefillModal} onClose={() => setShowRefillModal(false)} title="Request Prescription Refill">
-        <div className="space-y-3 text-sm">
-          <p className="text-gray-600">Refill prescriptions for {patient?.name || 'patient'}:</p>
-          {patient?.prescriptions.map(rx => (
-            <label key={rx.id} className="flex items-center gap-2">
-              <input type="checkbox" defaultChecked className="w-4 h-4" />
-              <span>{rx.name} ({rx.dosage})</span>
-            </label>
-          ))}
-          <div className="flex gap-2 justify-end pt-3 border-t">
-            <Button variant="outline" size="sm" onClick={() => setShowRefillModal(false)}>Cancel</Button>
-            <Button className="bg-[#8B1F1F] hover:bg-[#721919]" size="sm" onClick={() => { setShowRefillModal(false); alert('Refill request submitted'); }}>Submit</Button>
-          </div>
-        </div>
-      </ActionModal>
-
-      <ActionModal isOpen={showCallModal} onClose={() => setShowCallModal(false)} title="Log Call">
-        <div className="space-y-3 text-sm">
-          <textarea placeholder="Call notes..." className="w-full border border-gray-200 rounded p-2 text-xs h-20 resize-none" />
-          <div className="flex gap-2 justify-end pt-3 border-t">
-            <Button variant="outline" size="sm" onClick={() => setShowCallModal(false)}>Cancel</Button>
-            <Button className="bg-[#8B1F1F] hover:bg-[#721919]" size="sm" onClick={() => { setShowCallModal(false); alert('Call logged'); }}>Save</Button>
-          </div>
-        </div>
-      </ActionModal>
-
-      <ActionModal isOpen={showEmailModal} onClose={() => setShowEmailModal(false)} title="Send Email">
-        <div className="space-y-3 text-sm">
-          <input placeholder="Subject..." className="w-full border border-gray-200 rounded p-2 text-xs" />
-          <textarea placeholder="Message..." className="w-full border border-gray-200 rounded p-2 text-xs h-24 resize-none" />
-          <div className="flex gap-2 justify-end pt-3 border-t">
-            <Button variant="outline" size="sm" onClick={() => setShowEmailModal(false)}>Cancel</Button>
-            <Button className="bg-[#8B1F1F] hover:bg-[#721919]" size="sm" onClick={() => { setShowEmailModal(false); alert('Email sent'); }}>Send</Button>
-          </div>
-        </div>
-      </ActionModal>
-
-      <ActionModal isOpen={showTextModal} onClose={() => setShowTextModal(false)} title="Send Text Message">
-        <div className="space-y-3 text-sm">
-          <textarea placeholder="Message..." className="w-full border border-gray-200 rounded p-2 text-xs h-20 resize-none" />
-          <div className="flex gap-2 justify-end pt-3 border-t">
-            <Button variant="outline" size="sm" onClick={() => setShowTextModal(false)}>Cancel</Button>
-            <Button className="bg-[#8B1F1F] hover:bg-[#721919]" size="sm" onClick={() => { setShowTextModal(false); alert('Text sent'); }}>Send</Button>
-          </div>
-        </div>
-      </ActionModal>
-
       <ActionModal isOpen={showEscalateModal} onClose={() => setShowEscalateModal(false)} title="Escalate to Manager">
         <div className="space-y-3 text-sm">
           <textarea placeholder="Reason for escalation..." className="w-full border border-gray-200 rounded p-2 text-xs h-20 resize-none" />
@@ -619,18 +545,6 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
           <div className="flex gap-2 justify-end pt-3 border-t">
             <Button variant="outline" size="sm" onClick={() => setShowNoteModal(false)}>Cancel</Button>
             <Button className="bg-[#8B1F1F] hover:bg-[#721919]" size="sm" onClick={() => { setShowNoteModal(false); alert('Note added'); }}>Save</Button>
-          </div>
-        </div>
-      </ActionModal>
-
-      <ActionModal isOpen={showNewPatientModal} onClose={() => setShowNewPatientModal(false)} title="Create New Patient Record">
-        <div className="space-y-3 text-sm">
-          <input placeholder="Patient name..." className="w-full border border-gray-200 rounded p-2 text-xs" />
-          <input placeholder="Email..." className="w-full border border-gray-200 rounded p-2 text-xs" />
-          <input placeholder="Phone..." className="w-full border border-gray-200 rounded p-2 text-xs" />
-          <div className="flex gap-2 justify-end pt-3 border-t">
-            <Button variant="outline" size="sm" onClick={() => setShowNewPatientModal(false)}>Cancel</Button>
-            <Button className="bg-teal-600 hover:bg-teal-700" size="sm" onClick={() => { setShowNewPatientModal(false); alert('Patient record created'); }}>Create</Button>
           </div>
         </div>
       </ActionModal>
