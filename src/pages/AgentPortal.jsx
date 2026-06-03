@@ -4,7 +4,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { useIsMobile, useIsWide } from '@/hooks/use-mobile';
+import { useIsMobile, useIsTablet, useIsWide } from '@/hooks/use-mobile';
 import AgentWorkspaceTabs from '../components/agent/AgentWorkspaceTabs';
 import AgentRightPanel from '../components/agent/AgentRightPanel';
 import OrderSearchBar from '../components/agent/OrderSearchBar';
@@ -81,6 +81,7 @@ export default function AgentPortal() {
   const [detailsSheetOpen, setDetailsSheetOpen] = useState(false);
 
   const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
   const isWide = useIsWide();
 
   const MIN = 400;
@@ -167,9 +168,9 @@ export default function AgentPortal() {
           </div>
           <div className="flex flex-wrap items-center gap-2 md:gap-4 md:ml-auto">
             <OrderSearchBar onSelectPatient={setSelectedPatient} />
-            {selectedPatient && !isWide && (
+            {selectedPatient && isMobile && (
               <button
-                onClick={() => isMobile ? setMobilePanel('details') : setDetailsSheetOpen(true)}
+                onClick={() => setMobilePanel('details')}
                 className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border bg-white text-gray-600 border-gray-200 hover:border-[#8B1F1F] hover:text-[#8B1F1F] transition-all"
               >
                 <PanelRight className="w-3.5 h-3.5" />
@@ -259,10 +260,18 @@ export default function AgentPortal() {
                   {renderRightPanel()}
                 </div>
               )
-            ) : !isWide ? (
-              <div data-coach="workspace-tabs" className="flex-1 min-w-0 overflow-hidden flex flex-col">
-                {renderWorkspace()}
-              </div>
+            ) : isTablet ? (
+              <>
+                <div data-coach="workspace-tabs" className="flex-1 min-w-0 overflow-hidden flex flex-col border-r border-gray-200">
+                  {renderWorkspace()}
+                </div>
+                <div
+                  data-coach="right-panel"
+                  className="w-[min(340px,38vw)] min-w-[260px] max-w-[400px] flex-shrink-0 overflow-hidden flex flex-col bg-gray-50/50"
+                >
+                  {renderRightPanel()}
+                </div>
+              </>
             ) : !panelSwapped ? (
               <>
                 <div style={panelWidthStyle} className={`${panelWidthClass} overflow-hidden flex flex-col border-r border-gray-200`}>

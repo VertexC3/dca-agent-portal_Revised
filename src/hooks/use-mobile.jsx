@@ -21,6 +21,11 @@ export function useIsMobile() {
   return useMediaQuery(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
 }
 
+/** iPad and similar: split workspace + right panel (messages, KB) */
+export function useIsTablet() {
+  return useMediaQuery(`(min-width: ${MOBILE_BREAKPOINT}px) and (max-width: ${WIDE_BREAKPOINT - 1}px)`)
+}
+
 export function useIsWide() {
   return useMediaQuery(`(min-width: ${WIDE_BREAKPOINT}px)`)
 }

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, Send, Mail, Bot, GripVertical, ChevronDown, ChevronUp, Sparkles, Package, Truck, CheckCircle2, Clock, MoreVertical, Pin, PinOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile, useIsTablet } from '@/hooks/use-mobile';
 import ShareColleagueModal from './ShareColleagueModal';
 
 const WhatsAppIcon = () => (
@@ -104,6 +104,8 @@ function getAgentName() {
 
 export default function InlineMessageBox({ patient, activeComm, linkedOrder, onClose }) {
   const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+  const useBottomSheet = isMobile && !isTablet;
   const [pos, setPos] = useState({ x: Math.max(8, window.innerWidth - 360), y: 70 });
   const [pinned, setPinned] = useState(false);
   const [channel, setChannel] = useState('text');
@@ -135,7 +137,7 @@ export default function InlineMessageBox({ patient, activeComm, linkedOrder, onC
   }, [thread]);
 
   const onMouseDown = (e) => {
-    if (isMobile || pinned) return;
+    if (useBottomSheet || pinned) return;
     dragging.current = true;
     const rect = boxRef.current.getBoundingClientRect();
     offset.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
@@ -143,7 +145,7 @@ export default function InlineMessageBox({ patient, activeComm, linkedOrder, onC
   };
 
   useEffect(() => {
-    if (isMobile || pinned) return;
+    if (useBottomSheet || pinned) return;
     const onMove = (e) => {
       if (!dragging.current) return;
       setPos({
@@ -155,7 +157,7 @@ export default function InlineMessageBox({ patient, activeComm, linkedOrder, onC
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);
     return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
-  }, [isMobile, pinned]);
+  }, [useBottomSheet, pinned]);
 
   const handleSend = () => {
     const text = input.trim();
@@ -177,28 +179,30 @@ export default function InlineMessageBox({ patient, activeComm, linkedOrder, onC
 
   const pinnedStyle = pinned
     ? { position: 'sticky', top: 0, zIndex: 300, width: '100%' }
-    : isMobile
+    : useBottomSheet
     ? { position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 300, width: '100%', maxHeight: 'min(85dvh, 520px)' }
+    : isTablet
+    ? { position: 'fixed', left: 8, bottom: 16, zIndex: 300, width: 300, maxWidth: 'calc(100vw - 280px)' }
     : { position: 'fixed', left: pos.x, top: pos.y, zIndex: 300, width: 340, maxWidth: 'calc(100vw - 16px)' };
 
   return (
     <div
       ref={boxRef}
       style={pinnedStyle}
-      className={`${pinned ? 'rounded-none border-x-0 border-t-0' : isMobile ? 'rounded-t-xl shadow-2xl' : 'rounded-xl shadow-2xl'} border border-gray-200 overflow-hidden bg-white flex flex-col`}
+      className={`${pinned ? 'rounded-none border-x-0 border-t-0' : useBottomSheet ? 'rounded-t-xl shadow-2xl' : 'rounded-xl shadow-2xl'} border border-gray-200 overflow-hidden bg-white flex flex-col`}
     >
       {/* Drag/Pin header */}
       <div
-        onMouseDown={pinned || isMobile ? undefined : onMouseDown}
-        className={`bg-[#8B1F1F] text-white px-3 py-2 flex items-center gap-2 select-none ${pinned || isMobile ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
+        onMouseDown={pinned || useBottomSheet ? undefined : onMouseDown}
+        className={`bg-[#8B1F1F] text-white px-3 py-2 flex items-center gap-2 select-none ${pinned || useBottomSheet ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
       >
-        {!pinned && !isMobile && <GripVertical className="w-3.5 h-3.5 opacity-60 flex-shrink-0" />}
+        {!pinned && !useBottomSheet && <GripVertical className="w-3.5 h-3.5 opacity-60 flex-shrink-0" />}
         <MessageSquare className="w-3.5 h-3.5 flex-shrink-0" />
         <span className="text-xs font-bold uppercase tracking-wider flex-1">
           {activeComm ? `Re: ${activeComm.subject}` : patient ? `Message — ${patient.name}` : 'Messages'}
         </span>
         <Badge className="bg-white/20 text-white text-xs px-1.5 border-0">{thread.length}</Badge>
-        {!isMobile && (
+        {!useBottomSheet && (
           <button
             onClick={() => setPinned(v => !v)}
             className="p-0.5 rounded hover:bg-white/20 text-white"

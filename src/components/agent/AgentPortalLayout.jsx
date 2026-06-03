@@ -108,7 +108,7 @@ export default function AgentPortalLayout({ children, currentPageName }) {
       </header>
 
       {/* Main Content */}
-      <main className="pt-16 md:pt-20 px-3 sm:px-4 md:px-6 pb-4 md:pb-6 h-[calc(100dvh-4rem)] md:h-[calc(100dvh-5rem)] overflow-hidden">
+      <main className="pt-16 md:pt-20 px-2 sm:px-3 md:px-3 lg:px-6 pb-4 md:pb-6 h-[calc(100dvh-4rem)] md:h-[calc(100dvh-5rem)] overflow-hidden">
         <div className="max-w-full h-full min-h-0 flex flex-col">
           {children}
         </div>
