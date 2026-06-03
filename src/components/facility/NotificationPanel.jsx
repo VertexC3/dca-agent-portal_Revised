@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { createPageUrl } from '../../utils';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@/lib/router';
 
 export default function NotificationPanel({ isOpen, onClose }) {
   const navigate = useNavigate();

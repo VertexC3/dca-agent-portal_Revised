@@ -5,7 +5,7 @@ import { queryClientInstance } from '@/lib/query-client'
 import VisualEditAgent from '@/lib/VisualEditAgent'
 import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from '@/lib/router';
 import AgentPortal from './pages/AgentPortal';
 import AgentPortalLayout from './components/agent/AgentPortalLayout';
 import PageNotFound from './lib/PageNotFound';

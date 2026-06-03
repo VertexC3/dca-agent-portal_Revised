@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { ArrowLeft, User, Bell, Shield, Palette, Save, Loader2, Users, Layout } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/router';
 import { createPageUrl } from '../utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

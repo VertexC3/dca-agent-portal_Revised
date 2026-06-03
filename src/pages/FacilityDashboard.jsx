@@ -10,7 +10,7 @@ import { format, subDays, subMonths } from 'date-fns';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createPageUrl } from '../utils';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@/lib/router';
 import OrderDetailDialog from '../components/facility/OrderDetailDialog';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 

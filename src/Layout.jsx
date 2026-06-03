@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/router';
 import { createPageUrl } from './utils';
 import { Settings, User, X, Pill, ShoppingCart, Clock, ChevronDown } from 'lucide-react';
 import FacilityLayout from './components/facility/FacilityLayout';

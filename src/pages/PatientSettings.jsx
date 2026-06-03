@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Save, Layout, Sliders } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/router';
 import { createPageUrl } from '../utils';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
