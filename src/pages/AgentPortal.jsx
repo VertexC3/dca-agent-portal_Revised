@@ -69,7 +69,7 @@ function ResizeDivider({ onDrag, onSwap }) {
 export default function AgentPortal() {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [middleW, setMiddleW] = useState(700);
-  const [showMessageBox, setShowMessageBox] = useState(true);
+  const [showMessageBox, setShowMessageBox] = useState(false);
   const [activeComm, setActiveComm] = useState(null);
   // When true: left=RightPanel, right=WorkspaceTabs (swapped)
   const [panelSwapped, setPanelSwapped] = useState(false);

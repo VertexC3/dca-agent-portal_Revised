@@ -102,10 +102,10 @@ function getAgentName() {
   return 'Agent';
 }
 
-export default function InlineMessageBox({ patient, activeComm, linkedOrder, onClose }) {
+export default function InlineMessageBox({ patient, activeComm, linkedOrder, onClose, centered = true }) {
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
-  const useBottomSheet = isMobile && !isTablet;
+  const useBottomSheet = !centered && isMobile && !isTablet;
   const [pos, setPos] = useState({ x: Math.max(8, window.innerWidth - 360), y: 70 });
   const [pinned, setPinned] = useState(false);
   const [channel, setChannel] = useState('text');
@@ -179,30 +179,40 @@ export default function InlineMessageBox({ patient, activeComm, linkedOrder, onC
 
   const pinnedStyle = pinned
     ? { position: 'sticky', top: 0, zIndex: 300, width: '100%' }
+    : centered
+    ? undefined
     : useBottomSheet
     ? { position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 300, width: '100%', maxHeight: 'min(85dvh, 520px)' }
     : isTablet
     ? { position: 'fixed', left: 8, bottom: 16, zIndex: 300, width: 300, maxWidth: 'calc(100vw - 280px)' }
     : { position: 'fixed', left: pos.x, top: pos.y, zIndex: 300, width: 340, maxWidth: 'calc(100vw - 16px)' };
 
-  return (
+  const boxClassName = pinned
+    ? 'rounded-none border-x-0 border-t-0'
+    : centered
+    ? 'rounded-xl shadow-2xl w-full max-w-md max-h-[min(85dvh,560px)]'
+    : useBottomSheet
+    ? 'rounded-t-xl shadow-2xl'
+    : 'rounded-xl shadow-2xl';
+
+  const messageBox = (
     <div
       ref={boxRef}
       style={pinnedStyle}
-      className={`${pinned ? 'rounded-none border-x-0 border-t-0' : useBottomSheet ? 'rounded-t-xl shadow-2xl' : 'rounded-xl shadow-2xl'} border border-gray-200 overflow-hidden bg-white flex flex-col`}
+      className={`${boxClassName} border border-gray-200 overflow-hidden bg-white flex flex-col`}
     >
       {/* Drag/Pin header */}
       <div
         onMouseDown={pinned || useBottomSheet ? undefined : onMouseDown}
         className={`bg-[#8B1F1F] text-white px-3 py-2 flex items-center gap-2 select-none ${pinned || useBottomSheet ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
       >
-        {!pinned && !useBottomSheet && <GripVertical className="w-3.5 h-3.5 opacity-60 flex-shrink-0" />}
+        {!pinned && !useBottomSheet && !centered && <GripVertical className="w-3.5 h-3.5 opacity-60 flex-shrink-0" />}
         <MessageSquare className="w-3.5 h-3.5 flex-shrink-0" />
         <span className="text-xs font-bold uppercase tracking-wider flex-1">
           {activeComm ? `Re: ${activeComm.subject}` : patient ? `Message — ${patient.name}` : 'Messages'}
         </span>
         <Badge className="bg-white/20 text-white text-xs px-1.5 border-0">{thread.length}</Badge>
-        {!useBottomSheet && (
+        {!useBottomSheet && !centered && (
           <button
             onClick={() => setPinned(v => !v)}
             className="p-0.5 rounded hover:bg-white/20 text-white"
@@ -252,7 +262,7 @@ export default function InlineMessageBox({ patient, activeComm, linkedOrder, onC
       </div>
 
       {/* Thread */}
-      <div className="flex flex-col gap-2 p-3 overflow-y-auto max-h-52 bg-white">
+      <div className={`flex flex-col gap-2 p-3 overflow-y-auto bg-white ${centered && !pinned ? 'flex-1 min-h-0' : 'max-h-52'}`}>
         {thread.map(msg => (
           <div key={msg.id} className={`flex flex-col group ${msg.mine ? 'items-end' : 'items-start'}`}>
             <div className={`flex items-start gap-2 ${msg.mine ? 'flex-row-reverse' : ''}`}>
@@ -324,4 +334,22 @@ export default function InlineMessageBox({ patient, activeComm, linkedOrder, onC
       )}
     </div>
   );
+
+  if (centered && !pinned) {
+    return (
+      <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
+        <button
+          type="button"
+          aria-label="Close messages"
+          className="absolute inset-0 bg-black/40"
+          onClick={onClose}
+        />
+        <div className="relative z-10 w-full max-w-md flex flex-col max-h-[min(85dvh,560px)]">
+          {messageBox}
+        </div>
+      </div>
+    );
+  }
+
+  return messageBox;
 }
