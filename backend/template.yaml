@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  DCA Agent Portal — AWS backend (NeonNow parity). API Gateway + Lambda layer that
+  fronts all server-side AWS access (Bedrock, Lex, Transcribe, Contact Lens,
+  Pinpoint, Kinesis/Athena, Bedrock Agents). The frontend never holds IAM creds.
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 30
+    MemorySize: 256
+    Architectures: [arm64]
+    Environment:
+      Variables:
+        BEDROCK_MODEL_ID: !Ref BedrockModelId
+        CONNECT_INSTANCE_ARN: !Ref ConnectInstanceArn
+        LEX_BOT_ID: !Ref LexBotId
+        LEX_BOT_ALIAS_ID: !Ref LexBotAliasId
+        PINPOINT_PROJECT_ID: !Ref PinpointProjectId
+
+Parameters:
+  BedrockModelId:
+    Type: String
+    Default: anthropic.claude-3-5-sonnet-20240620-v1:0
+  ConnectInstanceArn:
+    Type: String
+    Default: ''
+  LexBotId:
+    Type: String
+    Default: ''
+  LexBotAliasId:
+    Type: String
+    Default: ''
+  PinpointProjectId:
+    Type: String
+    Default: ''
+
+Resources:
+  Api:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins: ['*']           # tighten to your app origin before prod
+        AllowHeaders: ['content-type', 'authorization']
+        AllowMethods: ['GET', 'POST', 'OPTIONS']
+
+  HealthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/health.handler
+      Events:
+        Get:
+          Type: HttpApi
+          Properties: { ApiId: !Ref Api, Path: /health, Method: GET }
+
+  # ── IQ (Amazon Bedrock) ───────────────────────────────────────────
+  IqSummariseFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/iqSummarise.handler
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: ['bedrock:InvokeModel']
+              Resource: '*'           # scope to the specific model ARN in prod
+      Events:
+        Summarise:
+          Type: HttpApi
+          Properties: { ApiId: !Ref Api, Path: /iq/summarise, Method: POST }
+        Suggest:
+          Type: HttpApi
+          Properties: { ApiId: !Ref Api, Path: /iq/suggest, Method: POST }
+        Risk:
+          Type: HttpApi
+          Properties: { ApiId: !Ref Api, Path: /iq/risk, Method: POST }
+
+Outputs:
+  ApiBaseUrl:
+    Description: Set this as VITE_API_BASE_URL in the frontend
+    Value: !Sub 'https://${Api}.execute-api.${AWS::Region}.amazonaws.com'

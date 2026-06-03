@@ -1,0 +1,15 @@
+{
+  "name": "dca-agent-portal-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "AWS Lambda + API Gateway backend for NeonNow-parity contact-centre features",
+  "scripts": {
+    "build": "sam build",
+    "deploy": "sam deploy --guided",
+    "local": "sam local start-api"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.600.0"
+  }
+}
