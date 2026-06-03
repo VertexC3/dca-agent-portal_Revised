@@ -2,7 +2,7 @@ import React from 'react';
 import { MessageSquare, Phone, Mail, Bot } from 'lucide-react';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
-import { Link } from '@/lib/router';
+import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 
 const channelIcons = {

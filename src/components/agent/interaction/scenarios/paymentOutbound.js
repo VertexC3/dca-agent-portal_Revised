@@ -1,0 +1,22 @@
+export default {
+  id: 'payment-outbound',
+  label: 'Outbound: Payment follow-up',
+  type: 'voice-out',
+  direction: 'outbound',
+  queue: 'Billing',
+  patientId: '2',
+  script: [
+    { at: 1500,  do: (ctx) => ctx.connect() },
+    { at: 1700,  do: (ctx) => ctx.addIntentTag('Billing') },
+    { at: 2200,  do: (ctx) => ctx.transcriptLine('agent', "Hi Jane, this is DCA Pharmacy following up on your January invoice.") },
+    { at: 5500,  do: (ctx) => ctx.transcriptLine('patient', "Oh — yes, I've been meaning to deal with that. It's tight this month.") },
+    { at: 8000,  do: (ctx) => ctx.setSentiment('frustrated', -0.3, 'declining') },
+    { at: 8200,  do: (ctx) => ctx.addAutoNote('Balance: $350 (INV-2026-002). Patient reports cash flow concern.', { id: 'note_pmt_1' }) },
+    { at: 9000,  do: (ctx) => ctx.addSuggestion({ id: 'sug_pmt_plan', text: 'Offer 3-month payment plan', category: 'action', kbLink: '/kb/PMT-12' }) },
+    { at: 12000, do: (ctx) => ctx.addSuggestion({ id: 'sug_pmt_card', text: 'Verify card on file (Mastercard •1234, exp 08/26)', category: 'action' }) },
+    { at: 15000, do: (ctx) => ctx.transcriptLine('agent', "I can split that into three monthly payments — would that help?") },
+    { at: 17500, do: (ctx) => ctx.transcriptLine('patient', "Yes, that would be great. Thank you.") },
+    { at: 18500, do: (ctx) => ctx.setSentiment('calm', 0.3, 'improving') },
+    { at: 19000, do: (ctx) => ctx.confirmNote('note_pmt_1') },
+  ],
+};

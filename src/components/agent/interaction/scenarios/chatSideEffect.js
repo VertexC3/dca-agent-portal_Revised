@@ -1,0 +1,21 @@
+export default {
+  id: 'chat-side-effect',
+  label: 'Chat: Side-effect report',
+  type: 'chat',
+  direction: 'inbound',
+  queue: 'Clinical',
+  patientId: '2',
+  script: [
+    { at: 500,   do: (ctx) => ctx.connect() },
+    { at: 700,   do: (ctx) => ctx.addIntentTag('Clinical') },
+    { at: 1000,  do: (ctx) => ctx.chatMessage('patient', "Hi — I think my new med is making me dizzy.") },
+    { at: 4000,  do: (ctx) => ctx.addAutoNote('Patient reports dizziness on Tirzepatide 5mg', { id: 'note_clin_1' }) },
+    { at: 4500,  do: (ctx) => ctx.setSentiment('frustrated', -0.4, 'steady') },
+    { at: 5500,  do: (ctx) => ctx.addSuggestion({ id: 'sug_clin_escalate', text: 'Escalate to pharmacist on-call', category: 'escalate' }) },
+    { at: 6500,  do: (ctx) => ctx.addSuggestion({ id: 'sug_clin_guide', text: 'Open medication guide: Tirzepatide', category: 'kb', kbLink: '/kb/MED-Tirzepatide' }) },
+    { at: 9000,  do: (ctx) => ctx.chatMessage('agent', "Thanks for letting us know. Have you eaten today before the injection?") },
+    { at: 13000, do: (ctx) => ctx.chatMessage('patient', "No — I usually take it on an empty stomach.") },
+    { at: 15000, do: (ctx) => ctx.addSuggestion({ id: 'sug_clin_meal', text: 'Advise small meal 30 min before injection', category: 'action' }) },
+    { at: 17000, do: (ctx) => ctx.setSentiment('calm', 0.1, 'improving') },
+  ],
+};

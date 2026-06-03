@@ -1,0 +1,22 @@
+export default {
+  id: 'distress-call',
+  label: 'Inbound: Distress (insulin / copay)',
+  type: 'voice-in',
+  direction: 'inbound',
+  queue: 'Urgent Support',
+  patientId: '1',
+  script: [
+    { at: 1200,  do: (ctx) => ctx.connect() },
+    { at: 1500,  do: (ctx) => ctx.addIntentTag('Urgent') },
+    { at: 2000,  do: (ctx) => ctx.transcriptLine('patient', "I'm out of insulin and I can't afford the copay this month.") },
+    { at: 4500,  do: (ctx) => ctx.setSentiment('frustrated', -0.4, 'declining') },
+    { at: 5500,  do: (ctx) => ctx.addAutoNote('Patient reports unable to afford copay; out of insulin', { id: 'note_d_1' }) },
+    { at: 7500,  do: (ctx) => ctx.transcriptLine('patient', "I don't know what to do. I've called everywhere.") },
+    { at: 9000,  do: (ctx) => ctx.setSentiment('distress', -0.85, 'declining') },
+    { at: 9300,  do: (ctx) => ctx.addSuggestion({ id: 'sug_d_escalate', text: 'Escalate to supervisor — patient in distress', category: 'escalate' }) },
+    { at: 10500, do: (ctx) => ctx.addSuggestion({ id: 'sug_d_assistance', text: 'Check manufacturer copay assistance (KB-ASSIST-01)', category: 'kb', kbLink: '/kb/ASSIST-01' }) },
+    { at: 12000, do: (ctx) => ctx.addSuggestion({ id: 'sug_d_empathy', text: '"I hear how stressful this is — let me help."', category: 'empathy' }) },
+    { at: 14500, do: (ctx) => ctx.addIntentTag('Financial Assistance') },
+    { at: 18000, do: (ctx) => ctx.setSentiment('frustrated', -0.3, 'improving') },
+  ],
+};

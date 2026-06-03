@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from '@/lib/router';
+import { Link } from 'react-router-dom';
 import { createPageUrl } from '../../utils';
 import { format } from 'date-fns';
 import { Phone, Mail, MessageSquare, Clock, User, ChevronRight, ChevronDown, ExternalLink } from 'lucide-react';

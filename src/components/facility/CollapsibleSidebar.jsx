@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from '@/lib/router';
+import { Link } from 'react-router-dom';
 import { createPageUrl } from '../../utils';
 import { LayoutDashboard, Users, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';

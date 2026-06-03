@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Pill, MessageSquare, User, Package, Filter, Calendar, FileText, CreditCard, Edit, CheckCircle2, X } from 'lucide-react';
-import { Link } from '@/lib/router';
+import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';

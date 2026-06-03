@@ -1,8 +1,7 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState } from 'react';
 import {
   AlertTriangle, CheckCircle2, Zap, Search, BookOpen,
-  Phone, Mail, Send, RefreshCw, FileText,
+  Phone, Mail, Send, RefreshCw, UserPlus, FileText,
   ChevronDown, ChevronUp, Clock, ArrowUpCircle, ExternalLink, Bot, MessageSquare, X
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -34,7 +33,7 @@ function SectionHeader({ icon: Icon, title, color = 'bg-[#8B1F1F]', badge, extra
         {extra}
         <button
           onClick={onPopOut}
-          className="hidden lg:inline-flex p-0.5 rounded hover:bg-white/20 transition-colors"
+          className="p-0.5 rounded hover:bg-white/20 transition-colors"
           title="Pop out"
         >
           <ExternalLink className="w-3 h-3" />
@@ -89,57 +88,22 @@ function padMessages(msgs, patient) {
   return combined;
 }
 
-export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflow }) {
+export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflow, topSlot }) {
   const [kbSearch, setKbSearch] = useState('');
   const [kbExpanded, setKbExpanded] = useState(false);
-  const [messagesExpanded, setMessagesExpanded] = useState(true);
-
-  const handleKbToggle = useCallback((expand) => {
-    const next = typeof expand === 'boolean' ? expand : !kbExpanded;
-    setKbExpanded(next);
-    setMessagesExpanded(!next);
-  }, [kbExpanded]);
-
-  const panelScrollRef = useRef(null);
-  const kbSectionRef = useRef(null);
-
-  useEffect(() => {
-    setKbExpanded(false);
-    setMessagesExpanded(true);
-    setKbSearch('');
-  }, [patient?.id]);
-
-  useEffect(() => {
-    const panel = panelScrollRef.current;
-    if (!panel) return undefined;
-
-    if (!kbExpanded) {
-      panel.scrollTop = 0;
-      return undefined;
-    }
-
-    const scrollKbToTop = () => {
-      const kb = kbSectionRef.current;
-      if (!kb) return;
-      panel.scrollTop = 0;
-      const top = kb.offsetTop - panel.offsetTop;
-      if (top > 2) {
-        panel.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
-      }
-    };
-
-    scrollKbToTop();
-    const t = window.setTimeout(scrollKbToTop, 320);
-    return () => clearTimeout(t);
-  }, [kbExpanded]);
-
   const [expandedMsgId, setExpandedMsgId] = useState(null);
   const [sortBy, setSortBy] = useState('latest');
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showQuickActionsPanel, setShowQuickActionsPanel] = useState(false);
   
+  // Modal states
+  const [showRefillModal, setShowRefillModal] = useState(false);
+  const [showCallModal, setShowCallModal] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [showTextModal, setShowTextModal] = useState(false);
   const [showEscalateModal, setShowEscalateModal] = useState(false);
   const [showNoteModal, setShowNoteModal] = useState(false);
+  const [showNewPatientModal, setShowNewPatientModal] = useState(false);
 
   // Pop-out state
   const [floats, setFloats] = useState({ priority: false, kb: false });
@@ -173,7 +137,7 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
 
   // ---- Reusable section content ----
   const PriorityContent = () => (
-    <div className="divide-y divide-gray-100 flex-1 min-h-0 overflow-y-auto">
+    <div className="divide-y divide-gray-100 max-h-[32rem] overflow-y-auto">
       {!patient ? (
         <div className="p-4 text-center text-xs text-gray-500">
           <CheckCircle2 className="w-6 h-6 mx-auto mb-1 text-gray-300" />
@@ -189,31 +153,17 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
           const Icon = CHANNEL_ICON[msg.type] || MessageSquare;
           const isExpanded = expandedMsgId === msg.id;
           return (
-            <div
-              key={msg.id}
-              className={
-                isExpanded
-                  ? 'mx-2 my-1.5 rounded-lg border border-[#8B1F1F]/20 bg-red-50/30 shadow-sm overflow-hidden'
-                  : 'border-b border-gray-100 last:border-0'
-              }
-            >
+            <div key={msg.id} className="border-b border-gray-100 last:border-0">
               <button
                 onClick={() => setExpandedMsgId(isExpanded ? null : msg.id)}
-                className={`w-full text-left flex items-start gap-2 p-2.5 transition-colors group ${
-                  isExpanded ? 'bg-red-50/50' : 'hover:bg-red-50/50'
-                }`}
-                aria-expanded={isExpanded}
+                className="w-full text-left flex items-start gap-2 p-2.5 hover:bg-red-50/50 transition-colors group"
               >
                 <span className={`mt-0.5 flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full ${CHANNEL_COLOR[msg.type] || 'bg-gray-100 text-gray-500'}`}>
                   <Icon className="w-3 h-3" />
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className={`text-xs font-semibold transition-colors truncate ${isExpanded ? 'text-[#8B1F1F]' : 'text-gray-900 group-hover:text-[#8B1F1F]'}`}>
-                    {msg.subject}
-                  </p>
-                  <p className={`text-xs text-gray-500 leading-snug mt-0.5 ${isExpanded ? '' : 'truncate'}`}>
-                    {msg.summary}
-                  </p>
+                  <p className="text-xs font-semibold text-gray-900 group-hover:text-[#8B1F1F] transition-colors truncate">{msg.subject}</p>
+                  <p className="text-xs text-gray-500 leading-snug mt-0.5 truncate">{msg.summary}</p>
                   <div className="flex items-center gap-1.5 mt-0.5 text-xs text-gray-400">
                     <span className="font-medium">{CHANNEL_LABEL[msg.type] || msg.type}</span>
                     <span>·</span>
@@ -221,26 +171,24 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
                     <span className="flex items-center gap-0.5 ml-auto">
                       <Clock className="w-2.5 h-2.5" />{msg.date}
                     </span>
-                    <ChevronDown className={`w-3 h-3 ml-1 transition-transform duration-200 ${isExpanded ? 'rotate-180 text-[#8B1F1F]' : ''}`} />
+                    <ChevronDown className={`w-3 h-3 ml-1 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
                   </div>
                 </div>
               </button>
               {isExpanded && (
-                <div className="px-2.5 pb-2.5 pt-0">
-                  <div className="ml-7 pl-3 border-l-2 border-[#8B1F1F]/25 bg-white/80 rounded-r-md px-3 py-2.5 text-xs text-gray-700 space-y-2">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-semibold ${CHANNEL_COLOR[msg.type] || 'bg-gray-100 text-gray-500'}`}>
-                        <Icon className="w-3 h-3" />{CHANNEL_LABEL[msg.type] || msg.type}
-                      </span>
-                      {msg.medication && (
-                        <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">{msg.medication}</span>
-                      )}
-                    </div>
-                    <p className="text-gray-800 leading-relaxed">{msg.summary}</p>
-                    <div className="flex items-center justify-between text-gray-400 pt-0.5 border-t border-gray-100">
-                      <span>Handled by: <strong className="text-gray-600">{msg.agent}</strong></span>
-                      <span>{msg.date}</span>
-                    </div>
+                <div className="bg-gray-50 border-t border-gray-100 px-3 py-3 text-xs text-gray-700 space-y-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-semibold ${CHANNEL_COLOR[msg.type] || 'bg-gray-100 text-gray-500'}`}>
+                      <Icon className="w-3 h-3" />{CHANNEL_LABEL[msg.type] || msg.type}
+                    </span>
+                    {msg.medication && (
+                      <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">{msg.medication}</span>
+                    )}
+                  </div>
+                  <p className="text-gray-800 leading-relaxed">{msg.summary}</p>
+                  <div className="flex items-center justify-between text-gray-400">
+                    <span>Handled by: <strong className="text-gray-600">{msg.agent}</strong></span>
+                    <span>{msg.date}</span>
                   </div>
                 </div>
               )}
@@ -258,15 +206,35 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
         <RefreshCw className="w-4 h-4 text-blue-600" />
         Refill Rx
       </Button>
+      <Button size="sm" variant="outline" onClick={() => setShowCallModal(true)}
+        className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-green-50 hover:border-green-300">
+        <Phone className="w-4 h-4 text-green-600" />
+        Log Call
+      </Button>
+      <Button size="sm" variant="outline" onClick={() => setShowEmailModal(true)}
+        className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-purple-50 hover:border-purple-300">
+        <Mail className="w-4 h-4 text-purple-600" />
+        Send Email
+      </Button>
+      <Button size="sm" variant="outline" onClick={() => setShowTextModal(true)}
+        className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-orange-50 hover:border-orange-300">
+        <Send className="w-4 h-4 text-orange-600" />
+        Send Text
+      </Button>
       <Button size="sm" variant="outline" onClick={() => setShowEscalateModal(true)}
         className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-red-50 hover:border-red-300">
         <AlertTriangle className="w-4 h-4 text-red-600" />
         Escalate
       </Button>
       <Button size="sm" variant="outline" onClick={() => setShowNoteModal(true)}
-        className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-yellow-50 hover:border-yellow-300 col-span-2">
+        className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-yellow-50 hover:border-yellow-300">
         <FileText className="w-4 h-4 text-yellow-600" />
         Add Note
+      </Button>
+      <Button size="sm" variant="outline" onClick={() => setShowNewPatientModal(true)}
+        className="h-12 text-xs flex-col justify-center gap-1 border-gray-200 hover:bg-teal-50 hover:border-teal-300 col-span-2">
+        <UserPlus className="w-4 h-4 text-teal-600" />
+        New Patient Record
       </Button>
     </div>
   );
@@ -306,7 +274,7 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
             value={kbSearch} onChange={e => setKbSearch(e.target.value)} />
         </div>
       </div>
-      <div className={`divide-y divide-gray-100 ${kbExpanded ? 'min-h-0' : 'max-h-48 overflow-y-auto'}`}>
+      <div className="divide-y divide-gray-100 max-h-48 overflow-y-auto">
         {filteredKb.map(a => (
           <button key={a.id}
             className="w-full text-left p-2.5 hover:bg-red-50 transition-colors text-xs text-gray-700 hover:text-[#8B1F1F] flex items-center justify-between group">
@@ -319,7 +287,7 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
   );
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
+    <>
       {/* ⚡ Quick Actions FAB — fixed to bottom-right */}
       <button
         onClick={() => setShowQuickActionsPanel(v => !v)}
@@ -335,114 +303,60 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
         </span>
       </button>
 
-      <div
-        ref={panelScrollRef}
-        className={`flex flex-col flex-1 min-h-0 p-3 bg-gray-50/50 overflow-hidden ${
-          kbExpanded ? 'gap-0' : 'gap-3'
-        }`}
-      >
-        {/* Patient Messages — full view when KB is collapsed */}
-        {!floats.priority && !kbExpanded && (
-          <div className="flex-1 min-h-0 flex flex-col">
-            <div
-              className="grid flex-1 min-h-0 transition-[grid-template-rows] duration-300 ease-in-out"
-              style={{ gridTemplateRows: messagesExpanded ? '1fr' : '0fr' }}
-            >
-              <div className="overflow-hidden min-h-0 flex flex-col">
-                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm flex flex-col flex-1 min-h-0">
-                  <div className="px-3 py-2 bg-[#8B1F1F] text-white flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <ArrowUpCircle className="w-3.5 h-3.5" />
-                      <h3 className="font-bold text-xs uppercase tracking-wider">Patient Messages</h3>
-                      {patient && <Badge className="bg-white text-[#8B1F1F] text-xs px-1.5 font-bold ml-1">{allMessages.length}</Badge>}
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <div className="relative">
-                        <button
-                          onClick={() => setShowSortMenu(v => !v)}
-                          className="flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white text-xs font-semibold px-2 py-0.5 rounded transition-colors"
-                        >
-                          {currentSortLabel} <ChevronDown className="w-3 h-3" />
-                        </button>
-                        {showSortMenu && (
-                          <>
-                            <div className="fixed inset-0 z-40" onClick={() => setShowSortMenu(false)} />
-                            <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-lg shadow-xl w-44 overflow-hidden">
-                              {SORT_OPTIONS.map(opt => (
-                                <button
-                                  key={opt.key}
-                                  onClick={() => { setSortBy(opt.key); setShowSortMenu(false); }}
-                                  className={`w-full text-left px-3 py-2 text-xs hover:bg-red-50 transition-colors ${sortBy === opt.key ? 'text-[#8B1F1F] font-bold bg-red-50' : 'text-gray-700'}`}
-                                >
-                                  {opt.label}
-                                </button>
-                              ))}
-                            </div>
-                          </>
-                        )}
+      <div className="flex flex-col gap-3 overflow-y-auto flex-1 min-h-0 p-3">
+        {topSlot ? <div className="border-b border-gray-200">{topSlot}</div> : null}
+
+        {/* Patient Messages */}
+        {!floats.priority && (
+          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+            {/* Custom header with sort dropdown */}
+            <div className="px-3 py-2 bg-[#8B1F1F] text-white flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <ArrowUpCircle className="w-3.5 h-3.5" />
+                <h3 className="font-bold text-xs uppercase tracking-wider">Patient Messages</h3>
+                {patient && <Badge className="bg-white text-[#8B1F1F] text-xs px-1.5 font-bold ml-1">{allMessages.length}</Badge>}
+              </div>
+              <div className="flex items-center gap-1.5">
+                {/* Sort dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowSortMenu(v => !v)}
+                    className="flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white text-xs font-semibold px-2 py-0.5 rounded transition-colors"
+                  >
+                    {currentSortLabel} <ChevronDown className="w-3 h-3" />
+                  </button>
+                  {showSortMenu && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setShowSortMenu(false)} />
+                      <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-lg shadow-xl w-44 overflow-hidden">
+                        {SORT_OPTIONS.map(opt => (
+                          <button
+                            key={opt.key}
+                            onClick={() => { setSortBy(opt.key); setShowSortMenu(false); }}
+                            className={`w-full text-left px-3 py-2 text-xs hover:bg-red-50 transition-colors ${sortBy === opt.key ? 'text-[#8B1F1F] font-bold bg-red-50' : 'text-gray-700'}`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => handleKbToggle(true)}
-                        className="p-0.5 rounded hover:bg-white/20 transition-colors"
-                        title="Collapse to focus on Knowledge Base"
-                        aria-label="Collapse patient messages"
-                      >
-                        <ChevronUp className="w-3 h-3" />
-                      </button>
-                      <button
-                        onClick={() => popOut('priority')}
-                        className="hidden lg:inline-flex p-0.5 rounded hover:bg-white/20 transition-colors"
-                        title="Pop out"
-                      >
-                        <ExternalLink className="w-3 h-3" />
-                      </button>
-                    </div>
-                  </div>
-                  <PriorityContent />
+                    </>
+                  )}
                 </div>
+                <button
+                  onClick={() => popOut('priority')}
+                  className="p-0.5 rounded hover:bg-white/20 transition-colors"
+                  title="Pop out"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                </button>
               </div>
             </div>
+            <PriorityContent />
           </div>
-        )}
-
-        {/* Compact Patient Messages — pinned above KB when KB is expanded */}
-        {!floats.priority && kbExpanded && (
-          <AnimatePresence initial={false}>
-            <motion.div
-              key="messages-compact"
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-              className="flex-shrink-0 overflow-hidden z-20 bg-gray-50/50 pb-3"
-            >
-              <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-                <div className="px-3 py-2 bg-[#8B1F1F] text-white flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <ArrowUpCircle className="w-3.5 h-3.5 flex-shrink-0" />
-                    <h3 className="font-bold text-xs uppercase tracking-wider truncate">Patient Messages</h3>
-                    {patient && (
-                      <Badge className="bg-white text-[#8B1F1F] text-xs px-1.5 font-bold flex-shrink-0">{allMessages.length}</Badge>
-                    )}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => { setMessagesExpanded(true); setKbExpanded(false); }}
-                    className="p-1 rounded hover:bg-white/20 transition-colors flex-shrink-0"
-                    title="Expand patient messages"
-                    aria-label="Expand patient messages"
-                  >
-                    <ChevronDown className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
         )}
         {floats.priority && (
           <>
-            <div className="bg-white border border-dashed border-gray-300 rounded-lg p-3 text-center text-xs text-gray-400 flex-shrink-0">
+            <div className="bg-white border border-dashed border-gray-300 rounded-lg p-3 text-center text-xs text-gray-400">
               Patient Messages — popped out
             </div>
             <FloatingWidget title="Patient Messages" onClose={() => popIn('priority')} defaultPos={{ x: 80, y: 120 }}>
@@ -481,56 +395,29 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
         )}
         <style>{`@keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
 
-        {/* Knowledge Base — slides up and fills panel when opened */}
+        {/* Knowledge Base */}
         {!floats.kb && (
-          <motion.div
-            ref={kbSectionRef}
-            key={kbExpanded ? 'kb-expanded' : 'kb-collapsed'}
-            initial={kbExpanded ? { y: 28, opacity: 0.92 } : { y: 0, opacity: 1 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 34 }}
-            className={`bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm flex flex-col min-h-0 ${
-              kbExpanded ? 'flex-1' : 'flex-shrink-0'
-            }`}
-          >
-            <div
-              className={`px-3 py-2 bg-[#8B1F1F] text-white flex items-center justify-between flex-shrink-0 ${
-                kbExpanded ? 'sticky top-0 z-10 shadow-sm' : ''
-              }`}
-            >
+          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+            <div className="px-3 py-2 bg-[#8B1F1F] text-white flex items-center justify-between">
               <button
-                type="button"
-                className="flex items-center gap-1.5 flex-1 text-left"
-                onClick={() => handleKbToggle()}
+                className="flex items-center gap-1.5 flex-1"
+                onClick={() => setKbExpanded(!kbExpanded)}
               >
                 <BookOpen className="w-3.5 h-3.5" />
                 <h3 className="font-bold text-xs uppercase tracking-wider">Knowledge Base</h3>
                 {kbExpanded ? <ChevronUp className="w-3.5 h-3.5 ml-auto" /> : <ChevronDown className="w-3.5 h-3.5 ml-auto" />}
               </button>
-              <button onClick={() => popOut('kb')} className="hidden lg:inline-flex ml-2 p-0.5 rounded hover:bg-white/20" title="Pop out">
+              <button onClick={() => popOut('kb')} className="ml-2 p-0.5 rounded hover:bg-white/20" title="Pop out">
                 <ExternalLink className="w-3 h-3" />
               </button>
             </div>
-            <div
-              className="grid transition-[grid-template-rows] duration-300 ease-in-out min-h-0 flex-1"
-              style={{ gridTemplateRows: kbExpanded ? '1fr' : '0fr' }}
-            >
-              <div className="overflow-hidden min-h-0 flex flex-col">
-                <div className="flex-1 min-h-0 overflow-y-auto">
-                  <KbContent />
-                </div>
-              </div>
-            </div>
-            {!kbExpanded && (
-              <button
-                type="button"
-                className="w-full text-center p-2 text-xs text-[#8B1F1F] hover:bg-red-50 transition-colors font-semibold flex-shrink-0"
-                onClick={() => handleKbToggle(true)}
-              >
+            {kbExpanded ? <KbContent /> : (
+              <button className="w-full text-center p-2 text-xs text-[#8B1F1F] hover:bg-red-50 transition-colors font-semibold"
+                onClick={() => setKbExpanded(true)}>
                 Browse {kbArticles.length} articles →
               </button>
             )}
-          </motion.div>
+          </div>
         )}
         {floats.kb && (
           <>
@@ -544,6 +431,54 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
         )}
 
       </div>
+
+      {/* Action Modals */}
+      <ActionModal isOpen={showRefillModal} onClose={() => setShowRefillModal(false)} title="Request Prescription Refill">
+        <div className="space-y-3 text-sm">
+          <p className="text-gray-600">Refill prescriptions for {patient?.name || 'patient'}:</p>
+          {patient?.prescriptions.map(rx => (
+            <label key={rx.id} className="flex items-center gap-2">
+              <input type="checkbox" defaultChecked className="w-4 h-4" />
+              <span>{rx.name} ({rx.dosage})</span>
+            </label>
+          ))}
+          <div className="flex gap-2 justify-end pt-3 border-t">
+            <Button variant="outline" size="sm" onClick={() => setShowRefillModal(false)}>Cancel</Button>
+            <Button className="bg-[#8B1F1F] hover:bg-[#721919]" size="sm" onClick={() => { setShowRefillModal(false); alert('Refill request submitted'); }}>Submit</Button>
+          </div>
+        </div>
+      </ActionModal>
+
+      <ActionModal isOpen={showCallModal} onClose={() => setShowCallModal(false)} title="Log Call">
+        <div className="space-y-3 text-sm">
+          <textarea placeholder="Call notes..." className="w-full border border-gray-200 rounded p-2 text-xs h-20 resize-none" />
+          <div className="flex gap-2 justify-end pt-3 border-t">
+            <Button variant="outline" size="sm" onClick={() => setShowCallModal(false)}>Cancel</Button>
+            <Button className="bg-[#8B1F1F] hover:bg-[#721919]" size="sm" onClick={() => { setShowCallModal(false); alert('Call logged'); }}>Save</Button>
+          </div>
+        </div>
+      </ActionModal>
+
+      <ActionModal isOpen={showEmailModal} onClose={() => setShowEmailModal(false)} title="Send Email">
+        <div className="space-y-3 text-sm">
+          <input placeholder="Subject..." className="w-full border border-gray-200 rounded p-2 text-xs" />
+          <textarea placeholder="Message..." className="w-full border border-gray-200 rounded p-2 text-xs h-24 resize-none" />
+          <div className="flex gap-2 justify-end pt-3 border-t">
+            <Button variant="outline" size="sm" onClick={() => setShowEmailModal(false)}>Cancel</Button>
+            <Button className="bg-[#8B1F1F] hover:bg-[#721919]" size="sm" onClick={() => { setShowEmailModal(false); alert('Email sent'); }}>Send</Button>
+          </div>
+        </div>
+      </ActionModal>
+
+      <ActionModal isOpen={showTextModal} onClose={() => setShowTextModal(false)} title="Send Text Message">
+        <div className="space-y-3 text-sm">
+          <textarea placeholder="Message..." className="w-full border border-gray-200 rounded p-2 text-xs h-20 resize-none" />
+          <div className="flex gap-2 justify-end pt-3 border-t">
+            <Button variant="outline" size="sm" onClick={() => setShowTextModal(false)}>Cancel</Button>
+            <Button className="bg-[#8B1F1F] hover:bg-[#721919]" size="sm" onClick={() => { setShowTextModal(false); alert('Text sent'); }}>Send</Button>
+          </div>
+        </div>
+      </ActionModal>
 
       <ActionModal isOpen={showEscalateModal} onClose={() => setShowEscalateModal(false)} title="Escalate to Manager">
         <div className="space-y-3 text-sm">
@@ -564,6 +499,18 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
           </div>
         </div>
       </ActionModal>
-    </div>
+
+      <ActionModal isOpen={showNewPatientModal} onClose={() => setShowNewPatientModal(false)} title="Create New Patient Record">
+        <div className="space-y-3 text-sm">
+          <input placeholder="Patient name..." className="w-full border border-gray-200 rounded p-2 text-xs" />
+          <input placeholder="Email..." className="w-full border border-gray-200 rounded p-2 text-xs" />
+          <input placeholder="Phone..." className="w-full border border-gray-200 rounded p-2 text-xs" />
+          <div className="flex gap-2 justify-end pt-3 border-t">
+            <Button variant="outline" size="sm" onClick={() => setShowNewPatientModal(false)}>Cancel</Button>
+            <Button className="bg-teal-600 hover:bg-teal-700" size="sm" onClick={() => { setShowNewPatientModal(false); alert('Patient record created'); }}>Create</Button>
+          </div>
+        </div>
+      </ActionModal>
+    </>
   );
 }

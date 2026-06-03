@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Search, X, Loader2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Link } from '@/lib/router';
+import { Link } from 'react-router-dom';
 import { createPageUrl } from '../../utils';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
