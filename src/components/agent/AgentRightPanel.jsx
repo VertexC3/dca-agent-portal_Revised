@@ -173,7 +173,7 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
 
   // ---- Reusable section content ----
   const PriorityContent = () => (
-    <div className="divide-y divide-gray-100 max-h-[32rem] overflow-y-auto">
+    <div className="divide-y divide-gray-100 flex-1 min-h-0 overflow-y-auto">
       {!patient ? (
         <div className="p-4 text-center text-xs text-gray-500">
           <CheckCircle2 className="w-6 h-6 mx-auto mb-1 text-gray-300" />
@@ -303,7 +303,7 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
   );
 
   return (
-    <>
+    <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
       {/* ⚡ Quick Actions FAB — fixed to bottom-right */}
       <button
         onClick={() => setShowQuickActionsPanel(v => !v)}
@@ -321,19 +321,19 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
 
       <div
         ref={panelScrollRef}
-        className={`flex flex-col h-full p-3 scroll-smooth bg-gray-50/50 ${
-          kbExpanded ? 'overflow-hidden gap-0' : 'overflow-y-auto gap-3'
+        className={`flex flex-col flex-1 min-h-0 p-3 bg-gray-50/50 overflow-hidden ${
+          kbExpanded ? 'gap-0' : 'gap-3'
         }`}
       >
         {/* Patient Messages — full view when KB is collapsed */}
         {!floats.priority && !kbExpanded && (
-          <div className="flex-shrink-0">
+          <div className="flex-1 min-h-0 flex flex-col">
             <div
-              className="grid transition-[grid-template-rows] duration-300 ease-in-out"
+              className="grid flex-1 min-h-0 transition-[grid-template-rows] duration-300 ease-in-out"
               style={{ gridTemplateRows: messagesExpanded ? '1fr' : '0fr' }}
             >
-              <div className="overflow-hidden min-h-0">
-                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+              <div className="overflow-hidden min-h-0 flex flex-col">
+                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm flex flex-col flex-1 min-h-0">
                   <div className="px-3 py-2 bg-[#8B1F1F] text-white flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
                       <ArrowUpCircle className="w-3.5 h-3.5" />
@@ -548,6 +548,6 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
           </div>
         </div>
       </ActionModal>
-    </>
+    </div>
   );
 }

@@ -143,7 +143,7 @@ export default function AgentPortal() {
             {selectedPatient && (
               <button
                 onClick={() => setSelectedPatient(null)}
-                className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-[#8B1F1F] transition-colors whitespace-nowrap self-start"
+                className="dashbords flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-[#8B1F1F] transition-colors whitespace-nowrap"
               >
                 <LayoutDashboard className="w-3.5 h-3.5" />
                 Dashboard
