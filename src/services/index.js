@@ -5,7 +5,7 @@
  *   const { suggestions } = await services.iq.suggestReplies({ transcript });
  *
  * Each service auto-selects a live AWS-backed adapter when configured (see
- * `config.js` / `isConfigured`), otherwise a mock/Base44 fallback that works
+ * `config.js` / `isConfigured`), otherwise a local mock fallback that works
  * with no AWS provisioning. This is the seam the NeonNow parity features build on.
  */
 import { config, isConfigured, hasBackend } from './config';

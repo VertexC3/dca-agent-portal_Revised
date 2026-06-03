@@ -1,14 +1,14 @@
 /**
  * IQService — agent assist, summarisation, wrap-up notes, and risk detection.
- * Uses Amazon Bedrock (via backend) when configured; otherwise Base44 InvokeLLM,
- * which works today with no AWS provisioning.
+ * Uses Amazon Bedrock (via the AWS backend) when configured; otherwise a local
+ * dependency-free mock adapter for dev/tests.
  */
 import { isConfigured } from '../config';
-import { createBase44IqAdapter } from './base44Adapter';
+import { createMockIqAdapter } from './mockAdapter';
 import { createApiIqAdapter } from './apiAdapter';
 
-export function createIqService({ forceBase44 = false } = {}) {
-  return !forceBase44 && isConfigured.iq() ? createApiIqAdapter() : createBase44IqAdapter();
+export function createIqService({ forceMock = false } = {}) {
+  return !forceMock && isConfigured.iq() ? createApiIqAdapter() : createMockIqAdapter();
 }
 
 export default createIqService;

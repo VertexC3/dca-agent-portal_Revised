@@ -50,7 +50,7 @@ export const config = {
 /** Is the server-side backend reachable? Gates all live AWS adapters. */
 export const hasBackend = () => Boolean(config.apiBaseUrl);
 
-/** Per-service readiness checks — used to pick live vs mock/Base44 adapters. */
+/** Per-service readiness checks — used to pick live AWS vs local mock adapters. */
 export const isConfigured = {
   // CCP can run client-side without our backend, so only needs the CCP URL.
   telephony: () => Boolean(config.connect.ccpUrl),

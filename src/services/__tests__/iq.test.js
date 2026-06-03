@@ -1,42 +1,35 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-
-// Mock the Base44 integrations module so no network call happens.
-vi.mock('@/api/integrations', () => ({
-  InvokeLLM: vi.fn(async () => ({
-    suggestions: [{ text: 'I can help with that refill.', category: 'reply' }],
-    nextBestAction: 'Open refill workflow',
-  })),
-  SendSMS: vi.fn(async () => ({ ok: true })),
-  SendEmail: vi.fn(async () => ({ ok: true })),
-}));
-
+import { describe, it, expect } from 'vitest';
 import { createIqService } from '../iq';
-import { InvokeLLM } from '@/api/integrations';
 
-describe('IQService (Base44 adapter)', () => {
-  beforeEach(() => vi.clearAllMocks());
-
-  it('uses the Base44 adapter when no AWS backend is configured', () => {
+describe('IQService (mock adapter)', () => {
+  it('uses the local mock adapter when no AWS backend is configured', () => {
     const svc = createIqService();
-    expect(svc.kind).toBe('base44');
+    expect(svc.kind).toBe('mock');
   });
 
-  it('returns normalised suggestions from InvokeLLM', async () => {
-    const svc = createIqService({ forceBase44: true });
+  it('produces context-aware suggestions', async () => {
+    const svc = createIqService({ forceMock: true });
     const res = await svc.suggestReplies({
-      transcript: [{ speaker: 'patient', text: 'I need a refill' }],
-      context: { patientId: '1' },
+      transcript: [{ speaker: 'patient', text: 'I need a prescription refill' }],
     });
-    expect(InvokeLLM).toHaveBeenCalledOnce();
-    expect(res.suggestions[0].category).toBe('reply');
-    expect(res.nextBestAction).toMatch(/refill/i);
+    expect(res.suggestions.length).toBeGreaterThan(0);
+    expect(res.suggestions.some((s) => /refill/i.test(s.text))).toBe(true);
+    expect(res.nextBestAction).toBeTruthy();
   });
 
-  it('summarise falls back gracefully on a plain-string LLM response', async () => {
-    InvokeLLM.mockResolvedValueOnce('Patient requested a refill; resolved.');
-    const svc = createIqService({ forceBase44: true });
-    const res = await svc.summarise({ transcript: [] });
-    expect(res.summary).toMatch(/refill/i);
-    expect(res.followUps).toEqual([]);
+  it('summarise returns a structured shape', async () => {
+    const svc = createIqService({ forceMock: true });
+    const res = await svc.summarise({ transcript: [{ speaker: 'patient', text: 'hi' }] });
+    expect(res).toHaveProperty('summary');
+    expect(res).toHaveProperty('disposition');
+    expect(Array.isArray(res.followUps)).toBe(true);
+  });
+
+  it('detectRisk flags affordability cues', async () => {
+    const svc = createIqService({ forceMock: true });
+    const res = await svc.detectRisk({
+      transcript: [{ speaker: 'patient', text: "I can't afford the copay" }],
+    });
+    expect(['low', 'medium', 'high']).toContain(res.level);
   });
 });

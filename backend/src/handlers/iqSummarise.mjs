@@ -1,7 +1,7 @@
 /**
  * IQ handler — Amazon Bedrock (Claude) for agent assist, summarisation, and
  * risk detection. Routed from API Gateway: POST /iq/summarise | /iq/suggest | /iq/risk.
- * Mirrors the frontend Base44 IQ adapter so the two are drop-in interchangeable.
+ * Mirrors the frontend IQ service interface so adapters are drop-in interchangeable.
  */
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 

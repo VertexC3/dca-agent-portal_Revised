@@ -1,6 +1,6 @@
 /**
  * IQ adapter backed by Amazon Bedrock via the AWS backend (API Gateway + Lambda).
- * Same interface as the Base44 adapter so callers are unaffected by the switch.
+ * Same interface as the mock adapter so callers are unaffected by the switch.
  * Backend handlers live in /backend/src/handlers/iq*.mjs.
  */
 import { apiFetch } from '../apiClient';
