@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   AlertTriangle, CheckCircle2, Zap, Search, BookOpen,
   Phone, Mail, Send, RefreshCw, UserPlus, FileText,
@@ -91,6 +92,47 @@ function padMessages(msgs, patient) {
 export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflow }) {
   const [kbSearch, setKbSearch] = useState('');
   const [kbExpanded, setKbExpanded] = useState(false);
+  const [messagesExpanded, setMessagesExpanded] = useState(true);
+
+  const handleKbToggle = useCallback((expand) => {
+    const next = typeof expand === 'boolean' ? expand : !kbExpanded;
+    setKbExpanded(next);
+    setMessagesExpanded(!next);
+  }, [kbExpanded]);
+
+  const panelScrollRef = useRef(null);
+  const kbSectionRef = useRef(null);
+
+  useEffect(() => {
+    setKbExpanded(false);
+    setMessagesExpanded(true);
+    setKbSearch('');
+  }, [patient?.id]);
+
+  useEffect(() => {
+    const panel = panelScrollRef.current;
+    if (!panel) return undefined;
+
+    if (!kbExpanded) {
+      panel.scrollTop = 0;
+      return undefined;
+    }
+
+    const scrollKbToTop = () => {
+      const kb = kbSectionRef.current;
+      if (!kb) return;
+      panel.scrollTop = 0;
+      const top = kb.offsetTop - panel.offsetTop;
+      if (top > 2) {
+        panel.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      }
+    };
+
+    scrollKbToTop();
+    const t = window.setTimeout(scrollKbToTop, 320);
+    return () => clearTimeout(t);
+  }, [kbExpanded]);
+
   const [expandedMsgId, setExpandedMsgId] = useState(null);
   const [sortBy, setSortBy] = useState('latest');
   const [showSortMenu, setShowSortMenu] = useState(false);
@@ -274,7 +316,7 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
             value={kbSearch} onChange={e => setKbSearch(e.target.value)} />
         </div>
       </div>
-      <div className="divide-y divide-gray-100 max-h-48 overflow-y-auto">
+      <div className={`divide-y divide-gray-100 ${kbExpanded ? 'min-h-0' : 'max-h-48 overflow-y-auto'}`}>
         {filteredKb.map(a => (
           <button key={a.id}
             className="w-full text-left p-2.5 hover:bg-red-50 transition-colors text-xs text-gray-700 hover:text-[#8B1F1F] flex items-center justify-between group">
@@ -303,59 +345,114 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
         </span>
       </button>
 
-      <div className="flex flex-col gap-3 overflow-y-auto h-full p-3">
-
-        {/* Patient Messages */}
-        {!floats.priority && (
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-            {/* Custom header with sort dropdown */}
-            <div className="px-3 py-2 bg-[#8B1F1F] text-white flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <ArrowUpCircle className="w-3.5 h-3.5" />
-                <h3 className="font-bold text-xs uppercase tracking-wider">Patient Messages</h3>
-                {patient && <Badge className="bg-white text-[#8B1F1F] text-xs px-1.5 font-bold ml-1">{allMessages.length}</Badge>}
-              </div>
-              <div className="flex items-center gap-1.5">
-                {/* Sort dropdown */}
-                <div className="relative">
-                  <button
-                    onClick={() => setShowSortMenu(v => !v)}
-                    className="flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white text-xs font-semibold px-2 py-0.5 rounded transition-colors"
-                  >
-                    {currentSortLabel} <ChevronDown className="w-3 h-3" />
-                  </button>
-                  {showSortMenu && (
-                    <>
-                      <div className="fixed inset-0 z-40" onClick={() => setShowSortMenu(false)} />
-                      <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-lg shadow-xl w-44 overflow-hidden">
-                        {SORT_OPTIONS.map(opt => (
-                          <button
-                            key={opt.key}
-                            onClick={() => { setSortBy(opt.key); setShowSortMenu(false); }}
-                            className={`w-full text-left px-3 py-2 text-xs hover:bg-red-50 transition-colors ${sortBy === opt.key ? 'text-[#8B1F1F] font-bold bg-red-50' : 'text-gray-700'}`}
-                          >
-                            {opt.label}
-                          </button>
-                        ))}
+      <div
+        ref={panelScrollRef}
+        className={`flex flex-col h-full p-3 scroll-smooth bg-gray-50/50 ${
+          kbExpanded ? 'overflow-hidden gap-0' : 'overflow-y-auto gap-3'
+        }`}
+      >
+        {/* Patient Messages — full view when KB is collapsed */}
+        {!floats.priority && !kbExpanded && (
+          <div className="flex-shrink-0">
+            <div
+              className="grid transition-[grid-template-rows] duration-300 ease-in-out"
+              style={{ gridTemplateRows: messagesExpanded ? '1fr' : '0fr' }}
+            >
+              <div className="overflow-hidden min-h-0">
+                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                  <div className="px-3 py-2 bg-[#8B1F1F] text-white flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <ArrowUpCircle className="w-3.5 h-3.5" />
+                      <h3 className="font-bold text-xs uppercase tracking-wider">Patient Messages</h3>
+                      {patient && <Badge className="bg-white text-[#8B1F1F] text-xs px-1.5 font-bold ml-1">{allMessages.length}</Badge>}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="relative">
+                        <button
+                          onClick={() => setShowSortMenu(v => !v)}
+                          className="flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white text-xs font-semibold px-2 py-0.5 rounded transition-colors"
+                        >
+                          {currentSortLabel} <ChevronDown className="w-3 h-3" />
+                        </button>
+                        {showSortMenu && (
+                          <>
+                            <div className="fixed inset-0 z-40" onClick={() => setShowSortMenu(false)} />
+                            <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-lg shadow-xl w-44 overflow-hidden">
+                              {SORT_OPTIONS.map(opt => (
+                                <button
+                                  key={opt.key}
+                                  onClick={() => { setSortBy(opt.key); setShowSortMenu(false); }}
+                                  className={`w-full text-left px-3 py-2 text-xs hover:bg-red-50 transition-colors ${sortBy === opt.key ? 'text-[#8B1F1F] font-bold bg-red-50' : 'text-gray-700'}`}
+                                >
+                                  {opt.label}
+                                </button>
+                              ))}
+                            </div>
+                          </>
+                        )}
                       </div>
-                    </>
-                  )}
+                      <button
+                        type="button"
+                        onClick={() => handleKbToggle(true)}
+                        className="p-0.5 rounded hover:bg-white/20 transition-colors"
+                        title="Collapse to focus on Knowledge Base"
+                        aria-label="Collapse patient messages"
+                      >
+                        <ChevronUp className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => popOut('priority')}
+                        className="p-0.5 rounded hover:bg-white/20 transition-colors"
+                        title="Pop out"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+                  <PriorityContent />
                 </div>
-                <button
-                  onClick={() => popOut('priority')}
-                  className="p-0.5 rounded hover:bg-white/20 transition-colors"
-                  title="Pop out"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                </button>
               </div>
             </div>
-            <PriorityContent />
           </div>
+        )}
+
+        {/* Compact Patient Messages — pinned above KB when KB is expanded */}
+        {!floats.priority && kbExpanded && (
+          <AnimatePresence initial={false}>
+            <motion.div
+              key="messages-compact"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+              className="flex-shrink-0 overflow-hidden z-20 bg-gray-50/50 pb-3"
+            >
+              <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                <div className="px-3 py-2 bg-[#8B1F1F] text-white flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <ArrowUpCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                    <h3 className="font-bold text-xs uppercase tracking-wider truncate">Patient Messages</h3>
+                    {patient && (
+                      <Badge className="bg-white text-[#8B1F1F] text-xs px-1.5 font-bold flex-shrink-0">{allMessages.length}</Badge>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => { setMessagesExpanded(true); setKbExpanded(false); }}
+                    className="p-1 rounded hover:bg-white/20 transition-colors flex-shrink-0"
+                    title="Expand patient messages"
+                    aria-label="Expand patient messages"
+                  >
+                    <ChevronDown className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
         )}
         {floats.priority && (
           <>
-            <div className="bg-white border border-dashed border-gray-300 rounded-lg p-3 text-center text-xs text-gray-400">
+            <div className="bg-white border border-dashed border-gray-300 rounded-lg p-3 text-center text-xs text-gray-400 flex-shrink-0">
               Patient Messages — popped out
             </div>
             <FloatingWidget title="Patient Messages" onClose={() => popIn('priority')} defaultPos={{ x: 80, y: 120 }}>
@@ -394,13 +491,27 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
         )}
         <style>{`@keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
 
-        {/* Knowledge Base */}
+        {/* Knowledge Base — slides up and fills panel when opened */}
         {!floats.kb && (
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-            <div className="px-3 py-2 bg-[#8B1F1F] text-white flex items-center justify-between">
+          <motion.div
+            ref={kbSectionRef}
+            key={kbExpanded ? 'kb-expanded' : 'kb-collapsed'}
+            initial={kbExpanded ? { y: 28, opacity: 0.92 } : { y: 0, opacity: 1 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 34 }}
+            className={`bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm flex flex-col min-h-0 ${
+              kbExpanded ? 'flex-1' : 'flex-shrink-0'
+            }`}
+          >
+            <div
+              className={`px-3 py-2 bg-[#8B1F1F] text-white flex items-center justify-between flex-shrink-0 ${
+                kbExpanded ? 'sticky top-0 z-10 shadow-sm' : ''
+              }`}
+            >
               <button
-                className="flex items-center gap-1.5 flex-1"
-                onClick={() => setKbExpanded(!kbExpanded)}
+                type="button"
+                className="flex items-center gap-1.5 flex-1 text-left"
+                onClick={() => handleKbToggle()}
               >
                 <BookOpen className="w-3.5 h-3.5" />
                 <h3 className="font-bold text-xs uppercase tracking-wider">Knowledge Base</h3>
@@ -410,13 +521,26 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
                 <ExternalLink className="w-3 h-3" />
               </button>
             </div>
-            {kbExpanded ? <KbContent /> : (
-              <button className="w-full text-center p-2 text-xs text-[#8B1F1F] hover:bg-red-50 transition-colors font-semibold"
-                onClick={() => setKbExpanded(true)}>
+            <div
+              className="grid transition-[grid-template-rows] duration-300 ease-in-out min-h-0 flex-1"
+              style={{ gridTemplateRows: kbExpanded ? '1fr' : '0fr' }}
+            >
+              <div className="overflow-hidden min-h-0 flex flex-col">
+                <div className="flex-1 min-h-0 overflow-y-auto">
+                  <KbContent />
+                </div>
+              </div>
+            </div>
+            {!kbExpanded && (
+              <button
+                type="button"
+                className="w-full text-center p-2 text-xs text-[#8B1F1F] hover:bg-red-50 transition-colors font-semibold flex-shrink-0"
+                onClick={() => handleKbToggle(true)}
+              >
                 Browse {kbArticles.length} articles →
               </button>
             )}
-          </div>
+          </motion.div>
         )}
         {floats.kb && (
           <>
