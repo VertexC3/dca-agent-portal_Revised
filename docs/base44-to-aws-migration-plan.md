@@ -39,13 +39,16 @@ introduced for NeonNow parity. **This is a plan only — execute on approval.**
 - ✅ Frontend `src/services/data`: `DataService` seam — `apiAdapter` (DynamoDB
   via backend) + `mockAdapter` (seeded from existing app data) behind
   `isConfigured.data()`. Interface: `list/get/create/update/remove`.
-- ✅ Reference cutover: `AgentDashboard` now reads patients via the new
-  `usePatients()` hook instead of importing `mockPatients` directly.
-- ✅ Tests: `src/services/__tests__/data.test.js` (5 cases).
-- ⏳ Remaining: migrate the other direct `mockPatients` consumers
-  (`AgentPortal`, `FacilityPatients`, `OrderSearchBar`, `InteractionContext`)
-  behind `usePatients`/`DataService`; model nested collections
-  (prescriptions/orders/invoices) and seed-load DynamoDB.
+- ✅ Consumer cutover: ALL shared `mockPatients` consumers now read via the
+  `usePatients()` hook / `DataService` — `AgentDashboard`, `AgentPortal`,
+  `OrderSearchBar`, `InteractionContext`. The only remaining direct imports are
+  the mock adapter's seed and one unit test (both intentional).
+- ✅ Tests: `src/services/__tests__/data.test.js` (5 cases); full suite 42 pass.
+- ⏳ Remaining: deploy backend + seed-load DynamoDB from `mockPatients`; model
+  nested collections (prescriptions/orders/invoices) as their own
+  collections instead of nested arrays; add the API-adapter integration test
+  against a live/local DynamoDB. (`FacilityPatients` uses its own inline
+  dataset, not the shared one — migrate when that page is reworked.)
 - IAM: `dynamodb:GetItem,PutItem,Query,UpdateItem,DeleteItem,Scan` on the table
   ARN (covered by `DynamoDBCrudPolicy`).
 

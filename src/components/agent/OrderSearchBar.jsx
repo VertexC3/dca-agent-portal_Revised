@@ -1,12 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Search, X, Package } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { mockPatients } from '../../data/mockPatients';
+import { usePatients } from '@/hooks/usePatients';
 import { format } from 'date-fns';
 
-function buildOrderIndex() {
+function buildOrderIndex(patients) {
   const results = [];
-  for (const patient of mockPatients) {
+  for (const patient of patients) {
     for (const order of patient.orders) {
       results.push({ patient, order });
     }
@@ -14,20 +14,17 @@ function buildOrderIndex() {
   return results;
 }
 
-let ALL_ORDERS = null;
-function getOrderIndex() {
-  if (!ALL_ORDERS) ALL_ORDERS = buildOrderIndex();
-  return ALL_ORDERS;
-}
-
 export default function OrderSearchBar({ onSelectPatient }) {
+  const { patients } = usePatients();
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const inputRef = useRef(null);
   const containerRef = useRef(null);
 
+  const orderIndex = useMemo(() => buildOrderIndex(patients), [patients]);
+
   const q = query.trim().toLowerCase();
-  const matches = q.length < 2 ? [] : getOrderIndex().filter(({ patient, order }) =>
+  const matches = q.length < 2 ? [] : orderIndex.filter(({ patient, order }) =>
     order.id.toLowerCase().includes(q) ||
     order.tracking.toLowerCase().includes(q) ||
     order.receipt.toLowerCase().includes(q) ||

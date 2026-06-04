@@ -12,7 +12,7 @@ import CoachMarks from '../components/agent/CoachMarks';
 import PrescriptionRefillWorkflow from '../components/agent/workflows/PrescriptionRefillWorkflow';
 import ShipmentUpdateWorkflow from '../components/agent/workflows/ShipmentUpdateWorkflow';
 import PaymentWorkflow from '../components/agent/workflows/PaymentWorkflow';
-import { mockPatients } from '../data/mockPatients';
+import { usePatients } from '@/hooks/usePatients';
 import { InteractionProvider, useInteraction } from '../components/agent/interaction/InteractionContext';
 import SimulateInteractionMenu from '../components/agent/interaction/SimulateInteractionMenu';
 import TaskQueueRail from '../components/agent/interaction/TaskQueueRail';
@@ -126,6 +126,7 @@ function PatientWorkspace({
   rightPanelVisible, setRightPanelVisible, MIN, MAX
 }) {
   const { interaction } = useInteraction();
+  const { patients } = usePatients();
   const [floatingOpen, setFloatingOpen] = React.useState(false);
 
   // Interaction Console width: default 560px, can be dragged closed by up to 10% (down to 504px).
@@ -224,7 +225,7 @@ function PatientWorkspace({
                   <AgentWorkspaceTabs
                     patient={selectedPatient}
                     onSwitchPatient={(member) => {
-                      const found = mockPatients.find(p => p.email === member.email);
+                      const found = patients.find(p => p.email === member.email);
                       if (found) setSelectedPatient(found);
                     }}
                     onStartWorkflow={(workflow, data) => {
@@ -312,7 +313,7 @@ function PatientWorkspace({
                   <AgentWorkspaceTabs
                     patient={selectedPatient}
                     onSwitchPatient={(member) => {
-                      const found = mockPatients.find(p => p.email === member.email);
+                      const found = patients.find(p => p.email === member.email);
                       if (found) setSelectedPatient(found);
                     }}
                     onStartWorkflow={(workflow, data) => {
@@ -344,6 +345,7 @@ function PatientWorkspace({
 }
 
 export default function AgentPortal() {
+  const { patients } = usePatients();
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [middleW, setMiddleW] = useState(700);
   const [showMessageBox, setShowMessageBox] = useState(true);
@@ -386,14 +388,14 @@ export default function AgentPortal() {
           )}
           <label className="text-xs font-bold text-gray-700 uppercase tracking-wide whitespace-nowrap">Select Patient:</label>
           <Select value={selectedPatient?.id || ''} onValueChange={(id) => {
-            const patient = mockPatients.find(p => p.id === id);
+            const patient = patients.find(p => p.id === id);
             setSelectedPatient(patient || null);
           }}>
             <SelectTrigger className="w-72">
               <SelectValue placeholder="Choose a patient..." />
             </SelectTrigger>
             <SelectContent>
-              {mockPatients.map(p => (
+              {patients.map(p => (
                 <SelectItem key={p.id} value={p.id}>
                   <span className="font-semibold">{p.name}</span> • {p.email}
                 </SelectItem>

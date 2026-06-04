@@ -2,7 +2,7 @@ import React, { createContext, useContext, useReducer, useMemo, useRef, useCallb
 import { reducer, initialState } from './interactionReducer';
 import { createRunner } from './demoRunner';
 import { scenarios } from './scenarios';
-import { mockPatients } from '@/data/mockPatients';
+import { usePatients } from '@/hooks/usePatients';
 
 const InteractionContext = createContext(null);
 
@@ -10,6 +10,7 @@ let intxIdCounter = 0;
 const newIntxId = () => `intx_${++intxIdCounter}_${Date.now()}`;
 
 export function InteractionProvider({ patient, onCommunicationsAppended, children }) {
+  const { patients } = usePatients();
   const [state, dispatch] = useReducer(reducer, initialState);
   const runnerRef = useRef(null);
 
@@ -29,7 +30,7 @@ export function InteractionProvider({ patient, onCommunicationsAppended, childre
   const startInteraction = useCallback((scenarioId, overridePatient) => {
     const scenario = scenarios[scenarioId];
     if (!scenario) return;
-    const p = overridePatient || mockPatients.find(mp => mp.id === scenario.patientId) || patient;
+    const p = overridePatient || patients.find(mp => mp.id === scenario.patientId) || patient;
     const id = newIntxId();
     const startedAt = Date.now();
     dispatch({ type: 'START_INTERACTION', payload: {
@@ -38,7 +39,7 @@ export function InteractionProvider({ patient, onCommunicationsAppended, childre
       startedAt,
     }});
     runnerRef.current.start(scenario);
-  }, [patient]);
+  }, [patient, patients]);
 
   const hangup = useCallback(() => {
     dispatch({ type: 'HANGUP', payload: { endedAt: Date.now() } });
