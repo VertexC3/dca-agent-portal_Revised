@@ -138,7 +138,7 @@ export default function AgentPortal() {
     <div className="flex flex-col h-full min-h-0 bg-gray-50">
       {/* Top Bar: Patient Selection + Order Search */}
       <div className="px-3 sm:px-4 py-3 bg-white border-b border-gray-200 shadow-sm flex-shrink-0">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-4">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 min-w-0 flex-1">
             {selectedPatient && (
               <button
@@ -154,7 +154,7 @@ export default function AgentPortal() {
               const patient = mockPatients.find(p => p.id === id);
               setSelectedPatient(patient || null);
             }}>
-              <SelectTrigger className="w-full sm:w-72">
+              <SelectTrigger className="w-full sm:flex-1 sm:max-w-72 min-w-0">
                 <SelectValue placeholder="Choose a patient..." />
               </SelectTrigger>
               <SelectContent>
@@ -166,7 +166,7 @@ export default function AgentPortal() {
               </SelectContent>
             </Select>
           </div>
-          <div className="flex flex-wrap items-center gap-2 md:gap-4 md:ml-auto">
+          <div className="flex flex-wrap items-center gap-2 w-full min-w-0 lg:w-auto lg:gap-4 lg:ml-auto">
             <OrderSearchBar onSelectPatient={setSelectedPatient} />
             {selectedPatient && isMobile && (
               <button
