@@ -160,6 +160,12 @@ export default function AgentPortal() {
     ? 'flex-shrink-0'
     : 'flex-1 min-w-0 w-full';
 
+  const isDesktopLayout = !isMobile && !isTablet && !activeWorkflow;
+  const showPanelSplit = isDesktopLayout && rightPanelVisible;
+
+  const splitPanelStyle = showPanelSplit ? panelWidthStyle : undefined;
+  const splitPanelClass = showPanelSplit ? panelWidthClass : 'flex-1 min-w-0 w-full';
+
   const renderWorkspace = () => (
     <AgentWorkspaceTabs
       patient={selectedPatient}
@@ -317,10 +323,16 @@ export default function AgentPortal() {
               </>
             ) : !panelSwapped ? (
               <>
-                <div style={panelWidthStyle} className={`${panelWidthClass} overflow-hidden flex flex-col border-r border-gray-200`}>
+                <div
+                  data-coach="workspace-tabs"
+                  style={splitPanelStyle}
+                  className={`${splitPanelClass} overflow-hidden flex flex-col${showPanelSplit ? ' border-r border-gray-200' : ''}`}
+                >
                   {renderWorkspace()}
                 </div>
-                <ResizeDivider onDrag={dragMiddle} onSwap={() => setPanelSwapped(v => !v)} />
+                {showPanelSplit && (
+                  <ResizeDivider onDrag={dragMiddle} onSwap={() => setPanelSwapped(v => !v)} />
+                )}
                 {rightPanelVisible && (
                   <div data-coach="right-panel" className="flex-1 min-w-0 overflow-hidden flex flex-col">
                     <RightPanelVisibilityToggle
@@ -341,7 +353,11 @@ export default function AgentPortal() {
             ) : (
               <>
                 {rightPanelVisible && (
-                  <div data-coach="right-panel" style={panelWidthStyle} className={`${panelWidthClass} overflow-hidden flex flex-col border-r border-gray-200`}>
+                  <div
+                    data-coach="right-panel"
+                    style={splitPanelStyle}
+                    className={`${splitPanelClass} overflow-hidden flex flex-col border-r border-gray-200`}
+                  >
                     <RightPanelVisibilityToggle
                       visible
                       onHide={() => setRightPanelVisible(false)}
@@ -356,7 +372,9 @@ export default function AgentPortal() {
                     floatingCorner="left"
                   />
                 )}
-                <ResizeDivider onDrag={dragMiddle} onSwap={() => setPanelSwapped(v => !v)} />
+                {showPanelSplit && (
+                  <ResizeDivider onDrag={dragMiddle} onSwap={() => setPanelSwapped(v => !v)} />
+                )}
                 <div data-coach="workspace-tabs" className="flex-1 min-w-0 overflow-hidden flex flex-col">
                   {renderWorkspace()}
                 </div>
