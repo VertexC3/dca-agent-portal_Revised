@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import DraggablePanelGrid from './DraggablePanelGrid';
 import { Input } from '@/components/ui/input';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { format } from 'date-fns';
 import OrderDetailModal from './OrderDetailModal';
 import PhysicianContextPopup from './PhysicianContextPopup';
@@ -133,8 +134,9 @@ function InlineEdit({ value, onSave, className = '' }) {
 }
 
 export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWorkflow }) {
+  const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState('overview');
-  const [headerExpanded, setHeaderExpanded] = useState(true);
+  const [headerExpanded, setHeaderExpanded] = useState(false);
   const [newNote, setNewNote] = useState('');
   const [editedAllergies, setEditedAllergies] = useState(patient?.allergies || '');
   const [editedPrimaryAddress, setEditedPrimaryAddress] = useState(patient?.primary_address || '');
@@ -144,17 +146,19 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWo
 
   const handleTabSelect = useCallback((tabId) => {
     setActiveTab(tabId);
-    setHeaderExpanded(tabId === 'overview');
-  }, []);
+    if (!isMobile) {
+      setHeaderExpanded(tabId === 'overview');
+    }
+  }, [isMobile]);
 
   React.useEffect(() => {
     setActiveTab('overview');
-    setHeaderExpanded(true);
+    setHeaderExpanded(!isMobile);
     setEditedAllergies(patient?.allergies || '');
     setEditedPrimaryAddress(patient?.primary_address || '');
     setEditedShippingAddress(patient?.shipping_address || '');
     setEditedPhysician(patient ? { name: patient.physician, npi: patient.physician_npi, phone: patient.physician_phone } : null);
-  }, [patient?.id]);
+  }, [patient?.id, isMobile]);
 
   if (!patient) {
     return (
@@ -168,7 +172,7 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWo
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm min-w-0">
+    <div className="flex-1 flex flex-col min-h-0 bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm min-w-0">
       {showPhysicianPicker && (
         <PhysicianPickerModal
           currentPhysician={editedPhysician?.name || patient.physician}
@@ -176,8 +180,8 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWo
           onClose={() => setShowPhysicianPicker(false)}
         />
       )}
-      {/* Sticky header: collapsible patient profile + tabs */}
-      <div className="flex-shrink-0 sticky top-0 z-10 bg-white shadow-sm">
+      {/* Patient profile (scrolls on mobile); tab bar stays sticky */}
+      <div className="flex-shrink-0 bg-white">
         <AnimatePresence initial={false}>
           {!headerExpanded && (
             <motion.div
@@ -224,7 +228,7 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWo
           className="grid transition-[grid-template-rows] duration-300 ease-in-out"
           style={{ gridTemplateRows: headerExpanded ? '1fr' : '0fr' }}
         >
-          <div className="overflow-hidden min-h-0">
+          <div className={`overflow-hidden min-h-0${isMobile && headerExpanded ? ' max-h-[42vh] overflow-y-auto' : ''}`}>
             <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">
@@ -331,8 +335,8 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWo
           </div>
         </div>
 
-        {/* Tab Bar */}
-        <div className="flex border-b border-gray-200 bg-gray-50 overflow-x-auto">
+        {/* Tab Bar — sticky so Overview/Rx/etc. stay visible on small screens */}
+        <div className="sticky top-0 z-10 flex border-b border-gray-200 bg-gray-50 overflow-x-auto shadow-sm">
           {TABS.map(tab => {
             const Icon = tab.icon;
             const count = tab.id === 'prescriptions' ? patient.prescriptions.length
@@ -363,7 +367,7 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWo
       </div>
 
       {/* Tab Content */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 min-h-0 overflow-y-auto p-4 overscroll-contain">
         {activeTab === 'overview' && <OverviewTab patient={patient} editedPhysician={editedPhysician} onChangePhysician={() => setShowPhysicianPicker(true)} onSwitchTab={handleTabSelect} />}
         {activeTab === 'prescriptions' && <PrescriptionsTab patient={patient} />}
         {activeTab === 'orders' && <OrdersTab patient={patient} />}
@@ -563,7 +567,7 @@ function OverviewTab({ patient, editedPhysician, onChangePhysician, onSwitchTab 
 
   // Build draggable panels
   const StatsPanel = (
-    <div className="grid grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
       {[
         { key: 'rx',        label: 'Active Rx',     value: patient.prescriptions.length, color: 'blue' },
         { key: 'orders',    label: 'Orders',         value: patient.orders.length,        color: 'gray' },
