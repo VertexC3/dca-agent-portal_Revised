@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   LayoutDashboard, Pill, ShoppingCart, MessageSquare, CreditCard,
   RefreshCw, Phone, Mail, Send, AlertTriangle, Bot, ExternalLink, Clock, IdCard, ChevronRight, CheckCircle2,
-  Pencil, Check, X, StickyNote, Truck, GripVertical, Plus, ChevronUp, ChevronDown, List, Zap
+  Pencil, Check, X, StickyNote, Truck, GripVertical, Plus, ChevronUp, ChevronDown, List, Zap, ScrollText
 } from 'lucide-react';
 import DraggablePanelGrid from './DraggablePanelGrid';
 import { Input } from '@/components/ui/input';
@@ -20,6 +20,7 @@ import AgentEngagementLog from './AgentEngagementLog';
 import KBSuggestions from './KBSuggestions';
 import QuickActionMacros from './QuickActionMacros';
 import CommunicationDetailModal from './CommunicationDetailModal';
+import RxScriptDialog from '../prescription/RxScriptDialog';
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -300,6 +301,7 @@ function StatCardModal({ stat, patient, onClose, onGoToOrders }) {
   const unpaid = patient.invoices.filter(i => i.status !== 'paid');
   const lowRefills = patient.prescriptions.filter(p => p.refills <= 1);
   const [selectedRx, setSelectedRx] = React.useState([]);
+  const [scriptRx, setScriptRx] = React.useState(null);
 
   const addToCart = (rx) => {
     setSelectedRx(prev => prev.includes(rx.id) ? prev.filter(id => id !== rx.id) : [...prev, rx.id]);
@@ -339,6 +341,13 @@ function StatCardModal({ stat, patient, onClose, onGoToOrders }) {
                     <span className="col-span-2">Prescriber: <strong>{rx.prescriber}</strong></span>
                   </div>
                 </div>
+                <button
+                  onClick={() => setScriptRx(rx)}
+                  className="p-1.5 rounded hover:bg-red-50 transition-colors flex-shrink-0"
+                  title="View doctor's script"
+                >
+                  <ScrollText className="w-4 h-4 text-[#8B1F1F]" />
+                </button>
                 {isSelected && (
                   <button className="p-1.5 rounded hover:bg-blue-200 transition-colors flex-shrink-0" title="Add to cart">
                     <ShoppingCart className="w-4 h-4 text-blue-600" />
@@ -456,6 +465,13 @@ function StatCardModal({ stat, patient, onClose, onGoToOrders }) {
           </div>
         )}
       </div>
+
+      <RxScriptDialog
+        open={!!scriptRx}
+        onClose={() => setScriptRx(null)}
+        prescription={scriptRx}
+        patient={patient}
+      />
     </div>
   );
 }
@@ -717,6 +733,7 @@ function OverviewTab({ patient, editedPhysician, onChangePhysician, onSwitchTab 
 
 function PrescriptionsTab({ patient }) {
   const [filter, setFilter] = useState('active');
+  const [scriptRx, setScriptRx] = useState(null);
 
   // Mock: treat prescriptions with 0 refills as inactive, rest as active
   const activePrescriptions = patient.prescriptions.filter(rx => rx.refills > 0);
@@ -773,13 +790,22 @@ function PrescriptionsTab({ patient }) {
               </div>
             </div>
             <div className="flex flex-col items-end gap-2 flex-shrink-0">
-              <Badge className={
-                rx.refills === 0 ? 'bg-red-100 text-red-800' :
-                rx.refills <= 1 ? 'bg-yellow-100 text-yellow-800' :
-                'bg-green-100 text-green-800'
-              }>
-                {rx.refills} refill{rx.refills !== 1 ? 's' : ''} left
-              </Badge>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setScriptRx(rx)}
+                  title="View doctor's script"
+                  className="p-1.5 rounded border border-gray-200 hover:bg-red-50 transition-colors"
+                >
+                  <ScrollText className="w-4 h-4 text-[#8B1F1F]" />
+                </button>
+                <Badge className={
+                  rx.refills === 0 ? 'bg-red-100 text-red-800' :
+                  rx.refills <= 1 ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-green-100 text-green-800'
+                }>
+                  {rx.refills} refill{rx.refills !== 1 ? 's' : ''} left
+                </Badge>
+              </div>
               {filter === 'active' && (
                 <Button size="sm" className="h-7 text-xs bg-[#8B1F1F] hover:bg-[#721919] px-3">
                   <RefreshCw className="w-3 h-3 mr-1" />
@@ -790,6 +816,13 @@ function PrescriptionsTab({ patient }) {
           </div>
         </div>
       ))}
+
+      <RxScriptDialog
+        open={!!scriptRx}
+        onClose={() => setScriptRx(null)}
+        prescription={scriptRx}
+        patient={patient}
+      />
     </div>
   );
 }

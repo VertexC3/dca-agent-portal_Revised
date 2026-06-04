@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pill, Calendar, Package, Truck, MoreVertical, RefreshCw, CreditCard, FileText, Play, History, BookOpen, StopCircle, ChevronDown, Download, Receipt, ExternalLink, CheckCircle, ShoppingCart } from 'lucide-react';
+import { Pill, Calendar, Package, Truck, MoreVertical, RefreshCw, CreditCard, FileText, Play, History, BookOpen, StopCircle, ChevronDown, Download, Receipt, ExternalLink, CheckCircle, ShoppingCart, ScrollText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,6 +18,7 @@ import MedicalGuideDialog from './MedicalGuideDialog';
 import RefillRequestDialog from './RefillRequestDialog';
 import PrescriberProfileDialog from './PrescriberProfileDialog';
 import PrescriptionPaymentDialog from './PrescriptionPaymentDialog';
+import RxScriptDialog from '../prescription/RxScriptDialog';
 import { format } from 'date-fns';
 
 const statusConfig = {
@@ -44,6 +45,7 @@ export default function PrescriptionCard({ prescription }) {
   const [showRenewalConfirm, setShowRenewalConfirm] = useState(false);
   const [renewalMessage, setRenewalMessage] = useState(null);
   const [showCancelRefill, setShowCancelRefill] = useState(false);
+  const [showScript, setShowScript] = useState(false);
   const { addToCart, removeFromCart, isInCart, isSubmitted, removeFromSubmitted } = useCart();
   
   const inCart = isInCart(prescription.id);
@@ -101,6 +103,15 @@ export default function PrescriptionCard({ prescription }) {
               >
                 {prescription.status}
               </Badge>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 w-8 p-0 border-gray-300 hover:bg-red-50"
+                title="View doctor's script"
+                onClick={(e) => { e.stopPropagation(); setShowScript(true); }}
+              >
+                <ScrollText className="w-4 h-4 text-[#8B1F1F]" />
+              </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="gap-2 text-xs h-8">
@@ -259,6 +270,12 @@ export default function PrescriptionCard({ prescription }) {
           )}
         </CardContent>
       </Card>
+
+      <RxScriptDialog
+        open={showScript}
+        onClose={() => setShowScript(false)}
+        prescription={prescription}
+      />
 
       <VideoExplainerDialog
         open={showVideo}
