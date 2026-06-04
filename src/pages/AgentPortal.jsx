@@ -51,17 +51,60 @@ function ResizeDivider({ onDrag, onSwap }) {
     >
       {/* Vertical line */}
       <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-gray-200 group-hover:bg-[#8B1F1F]/30 transition-colors" />
-      {/* Swap button — positioned near top */}
-      <button
-        data-coach="swap-button"
-        onMouseDown={e => e.stopPropagation()}
-        onClick={onSwap}
-        title="Swap panels"
-        style={{ top: '80px' }}
-        className="absolute z-10 w-6 h-6 rounded-full bg-white border border-gray-300 shadow-sm flex items-center justify-center hover:bg-[#8B1F1F] hover:border-[#8B1F1F] hover:text-white text-gray-500 transition-all duration-200 hover:scale-[2]"
+      {/* Swap button — positioned near top with always-visible label */}
+      <div
+        className="absolute z-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5 pointer-events-none"
+        style={{ top: '68px' }}
       >
-        <ArrowLeftRight className="w-3 h-3" />
+        <button
+          data-coach="swap-button"
+          onMouseDown={e => e.stopPropagation()}
+          onClick={onSwap}
+          aria-label="Swap panels"
+          className="pointer-events-auto w-6 h-6 rounded-full bg-white border border-gray-300 shadow-sm flex items-center justify-center hover:bg-[#8B1F1F] hover:border-[#8B1F1F] hover:text-white text-gray-500 transition-all duration-200 hover:scale-[2]"
+        >
+          <ArrowLeftRight className="w-3 h-3" />
+        </button>
+        <span className="whitespace-nowrap rounded-md bg-gray-800 px-1.5 py-0.5 text-[9px] font-medium leading-tight text-white shadow-sm">
+          Swap panels
+        </span>
+      </div>
+    </div>
+  );
+}
+
+const actionLabelClass =
+  'whitespace-nowrap rounded-md bg-gray-800 px-1.5 py-0.5 text-[9px] font-medium leading-tight text-white shadow-sm';
+
+function RightPanelVisibilityToggle({ visible, onHide, onShow, floatingCorner = 'right' }) {
+  if (visible) {
+    return (
+      <div className="flex justify-end items-center gap-1.5 px-2 py-1 border-b border-gray-100 bg-white flex-shrink-0">
+        <span className={actionLabelClass}>Hide panel</span>
+        <button
+          onClick={onHide}
+          aria-label="Hide right panel"
+          className="p-2 rounded-lg bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
+        >
+          <EyeOff className="w-4 h-4 text-gray-600" />
+        </button>
+      </div>
+    );
+  }
+
+  const cornerClass = floatingCorner === 'left' ? 'top-2 left-2' : 'top-2 right-2';
+  const alignClass = floatingCorner === 'left' ? 'items-start' : 'items-end';
+
+  return (
+    <div className={`absolute ${cornerClass} z-40 flex flex-col ${alignClass} gap-0.5`}>
+      <button
+        onClick={onShow}
+        aria-label="Show right panel"
+        className="p-2 rounded-lg bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
+      >
+        <Eye className="w-4 h-4 text-gray-600" />
       </button>
+      <span className={actionLabelClass}>Show panel</span>
     </div>
   );
 }
@@ -280,56 +323,38 @@ export default function AgentPortal() {
                 <ResizeDivider onDrag={dragMiddle} onSwap={() => setPanelSwapped(v => !v)} />
                 {rightPanelVisible && (
                   <div data-coach="right-panel" className="flex-1 min-w-0 overflow-hidden flex flex-col">
-                    <div className="flex justify-end px-2 py-1 border-b border-gray-100 bg-white flex-shrink-0">
-                      <button
-                        onClick={() => setRightPanelVisible(false)}
-                        className="p-2 rounded-lg bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
-                        title="Hide right panel"
-                      >
-                        <EyeOff className="w-4 h-4 text-gray-600" />
-                      </button>
-                    </div>
+                    <RightPanelVisibilityToggle
+                      visible
+                      onHide={() => setRightPanelVisible(false)}
+                    />
                     {renderRightPanel()}
                   </div>
                 )}
                 {!rightPanelVisible && (
-                  <div className="absolute top-2 right-2 z-40">
-                    <button
-                      onClick={() => setRightPanelVisible(true)}
-                      className="p-2 rounded-lg bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
-                      title="Show right panel"
-                    >
-                      <Eye className="w-4 h-4 text-gray-600" />
-                    </button>
-                  </div>
+                  <RightPanelVisibilityToggle
+                    visible={false}
+                    onShow={() => setRightPanelVisible(true)}
+                    floatingCorner="right"
+                  />
                 )}
               </>
             ) : (
               <>
                 {rightPanelVisible && (
                   <div data-coach="right-panel" style={panelWidthStyle} className={`${panelWidthClass} overflow-hidden flex flex-col border-r border-gray-200`}>
-                    <div className="flex justify-end px-2 py-1 border-b border-gray-100 bg-white flex-shrink-0">
-                      <button
-                        onClick={() => setRightPanelVisible(false)}
-                        className="p-2 rounded-lg bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
-                        title="Hide right panel"
-                      >
-                        <EyeOff className="w-4 h-4 text-gray-600" />
-                      </button>
-                    </div>
+                    <RightPanelVisibilityToggle
+                      visible
+                      onHide={() => setRightPanelVisible(false)}
+                    />
                     {renderRightPanel()}
                   </div>
                 )}
                 {!rightPanelVisible && (
-                  <div className="absolute top-2 left-2 z-40">
-                    <button
-                      onClick={() => setRightPanelVisible(true)}
-                      className="p-2 rounded-lg bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
-                      title="Show right panel"
-                    >
-                      <Eye className="w-4 h-4 text-gray-600" />
-                    </button>
-                  </div>
+                  <RightPanelVisibilityToggle
+                    visible={false}
+                    onShow={() => setRightPanelVisible(true)}
+                    floatingCorner="left"
+                  />
                 )}
                 <ResizeDivider onDrag={dragMiddle} onSwap={() => setPanelSwapped(v => !v)} />
                 <div data-coach="workspace-tabs" className="flex-1 min-w-0 overflow-hidden flex flex-col">
