@@ -11,6 +11,7 @@
 import { config, isConfigured, hasBackend } from './config';
 import { setAuthTokenProvider } from './apiClient';
 import { createTelephonyService } from './telephony';
+import { createDataService } from './data';
 import { createIqService } from './iq';
 import { createOutreachService } from './outreach';
 import { createReportingService } from './reporting';
@@ -23,6 +24,7 @@ export function getServices() {
   if (!_services) {
     _services = {
       telephony: createTelephonyService(),
+      data: createDataService(),
       iq: createIqService(),
       outreach: createOutreachService(),
       reporting: createReportingService(),

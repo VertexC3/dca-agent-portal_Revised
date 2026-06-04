@@ -75,7 +75,48 @@ Resources:
           Type: HttpApi
           Properties: { ApiId: !Ref Api, Path: /iq/risk, Method: POST }
 
+  # ── Data layer (DynamoDB) — M1 of the Base44→AWS migration ─────────
+  AppDataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - { AttributeName: collection, AttributeType: S }
+        - { AttributeName: id, AttributeType: S }
+      KeySchema:
+        - { AttributeName: collection, KeyType: HASH }
+        - { AttributeName: id, KeyType: RANGE }
+
+  DataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/dataCrud.handler
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref AppDataTable
+      Policies:
+        - DynamoDBCrudPolicy: { TableName: !Ref AppDataTable }
+      Events:
+        List:
+          Type: HttpApi
+          Properties: { ApiId: !Ref Api, Path: /data/{collection}, Method: GET }
+        Create:
+          Type: HttpApi
+          Properties: { ApiId: !Ref Api, Path: /data/{collection}, Method: POST }
+        GetOne:
+          Type: HttpApi
+          Properties: { ApiId: !Ref Api, Path: /data/{collection}/{id}, Method: GET }
+        Update:
+          Type: HttpApi
+          Properties: { ApiId: !Ref Api, Path: /data/{collection}/{id}, Method: PUT }
+        Delete:
+          Type: HttpApi
+          Properties: { ApiId: !Ref Api, Path: /data/{collection}/{id}, Method: DELETE }
+
 Outputs:
   ApiBaseUrl:
     Description: Set this as VITE_API_BASE_URL in the frontend
     Value: !Sub 'https://${Api}.execute-api.${AWS::Region}.amazonaws.com'
+  DataTableName:
+    Description: DynamoDB table backing the data layer
+    Value: !Ref AppDataTable

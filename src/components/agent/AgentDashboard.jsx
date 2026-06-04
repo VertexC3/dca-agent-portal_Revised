@@ -3,18 +3,18 @@ import { AlertTriangle, Package, CreditCard, Clock, ChevronRight, CheckCircle2, 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { format, differenceInDays } from 'date-fns';
-import { mockPatients } from '../../data/mockPatients';
+import { usePatients } from '@/hooks/usePatients';
 
-// ─── Derive priority data from mock patients ───────────────────────────────
+// ─── Derive priority data from patients ────────────────────────────────────
 
-function buildDashboardData() {
+function buildDashboardData(patients) {
   const pendingExceptions = [];
   const overdueShipments = [];
   const unprocessedPayments = [];
 
   const today = new Date();
 
-  for (const patient of mockPatients) {
+  for (const patient of patients) {
     // Pending exceptions: orders with no tracking or stuck in Processing
     for (const order of patient.orders) {
       if (order.tracking === 'Pending' || order.status === 'Processing') {
@@ -187,7 +187,8 @@ function SectionPanel({ title, icon: Icon, iconColor, emptyText, children, count
 // ─── Main Dashboard ────────────────────────────────────────────────────────
 
 export default function AgentDashboard({ onSelectPatient }) {
-  const { pendingExceptions, overdueShipments, unprocessedPayments } = buildDashboardData();
+  const { patients } = usePatients();
+  const { pendingExceptions, overdueShipments, unprocessedPayments } = buildDashboardData(patients);
   const [activeSection, setActiveSection] = useState(null);
 
   const totalUrgent = pendingExceptions.length + overdueShipments.length + unprocessedPayments.length;
@@ -212,7 +213,7 @@ export default function AgentDashboard({ onSelectPatient }) {
               ? <span className="text-red-600 font-semibold">{totalUrgent} urgent item{totalUrgent !== 1 ? 's' : ''} need attention</span>
               : <span className="text-green-600 font-semibold">All clear — no urgent items</span>
             }
-            <span className="text-gray-400 ml-2">· {mockPatients.length} patients · {mockPatients.reduce((a, p) => a + p.orders.length, 0)} total orders</span>
+            <span className="text-gray-400 ml-2">· {patients.length} patients · {patients.reduce((a, p) => a + p.orders.length, 0)} total orders</span>
           </p>
         </div>
         <div className="flex items-center gap-2 text-xs text-gray-400">
@@ -284,10 +285,10 @@ export default function AgentDashboard({ onSelectPatient }) {
         <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100 bg-gray-50">
           <Users className="w-4 h-4 text-gray-500" />
           <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wide">All Patients</h3>
-          <span className="ml-auto text-xs font-bold text-gray-500 bg-gray-200 rounded-full px-2 py-0.5">{mockPatients.length}</span>
+          <span className="ml-auto text-xs font-bold text-gray-500 bg-gray-200 rounded-full px-2 py-0.5">{patients.length}</span>
         </div>
         <div className="divide-y divide-gray-100">
-          {mockPatients.map(patient => {
+          {patients.map(patient => {
             const openInvCount = patient.invoices?.filter(i => i.status !== 'paid').length || 0;
             const lowRx = patient.prescriptions.filter(r => r.refills <= 1).length;
             return (

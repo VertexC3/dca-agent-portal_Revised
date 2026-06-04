@@ -32,13 +32,22 @@ introduced for NeonNow parity. **This is a plan only — execute on approval.**
 - Add regression tests around auth gate, a representative data read/write, and
   each integration call. Snapshot current behaviour before cutover.
 
-### M1 — Data layer (3–5 days)
-- Backend: DynamoDB table(s) + `/data/{collection}` CRUD Lambdas (extend SAM).
-- Frontend: `src/services/data` adapter (live API + local mock) mirroring the
-  `base44.entities.Query` surface the app uses.
-- Migrate callers off `@/api/entities` collection-by-collection behind the
-  service layer. App still boots on Base44 auth meanwhile.
-- IAM: `dynamodb:GetItem,PutItem,Query,UpdateItem,DeleteItem` on the table ARN.
+### M1 — Data layer (3–5 days) — 🟢 STARTED
+- ✅ Backend: DynamoDB table (`AppDataTable`, PK `collection` / SK `id`) +
+  generic `/data/{collection}[/{id}]` CRUD Lambda (`dataCrud.mjs`) in SAM, with
+  `DynamoDBCrudPolicy`.
+- ✅ Frontend `src/services/data`: `DataService` seam — `apiAdapter` (DynamoDB
+  via backend) + `mockAdapter` (seeded from existing app data) behind
+  `isConfigured.data()`. Interface: `list/get/create/update/remove`.
+- ✅ Reference cutover: `AgentDashboard` now reads patients via the new
+  `usePatients()` hook instead of importing `mockPatients` directly.
+- ✅ Tests: `src/services/__tests__/data.test.js` (5 cases).
+- ⏳ Remaining: migrate the other direct `mockPatients` consumers
+  (`AgentPortal`, `FacilityPatients`, `OrderSearchBar`, `InteractionContext`)
+  behind `usePatients`/`DataService`; model nested collections
+  (prescriptions/orders/invoices) and seed-load DynamoDB.
+- IAM: `dynamodb:GetItem,PutItem,Query,UpdateItem,DeleteItem,Scan` on the table
+  ARN (covered by `DynamoDBCrudPolicy`).
 
 ### M2 — Integrations cutover (2–3 days)
 - Backend Lambdas: SES email, SNS SMS, S3 presigned upload, Bedrock image,

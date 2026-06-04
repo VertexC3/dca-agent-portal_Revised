@@ -54,6 +54,7 @@ export const hasBackend = () => Boolean(config.apiBaseUrl);
 export const isConfigured = {
   // CCP can run client-side without our backend, so only needs the CCP URL.
   telephony: () => Boolean(config.connect.ccpUrl),
+  data: () => hasBackend(),
   iq: () => hasBackend() && Boolean(config.bedrock.modelId),
   intent: () => hasBackend() && Boolean(config.lex.botId && config.lex.botAliasId),
   outreach: () => hasBackend() && Boolean(config.pinpoint.projectId),
