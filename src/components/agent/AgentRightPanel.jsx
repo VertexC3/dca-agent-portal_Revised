@@ -189,17 +189,31 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
           const Icon = CHANNEL_ICON[msg.type] || MessageSquare;
           const isExpanded = expandedMsgId === msg.id;
           return (
-            <div key={msg.id} className="border-b border-gray-100 last:border-0">
+            <div
+              key={msg.id}
+              className={
+                isExpanded
+                  ? 'mx-2 my-1.5 rounded-lg border border-[#8B1F1F]/20 bg-red-50/30 shadow-sm overflow-hidden'
+                  : 'border-b border-gray-100 last:border-0'
+              }
+            >
               <button
                 onClick={() => setExpandedMsgId(isExpanded ? null : msg.id)}
-                className="w-full text-left flex items-start gap-2 p-2.5 hover:bg-red-50/50 transition-colors group"
+                className={`w-full text-left flex items-start gap-2 p-2.5 transition-colors group ${
+                  isExpanded ? 'bg-red-50/50' : 'hover:bg-red-50/50'
+                }`}
+                aria-expanded={isExpanded}
               >
                 <span className={`mt-0.5 flex-shrink-0 flex items-center justify-center w-5 h-5 rounded-full ${CHANNEL_COLOR[msg.type] || 'bg-gray-100 text-gray-500'}`}>
                   <Icon className="w-3 h-3" />
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-gray-900 group-hover:text-[#8B1F1F] transition-colors truncate">{msg.subject}</p>
-                  <p className="text-xs text-gray-500 leading-snug mt-0.5 truncate">{msg.summary}</p>
+                  <p className={`text-xs font-semibold transition-colors truncate ${isExpanded ? 'text-[#8B1F1F]' : 'text-gray-900 group-hover:text-[#8B1F1F]'}`}>
+                    {msg.subject}
+                  </p>
+                  <p className={`text-xs text-gray-500 leading-snug mt-0.5 ${isExpanded ? '' : 'truncate'}`}>
+                    {msg.summary}
+                  </p>
                   <div className="flex items-center gap-1.5 mt-0.5 text-xs text-gray-400">
                     <span className="font-medium">{CHANNEL_LABEL[msg.type] || msg.type}</span>
                     <span>·</span>
@@ -207,24 +221,26 @@ export default function AgentRightPanel({ patient, onOpenMessage, onStartWorkflo
                     <span className="flex items-center gap-0.5 ml-auto">
                       <Clock className="w-2.5 h-2.5" />{msg.date}
                     </span>
-                    <ChevronDown className={`w-3 h-3 ml-1 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-3 h-3 ml-1 transition-transform duration-200 ${isExpanded ? 'rotate-180 text-[#8B1F1F]' : ''}`} />
                   </div>
                 </div>
               </button>
               {isExpanded && (
-                <div className="bg-gray-50 border-t border-gray-100 px-3 py-3 text-xs text-gray-700 space-y-2">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-semibold ${CHANNEL_COLOR[msg.type] || 'bg-gray-100 text-gray-500'}`}>
-                      <Icon className="w-3 h-3" />{CHANNEL_LABEL[msg.type] || msg.type}
-                    </span>
-                    {msg.medication && (
-                      <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">{msg.medication}</span>
-                    )}
-                  </div>
-                  <p className="text-gray-800 leading-relaxed">{msg.summary}</p>
-                  <div className="flex items-center justify-between text-gray-400">
-                    <span>Handled by: <strong className="text-gray-600">{msg.agent}</strong></span>
-                    <span>{msg.date}</span>
+                <div className="px-2.5 pb-2.5 pt-0">
+                  <div className="ml-7 pl-3 border-l-2 border-[#8B1F1F]/25 bg-white/80 rounded-r-md px-3 py-2.5 text-xs text-gray-700 space-y-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-semibold ${CHANNEL_COLOR[msg.type] || 'bg-gray-100 text-gray-500'}`}>
+                        <Icon className="w-3 h-3" />{CHANNEL_LABEL[msg.type] || msg.type}
+                      </span>
+                      {msg.medication && (
+                        <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">{msg.medication}</span>
+                      )}
+                    </div>
+                    <p className="text-gray-800 leading-relaxed">{msg.summary}</p>
+                    <div className="flex items-center justify-between text-gray-400 pt-0.5 border-t border-gray-100">
+                      <span>Handled by: <strong className="text-gray-600">{msg.agent}</strong></span>
+                      <span>{msg.date}</span>
+                    </div>
                   </div>
                 </div>
               )}
