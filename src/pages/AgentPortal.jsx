@@ -255,10 +255,6 @@ function PatientWorkspace({
 
   return (
     <>
-      <div className={`absolute z-30 ${isMobile ? 'top-2 right-2' : 'top-[78px] right-4'}`}>
-        <SimulateInteractionMenu />
-      </div>
-
       <div className="flex gap-0 flex-1 min-h-0 overflow-hidden relative">
         {interaction && !isMobile && (
           <>
@@ -409,6 +405,59 @@ function PatientWorkspace({
   );
 }
 
+function AgentToolbar({
+  selectedPatient,
+  setSelectedPatient,
+  isMobile,
+  showMessageBox,
+  setShowMessageBox,
+  setMobilePanel,
+  showSimulate,
+}) {
+  return (
+    <div className="px-3 sm:px-4 py-3 bg-white border-b border-gray-200 shadow-sm flex-shrink-0">
+      <div className="flex items-center gap-2 sm:gap-3">
+        {selectedPatient && (
+          <button
+            onClick={() => setSelectedPatient(null)}
+            className="flex items-center gap-1.5 h-9 text-xs font-semibold text-gray-500 hover:text-[#8B1F1F] transition-colors whitespace-nowrap flex-shrink-0"
+          >
+            <LayoutDashboard className="w-3.5 h-3.5" />
+            Dashboard
+          </button>
+        )}
+        <OrderSearchBar onSelectPatient={setSelectedPatient} />
+        {selectedPatient && (
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {isMobile && (
+              <button
+                onClick={() => setMobilePanel('details')}
+                className="flex items-center gap-1.5 h-9 text-xs font-semibold px-3 rounded-lg border bg-white text-gray-600 border-gray-200 hover:border-[#8B1F1F] hover:text-[#8B1F1F] transition-all"
+              >
+                <PanelRight className="w-3.5 h-3.5" />
+                Details
+              </button>
+            )}
+            <button
+              onClick={() => setShowMessageBox(v => !v)}
+              className={`flex items-center gap-1.5 h-9 text-xs font-semibold px-3 rounded-lg border transition-all ${
+                showMessageBox
+                  ? 'bg-[#8B1F1F] text-white border-[#8B1F1F]'
+                  : 'bg-white text-gray-600 border-gray-200 hover:border-[#8B1F1F] hover:text-[#8B1F1F]'
+              }`}
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{showMessageBox ? 'Hide Messages' : 'Messages'}</span>
+              <span className="sm:hidden">{showMessageBox ? 'Hide' : 'Msg'}</span>
+            </button>
+            {showSimulate && <SimulateInteractionMenu />}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function AgentPortal() {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [middleW, setMiddleW] = useState(700);
@@ -441,74 +490,47 @@ export default function AgentPortal() {
     }
   }, [selectedPatient]);
 
+  const toolbarProps = {
+    selectedPatient,
+    setSelectedPatient,
+    isMobile,
+    showMessageBox,
+    setShowMessageBox,
+    setMobilePanel,
+  };
+
   return (
     <div className="flex flex-col h-full min-h-0 bg-gray-50">
-      <div className="px-3 sm:px-4 py-3 bg-white border-b border-gray-200 shadow-sm flex-shrink-0">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3">
-          {selectedPatient && (
-            <button
-              onClick={() => setSelectedPatient(null)}
-              className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-[#8B1F1F] transition-colors whitespace-nowrap flex-shrink-0"
-            >
-              <LayoutDashboard className="w-3.5 h-3.5" />
-              Dashboard
-            </button>
-          )}
-          <div className="flex flex-wrap items-center gap-2 w-full min-w-0 flex-1 sm:gap-3">
-            <OrderSearchBar onSelectPatient={setSelectedPatient} />
-            {selectedPatient && isMobile && (
-              <button
-                onClick={() => setMobilePanel('details')}
-                className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border bg-white text-gray-600 border-gray-200 hover:border-[#8B1F1F] hover:text-[#8B1F1F] transition-all"
-              >
-                <PanelRight className="w-3.5 h-3.5" />
-                Details
-              </button>
-            )}
-            {selectedPatient && (
-              <button
-                onClick={() => setShowMessageBox(v => !v)}
-                className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
-                  showMessageBox
-                    ? 'bg-[#8B1F1F] text-white border-[#8B1F1F]'
-                    : 'bg-white text-gray-600 border-gray-200 hover:border-[#8B1F1F] hover:text-[#8B1F1F]'
-                }`}
-              >
-                <MessageSquare className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{showMessageBox ? 'Hide Messages' : 'Messages'}</span>
-                <span className="sm:hidden">{showMessageBox ? 'Hide' : 'Msg'}</span>
-              </button>
-            )}
-          </div>
-        </div>
-        {selectedPatient && isMobile && !activeWorkflow && (
-          <div className="flex gap-1 mt-3 border-t border-gray-100 pt-3">
-            {[
-              { key: 'workspace', label: 'Workspace' },
-              { key: 'details', label: 'Patient Details' },
-            ].map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => setMobilePanel(key)}
-                className={`flex-1 text-xs font-semibold py-2 rounded-lg border transition-all ${
-                  mobilePanel === key
-                    ? 'bg-[#8B1F1F] text-white border-[#8B1F1F]'
-                    : 'bg-white text-gray-600 border-gray-200'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
       {!selectedPatient ? (
-        <div className="flex-1 min-h-0 overflow-hidden">
-          <AgentDashboard onSelectPatient={setSelectedPatient} />
-        </div>
+        <>
+          <AgentToolbar {...toolbarProps} showSimulate={false} />
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <AgentDashboard onSelectPatient={setSelectedPatient} />
+          </div>
+        </>
       ) : (
         <InteractionProvider patient={selectedPatient}>
+          <AgentToolbar {...toolbarProps} showSimulate />
+          {isMobile && !activeWorkflow && (
+            <div className="flex gap-1 px-3 sm:px-4 py-2 bg-white border-b border-gray-100">
+              {[
+                { key: 'workspace', label: 'Workspace' },
+                { key: 'details', label: 'Patient Details' },
+              ].map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => setMobilePanel(key)}
+                  className={`flex-1 text-xs font-semibold py-2 rounded-lg border transition-all ${
+                    mobilePanel === key
+                      ? 'bg-[#8B1F1F] text-white border-[#8B1F1F]'
+                      : 'bg-white text-gray-600 border-gray-200'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
           <PatientWorkspace
             selectedPatient={selectedPatient}
             setSelectedPatient={setSelectedPatient}

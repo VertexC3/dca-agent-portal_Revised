@@ -12,7 +12,7 @@ export default function SimulateInteractionMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border bg-white text-gray-600 border-gray-200 hover:border-[#8B1F1F] hover:text-[#8B1F1F] transition-all"
+        className="flex items-center gap-1.5 h-9 text-xs font-semibold px-3 rounded-lg border bg-white text-gray-600 border-gray-200 hover:border-[#8B1F1F] hover:text-[#8B1F1F] transition-all"
       >
         <Phone className="w-3.5 h-3.5" /> Simulate
       </DropdownMenuTrigger>
