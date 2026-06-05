@@ -127,7 +127,7 @@ function ConsoleDragHandle({ onDrag, atMin, atMax }) {
 const actionLabelClass =
   'whitespace-nowrap rounded-md bg-gray-800 px-1.5 py-0.5 text-[9px] font-medium leading-tight text-white shadow-sm';
 
-function RightPanelVisibilityToggle({ visible, onHide, onShow, floatingCorner = 'right' }) {
+function RightPanelVisibilityToggle({ visible, onHide, onShow, edge = 'right' }) {
   if (visible) {
     return (
       <div className="flex justify-end items-center gap-1.5 px-2 py-1 border-b border-gray-100 bg-white flex-shrink-0">
@@ -143,14 +143,14 @@ function RightPanelVisibilityToggle({ visible, onHide, onShow, floatingCorner = 
     );
   }
 
-  const cornerClass = floatingCorner === 'left' ? 'top-2 left-2' : 'top-2 right-2';
-  const alignClass = floatingCorner === 'left' ? 'items-start' : 'items-end';
+  const borderClass = edge === 'left' ? 'border-r' : 'border-l';
 
   return (
-    <div className={`absolute ${cornerClass} z-40 flex flex-col ${alignClass} gap-0.5`}>
+    <div className={`flex-shrink-0 flex flex-col items-center gap-0.5 pt-2 px-1.5 ${borderClass} border-gray-200 bg-gray-50/90 self-stretch`}>
       <button
         onClick={onShow}
         aria-label="Show right panel"
+        title="Show panel"
         className="p-2 rounded-lg bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
       >
         <Eye className="w-4 h-4 text-gray-600" />
@@ -342,7 +342,7 @@ function PatientWorkspace({
               <RightPanelVisibilityToggle
                 visible={false}
                 onShow={() => setRightPanelVisible(true)}
-                floatingCorner="right"
+                edge="right"
               />
             )}
           </>
@@ -365,7 +365,7 @@ function PatientWorkspace({
               <RightPanelVisibilityToggle
                 visible={false}
                 onShow={() => setRightPanelVisible(true)}
-                floatingCorner="left"
+                edge="left"
               />
             )}
             {showPanelSplit && (
