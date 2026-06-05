@@ -8,7 +8,6 @@ import { scenarioList } from './scenarios';
 
 export default function SimulateInteractionMenu() {
   const { actions, interaction } = useInteraction();
-  if (!import.meta.env.DEV) return null;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
