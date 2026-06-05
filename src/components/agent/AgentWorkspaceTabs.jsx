@@ -148,7 +148,7 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWo
   const handleTabSelect = useCallback((tabId) => {
     setActiveTab(tabId);
     if (!isMobile) {
-      setHeaderExpanded(tabId === 'overview');
+      setHeaderExpanded(false);
     }
   }, [isMobile]);
 
