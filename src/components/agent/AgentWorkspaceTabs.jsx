@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -133,7 +135,9 @@ function InlineEdit({ value, onSave, className = '' }) {
 }
 
 export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWorkflow }) {
+  const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState('overview');
+  const [headerExpanded, setHeaderExpanded] = useState(false);
   const [newNote, setNewNote] = useState('');
   const [editedAllergies, setEditedAllergies] = useState(patient?.allergies || '');
   const [editedPrimaryAddress, setEditedPrimaryAddress] = useState(patient?.primary_address || '');
@@ -141,12 +145,21 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWo
   const [editedPhysician, setEditedPhysician] = useState(patient ? { name: patient.physician, npi: patient.physician_npi, phone: patient.physician_phone } : null);
   const [showPhysicianPicker, setShowPhysicianPicker] = useState(false);
 
+  const handleTabSelect = useCallback((tabId) => {
+    setActiveTab(tabId);
+    if (!isMobile) {
+      setHeaderExpanded(tabId === 'overview');
+    }
+  }, [isMobile]);
+
   React.useEffect(() => {
+    setActiveTab('overview');
+    setHeaderExpanded(!isMobile);
     setEditedAllergies(patient?.allergies || '');
     setEditedPrimaryAddress(patient?.primary_address || '');
     setEditedShippingAddress(patient?.shipping_address || '');
     setEditedPhysician(patient ? { name: patient.physician, npi: patient.physician_npi, phone: patient.physician_phone } : null);
-  }, [patient?.id]);
+  }, [patient?.id, isMobile]);
 
   if (!patient) {
     return (
@@ -160,7 +173,7 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWo
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm min-w-0">
+    <div className="flex-1 flex flex-col min-h-0 bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm min-w-0">
       {showPhysicianPicker && (
         <PhysicianPickerModal
           currentPhysician={editedPhysician?.name || patient.physician}
@@ -168,95 +181,161 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWo
           onClose={() => setShowPhysicianPicker(false)}
         />
       )}
-      {/* Patient Profile Card */}
-      <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-        <div className="flex items-start gap-4">
-          {/* Profile Picture */}
-          <div className="flex-shrink-0">
-            {patient.profile_picture ? (
-              <img 
-                src={patient.profile_picture} 
-                alt={patient.name}
-                className="w-16 h-16 rounded-lg object-cover border-2 border-white shadow-sm"
-              />
-            ) : (
-              <div className="w-16 h-16 rounded-lg bg-[#8B1F1F] flex items-center justify-center text-white font-bold text-lg border-2 border-white shadow-sm">
-                {patient.name?.charAt(0) || 'P'}
-              </div>
-            )}
-          </div>
-          
-          {/* Patient Info Grid */}
-          <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-bold text-gray-900">{patient.name}</h2>
-            <p className="text-xs text-gray-500 mt-0.5">ID: {patient.id}</p>
-            
-            <div className="grid grid-cols-3 gap-3 mt-2 text-xs">
-               <div>
-                 <p className="text-gray-500">DOB</p>
-                 <p className="font-semibold text-gray-800">{format(new Date(patient.dob), 'MM/dd/yyyy')}</p>
-               </div>
-               <div>
-                 <p className="text-gray-500">Phone</p>
-                 <p className="font-semibold text-gray-800">{patient.phone}</p>
-               </div>
-               <div>
-                 <p className="text-gray-500">Email</p>
-                 <p className="font-semibold text-gray-800 truncate">{patient.email}</p>
-               </div>
-             </div>
-
-             <div className="grid grid-cols-2 gap-4 mt-2 text-xs border-t border-gray-200 pt-2">
-               <div>
-                 <p className="text-gray-500 mb-1">Primary Address</p>
-                 <p className="font-semibold text-gray-800 mb-1">123 Main Street</p>
-                 <AddressField address={editedPrimaryAddress} onChange={setEditedPrimaryAddress} />
-               </div>
-               <div>
-                 <p className="text-gray-500 mb-1">Shipping Address</p>
-                 <p className="font-semibold text-gray-800 mb-1">123 Main Street</p>
-                 <AddressField address={editedShippingAddress} onChange={setEditedShippingAddress} />
-               </div>
-             </div>
-
-            <div className="grid grid-cols-3 gap-3 mt-2 text-xs border-t border-gray-200 pt-2">
-              <div>
-                <p className="text-gray-500">Physician</p>
+      <div className="flex-shrink-0 bg-white">
+        <AnimatePresence initial={false}>
+          {!headerExpanded && (
+            <motion.div
+              key="patient-compact"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+              className="overflow-hidden border-b border-gray-200"
+            >
+              <div className="px-4 py-2 bg-gradient-to-r from-gray-50 to-gray-100 flex items-center gap-3">
+                <div className="flex-shrink-0">
+                  {patient.profile_picture ? (
+                    <img
+                      src={patient.profile_picture}
+                      alt={patient.name}
+                      className="w-9 h-9 rounded-lg object-cover border border-white shadow-sm"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-lg bg-[#8B1F1F] flex items-center justify-center text-white font-bold text-sm border border-white shadow-sm">
+                      {patient.name?.charAt(0) || 'P'}
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-sm font-bold text-gray-900 truncate">{patient.name}</h2>
+                  <p className="text-xs text-gray-500">ID: {patient.id} · {format(new Date(patient.dob), 'MM/dd/yyyy')}</p>
+                </div>
                 <button
-                  onClick={() => setShowPhysicianPicker(true)}
-                  className="flex items-center gap-1 group text-left font-semibold text-gray-800 hover:text-[#8B1F1F] transition-colors"
+                  type="button"
+                  onClick={() => setHeaderExpanded(true)}
+                  className="flex-shrink-0 p-1.5 rounded-lg text-gray-500 hover:text-[#8B1F1F] hover:bg-white/80 transition-colors"
+                  title="Expand patient details"
+                  aria-label="Expand patient details"
                 >
-                  <span>{editedPhysician?.name || patient.physician}</span>
-                  <Pencil className="w-2.5 h-2.5 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                  <ChevronDown className="w-4 h-4" />
                 </button>
               </div>
-              <div>
-                <p className="text-gray-500">Insurance</p>
-                <div className="flex items-center gap-1">
-                  <p className="font-semibold text-gray-800">{patient.insurance}</p>
-                  <InsuranceCardPopover />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div
+          className="grid transition-[grid-template-rows] duration-300 ease-in-out"
+          style={{ gridTemplateRows: headerExpanded ? '1fr' : '0fr' }}
+        >
+          <div className={`overflow-hidden min-h-0${isMobile && headerExpanded ? ' max-h-[42vh] overflow-y-auto' : ''}`}>
+            <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  {patient.profile_picture ? (
+                    <img
+                      src={patient.profile_picture}
+                      alt={patient.name}
+                      className="w-16 h-16 rounded-lg object-cover border-2 border-white shadow-sm"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-lg bg-[#8B1F1F] flex items-center justify-center text-white font-bold text-lg border-2 border-white shadow-sm">
+                      {patient.name?.charAt(0) || 'P'}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h2 className="text-lg font-bold text-gray-900">{patient.name}</h2>
+                      <p className="text-xs text-gray-500 mt-0.5">ID: {patient.id}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setHeaderExpanded(false)}
+                      className="flex-shrink-0 p-1.5 rounded-lg text-gray-400 hover:text-[#8B1F1F] hover:bg-white/80 transition-colors"
+                      title="Collapse patient details"
+                      aria-label="Collapse patient details"
+                    >
+                      <ChevronUp className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3 mt-2 text-xs">
+                    <div>
+                      <p className="text-gray-500">DOB</p>
+                      <p className="font-semibold text-gray-800">{format(new Date(patient.dob), 'MM/dd/yyyy')}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500">Phone</p>
+                      <p className="font-semibold text-gray-800">{patient.phone}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500">Email</p>
+                      <p className="font-semibold text-gray-800 truncate">{patient.email}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mt-2 text-xs border-t border-gray-200 pt-2">
+                    <div>
+                      <p className="text-gray-500 mb-1">Primary Address</p>
+                      <p className="font-semibold text-gray-800 mb-1">123 Main Street</p>
+                      <AddressField address={editedPrimaryAddress} onChange={setEditedPrimaryAddress} />
+                    </div>
+                    <div>
+                      <p className="text-gray-500 mb-1">Shipping Address</p>
+                      <p className="font-semibold text-gray-800 mb-1">123 Main Street</p>
+                      <AddressField address={editedShippingAddress} onChange={setEditedShippingAddress} />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3 mt-2 text-xs border-t border-gray-200 pt-2">
+                    <div>
+                      <p className="text-gray-500">Physician</p>
+                      <button
+                        onClick={() => setShowPhysicianPicker(true)}
+                        className="flex items-center gap-1 group text-left font-semibold text-gray-800 hover:text-[#8B1F1F] transition-colors"
+                      >
+                        <span>{editedPhysician?.name || patient.physician}</span>
+                        <Pencil className="w-2.5 h-2.5 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                      </button>
+                    </div>
+                    <div>
+                      <p className="text-gray-500">Insurance</p>
+                      <div className="flex items-center gap-1">
+                        <p className="font-semibold text-gray-800">{patient.insurance}</p>
+                        <InsuranceCardPopover />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-gray-500">Allergies</p>
+                      <InlineEdit
+                        value={editedAllergies}
+                        onSave={setEditedAllergies}
+                        className="font-semibold text-red-700 text-xs hover:text-red-500 transition-colors"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div>
-                <p className="text-gray-500">Allergies</p>
-                <InlineEdit
-                  value={editedAllergies}
-                  onSave={setEditedAllergies}
-                  className="font-semibold text-red-700 text-xs hover:text-red-500 transition-colors"
+            </div>
+
+            <div
+              className="grid transition-[grid-template-rows] duration-300 ease-in-out"
+              style={{ gridTemplateRows: headerExpanded ? '1fr' : '0fr' }}
+            >
+              <div className="overflow-hidden min-h-0">
+                <FamilyMemberBar
+                  familyMembers={patient.family_members}
+                  onSwitchPatient={onSwitchPatient}
                 />
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <FamilyMemberBar
-        familyMembers={patient.family_members}
-        onSwitchPatient={onSwitchPatient}
-      />
-
-      {/* Tab Bar */}
-      <div className="flex border-b border-gray-200 bg-gray-50 overflow-x-auto">
+        <div className="sticky top-0 z-10 flex border-b border-gray-200 bg-gray-50 overflow-x-auto shadow-sm">
         {TABS.map(tab => {
           const Icon = tab.icon;
           const count = tab.id === 'prescriptions' ? patient.prescriptions.length
@@ -266,7 +345,7 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWo
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => handleTabSelect(tab.id)}
               className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold whitespace-nowrap transition-colors border-b-2 ${
                 activeTab === tab.id
                   ? 'border-[#8B1F1F] text-[#8B1F1F] bg-white'
@@ -283,11 +362,11 @@ export default function AgentWorkspaceTabs({ patient, onSwitchPatient, onStartWo
             </button>
           );
         })}
+        </div>
       </div>
 
-      {/* Tab Content */}
-      <div className="flex-1 min-h-0 overflow-y-auto p-4">
-        {activeTab === 'overview' && <OverviewTab patient={patient} editedPhysician={editedPhysician} onChangePhysician={() => setShowPhysicianPicker(true)} onSwitchTab={setActiveTab} />}
+      <div className="flex-1 min-h-0 overflow-y-auto p-4 overscroll-contain">
+        {activeTab === 'overview' && <OverviewTab patient={patient} editedPhysician={editedPhysician} onChangePhysician={() => setShowPhysicianPicker(true)} onSwitchTab={handleTabSelect} />}
         {activeTab === 'prescriptions' && <PrescriptionsTab patient={patient} />}
         {activeTab === 'orders' && <OrdersTab patient={patient} />}
         {activeTab === 'communications' && <CommunicationsTab patient={patient} newNote={newNote} setNewNote={setNewNote} />}
