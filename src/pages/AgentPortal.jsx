@@ -1,8 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { LayoutDashboard, MessageSquare, ArrowLeftRight, Eye, EyeOff, PanelRight } from 'lucide-react';
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue
-} from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useIsMobile, useIsTablet, useIsWide } from '@/hooks/use-mobile';
 import AgentWorkspaceTabs from '../components/agent/AgentWorkspaceTabs';
@@ -413,7 +410,6 @@ function PatientWorkspace({
 }
 
 export default function AgentPortal() {
-  const { patients } = usePatients();
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [middleW, setMiddleW] = useState(700);
   const [showMessageBox, setShowMessageBox] = useState(true);
@@ -448,35 +444,17 @@ export default function AgentPortal() {
   return (
     <div className="flex flex-col h-full min-h-0 bg-gray-50">
       <div className="px-3 sm:px-4 py-3 bg-white border-b border-gray-200 shadow-sm flex-shrink-0">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-4">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 min-w-0 flex-1">
-            {selectedPatient && (
-              <button
-                onClick={() => setSelectedPatient(null)}
-                className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-[#8B1F1F] transition-colors whitespace-nowrap"
-              >
-                <LayoutDashboard className="w-3.5 h-3.5" />
-                Dashboard
-              </button>
-            )}
-            <label className="text-xs font-bold text-gray-700 uppercase tracking-wide whitespace-nowrap hidden sm:block">Select Patient:</label>
-            <Select value={selectedPatient?.id || ''} onValueChange={(id) => {
-              const patient = patients.find(p => p.id === id);
-              setSelectedPatient(patient || null);
-            }}>
-              <SelectTrigger className="w-full sm:flex-1 sm:max-w-72 min-w-0">
-                <SelectValue placeholder="Choose a patient..." />
-              </SelectTrigger>
-              <SelectContent>
-                {patients.map(p => (
-                  <SelectItem key={p.id} value={p.id}>
-                    <span className="font-semibold">{p.name}</span> • {p.email}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex flex-wrap items-center gap-2 w-full min-w-0 lg:w-auto lg:gap-4 lg:ml-auto">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3">
+          {selectedPatient && (
+            <button
+              onClick={() => setSelectedPatient(null)}
+              className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-[#8B1F1F] transition-colors whitespace-nowrap flex-shrink-0"
+            >
+              <LayoutDashboard className="w-3.5 h-3.5" />
+              Dashboard
+            </button>
+          )}
+          <div className="flex flex-wrap items-center gap-2 w-full min-w-0 flex-1 sm:gap-3">
             <OrderSearchBar onSelectPatient={setSelectedPatient} />
             {selectedPatient && isMobile && (
               <button
