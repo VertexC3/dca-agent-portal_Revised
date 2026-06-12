@@ -21,6 +21,12 @@ export const config = {
     region: str(env.VITE_AWS_REGION) || 'us-east-1',
   },
 
+  // NEONNOW embedded softphone (iframe panel in agent portal).
+  neonnow: {
+    softphoneUrl:
+      str(env.VITE_NEONNOW_SOFTPHONE_URL) || 'https://dcapharma.nvg.cw-neon.com/landing',
+  },
+
   // Amazon Connect (telephony + CCP embedded softphone).
   connect: {
     instanceArn: str(env.VITE_CONNECT_INSTANCE_ARN),
